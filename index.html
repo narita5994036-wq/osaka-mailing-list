@@ -451,6 +451,24 @@
   }
   .csv-btn:hover { background: #333; }
 
+  .csv-filter {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 9px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    background: var(--bg);
+    color: var(--black);
+    border: 0.5px solid var(--border);
+    padding: 0 10px;
+    height: 36px;
+    cursor: pointer;
+    margin-right: 8px;
+    appearance: none;
+    -webkit-appearance: none;
+    border-radius: 0;
+  }
+
   .clear-btn {
     font-family: 'Montserrat', sans-serif;
     font-size: 9px;
@@ -702,6 +720,11 @@
         <span class="count-badge" id="admin-count">0 records</span>
       </div>
       <div>
+        <select class="csv-filter" id="csv-filter">
+          <option value="all">All Opt-ins</option>
+          <option value="yes">Yes Only</option>
+          <option value="no">No Only</option>
+        </select>
         <button class="csv-btn" onclick="downloadCSV()">&#8595; Download CSV</button>
         <button class="clear-btn" onclick="clearAll()">Clear All</button>
       </div>
@@ -1107,7 +1130,11 @@ function renderAdminTable() {
 }
 
 function downloadCSV() {
-  const records = getRecords();
+  const filter = document.getElementById('csv-filter').value;
+  let records = getRecords();
+  if (filter === 'yes') records = records.filter(r => r.optin);
+  else if (filter === 'no') records = records.filter(r => !r.optin);
+
   if (records.length === 0) { alert('No records to export.'); return; }
 
   const header = ['No.', 'Timestamp', 'Name', 'Country', 'Email', 'Email Opt-in', 'Language'];
@@ -1129,7 +1156,8 @@ function downloadCSV() {
   const now = new Date();
   const dateStr = now.getFullYear() + ('0'+(now.getMonth()+1)).slice(-2) + ('0'+now.getDate()).slice(-2);
   a.href = url;
-  a.download = `mykita_warranty_${dateStr}.csv`;
+  const suffix = filter === 'yes' ? '_optin_yes' : filter === 'no' ? '_optin_no' : '';
+  a.download = `mykita_warranty${suffix}_${dateStr}.csv`;
   a.click();
   URL.revokeObjectURL(url);
 }
