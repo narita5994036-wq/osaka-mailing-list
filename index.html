@@ -992,10 +992,11 @@ function handleSubmit() {
   const record = {
     timestamp: ts,
     name: name.value.trim(),
-    country: country.value,
     email: email.value.trim(),
     optin: optinYes.checked,
-    lang: currentLang
+    country: country.value,
+    lang: currentLang,
+    memberNo: ''
   };
 
   const data = getRecords();
