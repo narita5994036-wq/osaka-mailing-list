@@ -44,7 +44,9 @@
 
   .scale-btn {
     font-family: 'Montserrat', sans-serif;
+    font-size: 10px;
     font-weight: 600;
+    letter-spacing: 0.05em;
     color: var(--light);
     background: none;
     border: none;
@@ -56,9 +58,7 @@
   }
   .scale-btn:last-child { border-right: none; }
   .scale-btn:hover { color: var(--black); }
-  .scale-btn.scale-down { font-size: 9px; }
-  .scale-btn.scale-reset { font-size: 11px; }
-  .scale-btn.scale-up { font-size: 13px; }
+  .scale-btn.scale-reset { font-weight: 700; }
 
   .lang-btn {
     font-family: 'Montserrat', sans-serif;
@@ -553,9 +553,9 @@
 <div id="customer-view">
   <div class="lang-bar">
     <div class="text-scale" role="group" aria-label="Text size">
-      <button class="scale-btn scale-down" onclick="adjustTextScale(-1)" aria-label="Decrease text size">A</button>
-      <button class="scale-btn scale-reset" onclick="adjustTextScale(0)" aria-label="Reset text size">A</button>
-      <button class="scale-btn scale-up" onclick="adjustTextScale(1)" aria-label="Increase text size">A</button>
+      <button class="scale-btn scale-down" onclick="adjustTextScale(-1)" aria-label="Decrease text size" title="Decrease text size">A−</button>
+      <button class="scale-btn scale-reset" onclick="adjustTextScale(0)" aria-label="Reset text size" title="Reset text size">A</button>
+      <button class="scale-btn scale-up" onclick="adjustTextScale(1)" aria-label="Increase text size" title="Increase text size">A+</button>
     </div>
     <div>
       <button class="lang-btn active" onclick="setLang('en')">EN</button>
