@@ -16,12 +16,17 @@ function doPost(e) {
     sheet.appendRow(headers);
   }
 
+  var country = data.country || '';
+  if (data.countryCode) {
+    country += ' (' + data.countryCode + ')';
+  }
+
   sheet.appendRow([
     data.timestamp || '',
     data.name || '',
     data.email || '',
     data.optin ? 'Yes' : 'No',
-    data.country || '',
+    country,
     (data.lang || '').toUpperCase(),
     data.memberNo || ''
   ]);
