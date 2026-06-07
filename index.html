@@ -277,28 +277,23 @@
     line-height: 1.85;
     letter-spacing: 0.03em;
   }
-  .info-box {
-    background: var(--bg2);
-    border: 0.5px solid var(--border);
-    padding: 1rem 1.25rem;
-    font-size: 10px;
-    color: var(--mid);
-    line-height: 1.85;
-    letter-spacing: 0.03em;
+  .privacy-box.no-scroll {
+    max-height: none;
+    overflow: visible;
   }
-  .info-box ul {
+  .privacy-box ul {
     list-style: none;
     margin: 0;
     padding: 0;
   }
-  .info-box li {
+  .privacy-box li {
     position: relative;
     padding-left: 1.1em;
   }
-  .info-box li:not(:last-child) {
+  .privacy-box li:not(:last-child) {
     margin-bottom: 6px;
   }
-  .info-box li::before {
+  .privacy-box li::before {
     content: '\2022';
     position: absolute;
     left: 0;
@@ -527,8 +522,8 @@
 
   <div class="main">
     <div id="form-area">
-      <p class="section-label" id="lbl-warranty-info">Warranty Information</p>
-      <div class="info-box" id="warranty-info-box" style="margin-bottom:2.5rem;">
+      <div class="privacy-box no-scroll" id="warranty-info-box" style="margin-bottom:2.5rem;">
+        <h4 id="lbl-warranty-info">Warranty Information</h4>
         <ul id="warranty-info-list">
           <li>MYKITA frames purchased at MYKITA OSAKA are covered by a 2-year manufacturer's warranty from the date of purchase.</li>
           <li>Covered: manufacturing defects in materials and workmanship, and damage caused by normal wear and tear.</li>
