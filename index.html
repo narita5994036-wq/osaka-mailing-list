@@ -334,6 +334,12 @@
     margin-top: 0.5rem;
   }
   .submit-btn:hover { background: #333; }
+  .submit-btn:disabled {
+    background: var(--border);
+    color: var(--light);
+    cursor: not-allowed;
+  }
+  .submit-btn:disabled:hover { background: var(--border); }
 
   /* thanks */
   .thanks {
@@ -540,7 +546,7 @@
       </div>
 
       <div class="field">
-        <label id="lbl-country">Country <span class="req">*</span></label>
+        <label id="lbl-country">Country</label>
         <div class="ac-wrap" id="ac-wrap">
           <input type="text" class="ac-input" id="f-country-input" autocomplete="off" placeholder="Type or select country...">
           <div class="ac-chevron"></div>
@@ -839,7 +845,7 @@ function setLang(lang) {
   document.getElementById('warranty-info-list').innerHTML = t.warrantyInfoBullets.map(b => '<li>' + escapeHtml(b) + '</li>').join('');
   document.getElementById('lbl-info').textContent = t.lblInfo;
   setLabelWithReq('lbl-name', t.lblName);
-  setLabelWithReq('lbl-country', t.lblCountry);
+  document.getElementById('lbl-country').textContent = t.lblCountry;
   setLabelWithReq('lbl-email', t.lblEmail);
   document.getElementById('lbl-pref').textContent = t.lblPref;
   document.getElementById('lbl-optin-title').textContent = t.lblOptinTitle;
@@ -881,11 +887,6 @@ function handleSubmit() {
   if (!name.value.trim()) {
     name.classList.add('err');
     show('e-name');
-    valid = false;
-  }
-  if (!country.value) {
-    countryInput.classList.add('err');
-    show('e-country');
     valid = false;
   }
   const emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -948,6 +949,7 @@ function resetForm() {
   document.getElementById('thanks-area').style.display = 'none';
   document.getElementById('form-area').style.display = 'block';
   window.scrollTo({ top: 0, behavior: 'smooth' });
+  updateSubmitState();
 }
 
 function show(id) {
@@ -1170,9 +1172,34 @@ function initAutocomplete() {
   });
 }
 
+// ── SUBMIT BUTTON STATE ──
+function updateSubmitState() {
+  const name = document.getElementById('f-name');
+  const email = document.getElementById('f-email');
+  const optinYes = document.getElementById('f-optin-yes');
+  const optinNo = document.getElementById('f-optin-no');
+  const agree = document.getElementById('f-agree');
+  const emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+  const ready = !!name.value.trim()
+    && emailRe.test(email.value.trim())
+    && (optinYes.checked || optinNo.checked)
+    && agree.checked;
+
+  document.getElementById('lbl-submit').disabled = !ready;
+}
+
+['f-name', 'f-email'].forEach(id => {
+  document.getElementById(id).addEventListener('input', updateSubmitState);
+});
+['f-optin-yes', 'f-optin-no', 'f-agree'].forEach(id => {
+  document.getElementById(id).addEventListener('change', updateSubmitState);
+});
+
 // ── INIT ──
 initAutocomplete();
 checkAdminMode();
+updateSubmitState();
 </script>
 </body>
 </html>
