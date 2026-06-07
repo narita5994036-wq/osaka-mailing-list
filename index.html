@@ -353,8 +353,21 @@
     border-radius: 50%;
     display: flex; align-items: center; justify-content: center;
     margin: 0 auto 1.5rem;
+    animation: thanksPop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) both;
   }
   .thanks-check svg { display: block; }
+  .thanks-check svg polyline {
+    stroke-dasharray: 24;
+    stroke-dashoffset: 24;
+    animation: thanksDraw 0.35s ease-out 0.3s both;
+  }
+  @keyframes thanksPop {
+    from { transform: scale(0); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+  }
+  @keyframes thanksDraw {
+    to { stroke-dashoffset: 0; }
+  }
   .thanks-title {
     font-size: 12px;
     font-weight: 600;
@@ -930,6 +943,10 @@ function handleSubmit() {
   document.getElementById('form-area').style.display = 'none';
   const ta = document.getElementById('thanks-area');
   ta.style.display = 'block';
+  const checkEl = ta.querySelector('.thanks-check');
+  checkEl.style.animation = 'none';
+  void checkEl.offsetWidth;
+  checkEl.style.animation = '';
   document.getElementById('thanks-title').textContent = t.thanksTitle;
   document.getElementById('thanks-body').innerHTML = t.thanksBody.replace(/\n/g, '<br>');
   document.getElementById('btn-done').textContent = t.lblDone;
