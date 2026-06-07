@@ -953,20 +953,42 @@ function handleSubmit() {
 }
 
 function resetForm() {
-  document.getElementById('f-name').value = '';
-  document.getElementById('f-country-input').value = '';
-  document.getElementById('f-country').value = '';
-  document.getElementById('f-email').value = '';
-  document.getElementById('f-optin-yes').checked = false;
-  document.getElementById('f-optin-no').checked = false;
-  document.getElementById('f-agree').checked = false;
-  ['f-name', 'f-country-input', 'f-email'].forEach(id => document.getElementById(id).classList.remove('err'));
-  document.querySelectorAll('.err-msg').forEach(el => el.style.display = 'none');
+  const ta = document.getElementById('thanks-area');
+  const fa = document.getElementById('form-area');
+  const FADE_MS = 450;
 
-  document.getElementById('thanks-area').style.display = 'none';
-  document.getElementById('form-area').style.display = 'block';
-  window.scrollTo({ top: 0, behavior: 'smooth' });
-  updateSubmitState();
+  ta.style.transition = `opacity ${FADE_MS}ms ease`;
+  ta.style.opacity = '0';
+
+  setTimeout(() => {
+    ta.style.display = 'none';
+    ta.style.transition = '';
+    ta.style.opacity = '';
+
+    document.getElementById('f-name').value = '';
+    document.getElementById('f-country-input').value = '';
+    document.getElementById('f-country').value = '';
+    document.getElementById('f-email').value = '';
+    document.getElementById('f-optin-yes').checked = false;
+    document.getElementById('f-optin-no').checked = false;
+    document.getElementById('f-agree').checked = false;
+    ['f-name', 'f-country-input', 'f-email'].forEach(id => document.getElementById(id).classList.remove('err'));
+    document.querySelectorAll('.err-msg').forEach(el => el.style.display = 'none');
+    updateSubmitState();
+
+    fa.style.transition = 'none';
+    fa.style.opacity = '0';
+    fa.style.display = 'block';
+    void fa.offsetWidth;
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    fa.style.transition = `opacity ${FADE_MS}ms ease`;
+    fa.style.opacity = '1';
+
+    setTimeout(() => {
+      fa.style.transition = '';
+      fa.style.opacity = '';
+    }, FADE_MS);
+  }, FADE_MS);
 }
 
 function show(id) {
