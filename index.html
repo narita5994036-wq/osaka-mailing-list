@@ -472,8 +472,8 @@
   </div>
 
   <div class="header">
-    <div class="logo">MYKITA</div>
-    <div class="logo-sub" id="hdr-sub">Osaka &nbsp;·&nbsp; Frame Warranty Registration</div>
+    <div class="logo" id="hdr-title">Frame Warranty Registration</div>
+    <div class="logo-sub" id="hdr-sub">Osaka</div>
   </div>
 
   <div class="main">
@@ -636,7 +636,8 @@ function sendToSheet(record) {
 // ── LANGUAGE STRINGS ──
 const i18n = {
   en: {
-    hdrSub: 'Osaka · Frame Warranty Registration',
+    hdrSub: 'Osaka',
+    mainTitle: 'Frame Warranty Registration',
     lblInfo: 'Customer Information',
     lblName: 'Name',
     lblCountry: 'Country',
@@ -659,7 +660,8 @@ const i18n = {
     namePlaceholder: 'Your full name',
   },
   ja: {
-    hdrSub: 'Osaka · フレーム保証登録',
+    hdrSub: 'Osaka',
+    mainTitle: 'フレーム保証登録',
     lblInfo: 'お客様情報',
     lblName: 'お名前',
     lblCountry: '国・地域',
@@ -682,7 +684,8 @@ const i18n = {
     namePlaceholder: 'お名前',
   },
   zh: {
-    hdrSub: 'Osaka · 镜架保修登记',
+    hdrSub: 'Osaka',
+    mainTitle: '镜架保修登记',
     lblInfo: '客户信息',
     lblName: '姓名',
     lblCountry: '国家 / 地区',
@@ -705,7 +708,8 @@ const i18n = {
     namePlaceholder: '您的姓名',
   },
   ko: {
-    hdrSub: 'Osaka · 프레임 보증 등록',
+    hdrSub: 'Osaka',
+    mainTitle: '프레임 보증 등록',
     lblInfo: '고객 정보',
     lblName: '이름',
     lblCountry: '국가 / 지역',
@@ -739,6 +743,7 @@ function setLang(lang) {
     b.classList.toggle('active', b.textContent.trim() === ({en:'EN', zh:'中', ko:'한', ja:'日'}[lang]));
   });
   document.getElementById('hdr-sub').textContent = t.hdrSub;
+  document.getElementById('hdr-title').textContent = t.mainTitle;
   document.getElementById('lbl-info').textContent = t.lblInfo;
   setLabelWithReq('lbl-name', t.lblName);
   setLabelWithReq('lbl-country', t.lblCountry);
