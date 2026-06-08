@@ -1474,7 +1474,7 @@ function initEmailAutocomplete() {
       ? EMAIL_DOMAINS.filter(d => d.startsWith(domainPart) && d !== domainPart)
       : EMAIL_DOMAINS;
 
-    return matches.slice(0, 6).map(d => local + '@' + d);
+    return matches.map(d => local + '@' + d);
   }
 
   function renderList(value) {
