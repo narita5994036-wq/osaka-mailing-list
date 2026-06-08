@@ -297,6 +297,10 @@
     overflow-y: auto;
     z-index: 100;
   }
+  .ac-dropdown.drop-up {
+    top: auto;
+    bottom: calc(100% + 2px);
+  }
   .ac-wrap.open .ac-dropdown { display: block; }
   .ac-item {
     padding: 10px 14px;
@@ -1358,6 +1362,28 @@ const COUNTRY_CODES = {
 
 let acHighlight = -1;
 
+// Flips a dropdown above its input and caps its height when the visible
+// viewport (e.g. shrunk by an on-screen keyboard) leaves little room below.
+function positionDropdown(input, dropdown) {
+  const rect = input.getBoundingClientRect();
+  const vv = window.visualViewport;
+  const viewportHeight = vv ? vv.height : window.innerHeight;
+  const viewportTop = vv ? vv.offsetTop : 0;
+  const spaceBelow = (viewportTop + viewportHeight) - rect.bottom;
+  const spaceAbove = rect.top - viewportTop;
+
+  const GAP = 10;
+  const MIN_USABLE = 90;
+
+  if (spaceBelow < MIN_USABLE && spaceAbove > spaceBelow) {
+    dropdown.classList.add('drop-up');
+    dropdown.style.maxHeight = Math.max(MIN_USABLE, spaceAbove - GAP) + 'px';
+  } else {
+    dropdown.classList.remove('drop-up');
+    dropdown.style.maxHeight = Math.max(MIN_USABLE, spaceBelow - GAP) + 'px';
+  }
+}
+
 function initAutocomplete() {
   const wrap = document.getElementById('ac-wrap');
   const input = document.getElementById('f-country-input');
@@ -1407,6 +1433,7 @@ function initAutocomplete() {
 
   function openDropdown() {
     wrap.classList.add('open');
+    positionDropdown(input, dropdown);
     renderList(input.value);
   }
 
@@ -1505,7 +1532,10 @@ function initEmailAutocomplete() {
     input.focus();
   }
 
-  function openDropdown() { wrap.classList.add('open'); }
+  function openDropdown() {
+    wrap.classList.add('open');
+    positionDropdown(input, dropdown);
+  }
 
   function closeDropdown() {
     wrap.classList.remove('open');
@@ -1546,6 +1576,27 @@ document.addEventListener('click', e => {
   const wrap = document.getElementById('email-wrap');
   if (wrap && !wrap.contains(e.target)) wrap.classList.remove('open');
 });
+
+// Re-flip/re-size open dropdowns when the visible viewport changes
+// (e.g. an on-screen keyboard opens or closes).
+function repositionOpenDropdowns() {
+  [
+    ['ac-wrap', 'f-country-input', 'ac-dropdown'],
+    ['email-wrap', 'f-email', 'email-dropdown']
+  ].forEach(([wrapId, inputId, dropdownId]) => {
+    const wrap = document.getElementById(wrapId);
+    const input = document.getElementById(inputId);
+    const dropdown = document.getElementById(dropdownId);
+    if (wrap && input && dropdown && wrap.classList.contains('open')) {
+      positionDropdown(input, dropdown);
+    }
+  });
+}
+if (window.visualViewport) {
+  window.visualViewport.addEventListener('resize', repositionOpenDropdowns);
+  window.visualViewport.addEventListener('scroll', repositionOpenDropdowns);
+}
+window.addEventListener('resize', repositionOpenDropdowns);
 
 // ── SUBMIT BUTTON STATE ──
 function updateSubmitState() {
