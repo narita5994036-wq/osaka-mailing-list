@@ -615,6 +615,19 @@
     padding: 3px 8px;
   }
 
+  .row-delete-btn {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 13px;
+    line-height: 1;
+    color: var(--light);
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 4px 8px;
+    transition: color 0.15s;
+  }
+  .row-delete-btn:hover { color: var(--red); }
+
   .empty-state {
     text-align: center;
     padding: 3rem;
@@ -824,6 +837,7 @@
             <th>Email</th>
             <th>Opt-in</th>
             <th>Lang</th>
+            <th></th>
           </tr>
         </thead>
         <tbody id="admin-tbody"></tbody>
@@ -834,11 +848,12 @@
 </div>
 
 <script>
-// ── STORAGE KEY ──
-const STORAGE_KEY = 'mykita_warranty_v1';
-
-// ── ADMIN PASSWORD (change as needed) ──
-const ADMIN_PASSWORD = '1120';
+// ── ADMIN ──
+// Authentication and record access are verified server-side by the
+// Apps Script (see apps-script.gs); no password or registration data
+// is kept in this file or in browser storage.
+let adminPassword = '';
+let adminRecords = [];
 
 // ── GOOGLE SHEET SYNC ──
 const SHEET_WEBHOOK_URL = 'https://script.google.com/macros/s/AKfycby5IyRK9d3Dlz3dHZdBrz5CBo_kHnD01WbArgslG_Aq_4cITF5wlF75VbTi00hPjD4F_g/exec';
@@ -1085,9 +1100,6 @@ function handleSubmit() {
     memberNo: ''
   };
 
-  const data = getRecords();
-  data.push(record);
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
   sendToSheet(record);
 
   document.getElementById('form-area').style.display = 'none';
@@ -1157,19 +1169,41 @@ function checkAdminMode() {
   }
 }
 
-function checkPw() {
-  const pw = document.getElementById('admin-pw').value;
+async function adminRequest(params) {
+  const qs = new URLSearchParams(Object.assign({ action: 'admin', password: adminPassword }, params));
+  const res = await fetch(SHEET_WEBHOOK_URL + '?' + qs.toString());
+  return res.json();
+}
+
+async function checkPw() {
+  const pwInput = document.getElementById('admin-pw');
+  const pw = pwInput.value;
   const errEl = document.getElementById('e-pw');
-  if (pw === ADMIN_PASSWORD) {
-    errEl.style.visibility = 'hidden';
-    document.getElementById('admin-gate').style.display = 'none';
-    document.getElementById('admin-panel').style.display = 'block';
-    renderAdminTable();
-    isAdmin = true;
-  } else {
+  const btn = document.querySelector('#admin-gate button.submit-btn');
+  errEl.style.visibility = 'hidden';
+  pwInput.classList.remove('err');
+  if (btn) btn.disabled = true;
+  try {
+    const qs = new URLSearchParams({ action: 'admin', password: pw });
+    const res = await fetch(SHEET_WEBHOOK_URL + '?' + qs.toString());
+    const json = await res.json();
+    if (json.ok) {
+      adminPassword = pw;
+      adminRecords = json.records || [];
+      document.getElementById('admin-gate').style.display = 'none';
+      document.getElementById('admin-panel').style.display = 'block';
+      renderAdminTable();
+      isAdmin = true;
+    } else {
+      errEl.style.visibility = 'visible';
+      errEl.textContent = 'Incorrect password.';
+      pwInput.classList.add('err');
+    }
+  } catch (err) {
     errEl.style.visibility = 'visible';
-    errEl.textContent = 'Incorrect password.';
-    document.getElementById('admin-pw').classList.add('err');
+    errEl.textContent = 'Connection error. Please try again.';
+  } finally {
+    if (btn) btn.disabled = false;
   }
 }
 
@@ -1177,12 +1211,8 @@ function logout() {
   document.getElementById('admin-panel').style.display = 'none';
   document.getElementById('customer-view').style.display = 'block';
   isAdmin = false;
-}
-
-function getRecords() {
-  try {
-    return JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
-  } catch(e) { return []; }
+  adminPassword = '';
+  adminRecords = [];
 }
 
 function escapeHtml(str) {
@@ -1195,7 +1225,7 @@ function escapeHtml(str) {
 }
 
 function renderAdminTable() {
-  const records = getRecords();
+  const records = adminRecords;
   const tbody = document.getElementById('admin-tbody');
   const empty = document.getElementById('empty-state');
   document.getElementById('admin-count').textContent = records.length + ' record' + (records.length !== 1 ? 's' : '');
@@ -1214,17 +1244,33 @@ function renderAdminTable() {
       <td>${escapeHtml(r.name)}</td>
       <td>${escapeHtml(r.country)}</td>
       <td style="color:#185FA5;">${escapeHtml(r.email)}</td>
-      <td><span class="${r.optin ? 'badge-yes' : 'badge-no'}">${r.optin ? 'Yes' : 'No'}</span></td>
+      <td><span class="${r.optin === 'Yes' ? 'badge-yes' : 'badge-no'}">${escapeHtml(r.optin)}</span></td>
       <td style="text-transform:uppercase; font-size:10px; color:var(--mid);">${escapeHtml(r.lang)}</td>
+      <td><button class="row-delete-btn" onclick="deleteRecord(${r.row})" title="Delete this record" aria-label="Delete this record">&times;</button></td>
     </tr>
   `).join('');
 }
 
+async function deleteRecord(row) {
+  if (!confirm('Delete this registration record? This cannot be undone.')) return;
+  try {
+    const json = await adminRequest({ op: 'delete', row: row });
+    if (json.ok) {
+      adminRecords = adminRecords.filter(r => r.row !== row);
+      renderAdminTable();
+    } else {
+      alert('Failed to delete the record. Please try again.');
+    }
+  } catch (err) {
+    alert('Connection error. Please try again.');
+  }
+}
+
 function downloadCSV() {
   const filter = document.getElementById('csv-filter').value;
-  let records = getRecords();
-  if (filter === 'yes') records = records.filter(r => r.optin);
-  else if (filter === 'no') records = records.filter(r => !r.optin);
+  let records = adminRecords;
+  if (filter === 'yes') records = records.filter(r => r.optin === 'Yes');
+  else if (filter === 'no') records = records.filter(r => r.optin !== 'Yes');
 
   if (records.length === 0) { alert('No records to export.'); return; }
 
@@ -1232,11 +1278,11 @@ function downloadCSV() {
   const rows = records.map((r, i) => [
     i + 1,
     r.timestamp,
-    `"${r.name.replace(/"/g, '""')}"`,
+    `"${String(r.name).replace(/"/g, '""')}"`,
     r.country,
     r.email,
-    r.optin ? 'Yes' : 'No',
-    r.lang.toUpperCase()
+    r.optin,
+    String(r.lang).toUpperCase()
   ]);
 
   const csv = [header, ...rows].map(r => r.join(',')).join('\r\n');
@@ -1253,10 +1299,19 @@ function downloadCSV() {
   URL.revokeObjectURL(url);
 }
 
-function clearAll() {
+async function clearAll() {
   if (!confirm('Delete all registration records? This cannot be undone.')) return;
-  localStorage.removeItem(STORAGE_KEY);
-  renderAdminTable();
+  try {
+    const json = await adminRequest({ op: 'clear' });
+    if (json.ok) {
+      adminRecords = [];
+      renderAdminTable();
+    } else {
+      alert('Failed to clear records. Please try again.');
+    }
+  } catch (err) {
+    alert('Connection error. Please try again.');
+  }
 }
 
 // ── COUNTRY AUTOCOMPLETE ──
