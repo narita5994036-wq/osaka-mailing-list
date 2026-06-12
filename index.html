@@ -668,6 +668,88 @@
   }
   .logout-btn:hover { color: var(--black); border-color: var(--black); }
 
+  tbody tr.row-pressing { background: var(--bg2); }
+
+  /* ── MAIL COMPOSE MODAL ── */
+  .mail-modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(17,17,17,0.5);
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+  .mail-modal-overlay.active { display: flex; }
+
+  .mail-modal {
+    background: #fff;
+    width: 100%;
+    max-width: 540px;
+    max-height: 88vh;
+    overflow-y: auto;
+    padding: 28px 24px;
+    border: 0.5px solid var(--border);
+  }
+
+  .mail-modal-recipient {
+    font-size: 11px;
+    color: var(--mid);
+    letter-spacing: 0.04em;
+    margin: 0 0 1.5rem;
+  }
+
+  .mail-modal-field {
+    margin-bottom: 14px;
+  }
+
+  .mail-modal-field label {
+    display: block;
+    font-size: 9px;
+    font-weight: 600;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--black);
+    margin-bottom: 8px;
+  }
+
+  .mail-template-select {
+    font-family: 'Inter', 'Hiragino Sans', 'Hiragino Kaku Gothic ProN', 'PingFang SC', 'Microsoft YaHei', 'Noto Sans CJK SC', sans-serif;
+    width: 100%;
+    height: 44px;
+    font-size: 12px;
+    padding: 0 12px;
+    border: 0.5px solid var(--border);
+    background: var(--bg);
+    color: var(--black);
+    cursor: pointer;
+    appearance: none;
+    -webkit-appearance: none;
+    border-radius: 0;
+  }
+
+  .mail-textarea {
+    width: 100%;
+    min-height: 220px;
+    font-family: 'Inter', 'Hiragino Sans', 'Hiragino Kaku Gothic ProN', 'PingFang SC', 'Microsoft YaHei', 'Noto Sans CJK SC', sans-serif;
+    font-size: 12px;
+    line-height: 1.8;
+    padding: 12px;
+    border: 0.5px solid var(--border);
+    resize: vertical;
+    box-sizing: border-box;
+    background: var(--bg);
+    color: var(--black);
+  }
+
+  .mail-modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    margin-top: 18px;
+  }
+
   /* Prevent iOS Safari from auto-zooming the page when a text field is
      focused — it only zooms when the focused field's font-size is below 16px. */
   @media (max-width: 600px) {
@@ -870,6 +952,25 @@
         <tbody id="admin-tbody"></tbody>
       </table>
       <div class="empty-state" id="empty-state" style="display:none;">No registrations yet.</div>
+    </div>
+  </div>
+
+  <div class="mail-modal-overlay" id="mail-modal-overlay" onclick="closeMailModalOnOverlay(event)">
+    <div class="mail-modal">
+      <p class="section-label" style="border:none; margin:0 0 4px;">Compose Follow-up Email</p>
+      <p class="mail-modal-recipient" id="mail-recipient"></p>
+      <div class="mail-modal-field">
+        <label>Template</label>
+        <select class="mail-template-select" id="mail-template-select" onchange="applyMailTemplate()"></select>
+      </div>
+      <div class="mail-modal-field">
+        <label>Message</label>
+        <textarea class="mail-textarea" id="mail-textarea"></textarea>
+      </div>
+      <div class="mail-modal-actions">
+        <button class="refresh-btn" onclick="closeMailModal()">Close</button>
+        <button class="csv-btn" id="mail-copy-btn" onclick="copyMailText()">Copy</button>
+      </div>
     </div>
   </div>
 </div>
@@ -1317,7 +1418,7 @@ function renderAdminTable() {
   empty.style.display = 'none';
 
   tbody.innerHTML = records.map((r, i) => `
-    <tr>
+    <tr data-row="${r.row}" title="Long-press to compose a follow-up email">
       <td style="color:var(--light); font-size:10px;">${i + 1}</td>
       <td style="font-size:10px; color:var(--mid);">${escapeHtml(r.timestamp)}</td>
       <td>${escapeHtml(r.name)}</td>
@@ -1328,6 +1429,36 @@ function renderAdminTable() {
       <td><button class="row-delete-btn" onclick="deleteRecord(${r.row})" title="Delete this record" aria-label="Delete this record">&times;</button></td>
     </tr>
   `).join('');
+
+  tbody.querySelectorAll('tr').forEach(tr => {
+    const record = records.find(r => String(r.row) === tr.dataset.row);
+    attachLongPress(tr, record);
+  });
+}
+
+const LONG_PRESS_MS = 600;
+
+function attachLongPress(tr, record) {
+  let timer = null;
+  const start = (e) => {
+    if (e.target.closest('.row-delete-btn')) return;
+    tr.classList.add('row-pressing');
+    timer = setTimeout(() => {
+      tr.classList.remove('row-pressing');
+      openMailCompose(record);
+    }, LONG_PRESS_MS);
+  };
+  const cancel = () => {
+    clearTimeout(timer);
+    tr.classList.remove('row-pressing');
+  };
+  tr.addEventListener('mousedown', start);
+  tr.addEventListener('mouseup', cancel);
+  tr.addEventListener('mouseleave', cancel);
+  tr.addEventListener('touchstart', start, { passive: true });
+  tr.addEventListener('touchend', cancel);
+  tr.addEventListener('touchmove', cancel);
+  tr.addEventListener('contextmenu', (e) => e.preventDefault());
 }
 
 async function deleteRecord(row) {
@@ -1388,6 +1519,66 @@ async function clearAll() {
   } catch (err) {
     alert('Connection error. Please try again.');
   }
+}
+
+// ── FOLLOW-UP MAIL COMPOSE ──
+const MAIL_TEMPLATES = [
+  {
+    id: 'confirmation',
+    label: 'Warranty Registration Confirmation',
+    body: (r) => `Dear ${r.name},\n\nThank you for registering your MYKITA frame with us. Your warranty registration has been received and recorded.\n\nIf you have any questions, please feel free to contact us.\n\nBest regards,\nMYKITA JAPAN`
+  },
+  {
+    id: 'followup',
+    label: 'Promotional Follow-up',
+    body: (r) => `Dear ${r.name},\n\nThank you for your interest in MYKITA JAPAN. We'd love to keep you updated on our latest collections, exclusive offers, and news.\n\nBest regards,\nMYKITA JAPAN`
+  },
+  {
+    id: 'blank',
+    label: 'Blank',
+    body: (r) => ''
+  }
+];
+
+let currentMailRecord = null;
+
+function openMailCompose(record) {
+  currentMailRecord = record;
+  document.getElementById('mail-recipient').textContent = record.name + '  <' + record.email + '>';
+  const select = document.getElementById('mail-template-select');
+  select.innerHTML = MAIL_TEMPLATES.map(t => `<option value="${t.id}">${escapeHtml(t.label)}</option>`).join('');
+  select.value = MAIL_TEMPLATES[0].id;
+  applyMailTemplate();
+  document.getElementById('mail-modal-overlay').classList.add('active');
+}
+
+function applyMailTemplate() {
+  const select = document.getElementById('mail-template-select');
+  const tpl = MAIL_TEMPLATES.find(t => t.id === select.value);
+  document.getElementById('mail-textarea').value = tpl ? tpl.body(currentMailRecord) : '';
+}
+
+function closeMailModal() {
+  document.getElementById('mail-modal-overlay').classList.remove('active');
+  currentMailRecord = null;
+}
+
+function closeMailModalOnOverlay(e) {
+  if (e.target.id === 'mail-modal-overlay') closeMailModal();
+}
+
+async function copyMailText() {
+  const textarea = document.getElementById('mail-textarea');
+  const btn = document.getElementById('mail-copy-btn');
+  try {
+    await navigator.clipboard.writeText(textarea.value);
+  } catch (err) {
+    textarea.select();
+    document.execCommand('copy');
+  }
+  const original = btn.textContent;
+  btn.textContent = 'Copied';
+  setTimeout(() => { btn.textContent = original; }, 1500);
 }
 
 // ── COUNTRY AUTOCOMPLETE ──
