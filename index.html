@@ -1489,9 +1489,12 @@ function renderAdminTable() {
   }
   empty.style.display = 'none';
 
+  const rankMap = new Map();
+  adminRecords.slice().sort((a, b) => a.row - b.row).forEach((r, idx) => rankMap.set(r.row, idx + 1));
+
   tbody.innerHTML = records.map((r, i) => `
     <tr data-row="${r.row}">
-      <td style="color:var(--light); font-size:10px;">${i + 1}</td>
+      <td style="color:var(--light); font-size:10px;">${rankMap.get(r.row)}</td>
       <td style="font-size:10px; color:var(--mid);">${escapeHtml(formatTimestamp(r.timestamp))}</td>
       <td>${escapeHtml(r.name)}</td>
       <td>${escapeHtml(r.country)}</td>
