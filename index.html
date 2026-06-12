@@ -210,6 +210,7 @@
 
   .field input[type="text"],
   .field input[type="email"],
+  .field input[type="password"],
   .field select {
     width: 100%;
     height: 44px;
@@ -755,8 +756,11 @@
   @media (max-width: 600px) {
     .field input[type="text"],
     .field input[type="email"],
+    .field input[type="password"],
     .field select,
-    .ac-input {
+    .ac-input,
+    .mail-template-select,
+    .mail-textarea {
       font-size: 16px;
     }
   }
@@ -1345,6 +1349,7 @@ async function checkPw() {
     if (json.ok) {
       adminPassword = pw;
       adminRecords = json.records || [];
+      pwInput.blur();
       document.getElementById('admin-gate').style.display = 'none';
       document.getElementById('admin-panel').style.display = 'block';
       renderAdminTable();
