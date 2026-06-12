@@ -589,6 +589,7 @@
   tbody tr { border-bottom: 0.5px solid var(--border); }
   tbody tr:last-child { border-bottom: none; }
   tbody tr:hover { background: var(--bg2); }
+  tbody.no-hover tr:hover { background: none; }
 
   tbody tr.row-deleting {
     transition: opacity 0.35s ease-out, background-color 0.35s ease-out;
@@ -1568,12 +1569,23 @@ async function deleteRecord(row) {
         await new Promise(resolve => setTimeout(resolve, 350));
       }
       renderAdminTable();
+      suppressRowHover();
     } else {
       alert('Failed to delete the record. Please try again.');
     }
   } catch (err) {
     alert('Connection error. Please try again.');
   }
+}
+
+function suppressRowHover() {
+  const tbody = document.getElementById('admin-tbody');
+  tbody.classList.add('no-hover');
+  const reenable = () => {
+    tbody.classList.remove('no-hover');
+    tbody.removeEventListener('mousemove', reenable);
+  };
+  tbody.addEventListener('mousemove', reenable);
 }
 
 function downloadCSV() {
