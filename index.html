@@ -1389,6 +1389,7 @@ async function checkPw() {
       document.getElementById('admin-panel').style.display = 'block';
       renderAdminTable();
       isAdmin = true;
+      startIdleTimer();
     } else {
       errEl.style.visibility = 'visible';
       errEl.textContent = 'Incorrect password.';
@@ -1426,7 +1427,27 @@ function logout() {
   isAdmin = false;
   adminPassword = '';
   adminRecords = [];
+  clearTimeout(idleTimer);
 }
+
+// ── ADMIN AUTO-LOGOUT ──
+const ADMIN_IDLE_TIMEOUT_MS = 10 * 60 * 1000;
+let idleTimer = null;
+
+function startIdleTimer() {
+  clearTimeout(idleTimer);
+  idleTimer = setTimeout(() => {
+    if (!isAdmin) return;
+    logout();
+    alert('You have been logged out due to inactivity.');
+  }, ADMIN_IDLE_TIMEOUT_MS);
+}
+
+['mousedown', 'mousemove', 'keydown', 'touchstart', 'scroll'].forEach(evt => {
+  document.addEventListener(evt, () => {
+    if (isAdmin) startIdleTimer();
+  }, { passive: true });
+});
 
 function escapeHtml(str) {
   return String(str)
