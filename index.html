@@ -967,6 +967,7 @@
       </div>
       <div class="admin-controls">
         <button class="refresh-btn" id="refresh-btn" onclick="refreshRecords()">&#8635; Refresh</button>
+        <button class="refresh-btn" id="sort-btn" onclick="toggleSortOrder()">Newest First &#8595;</button>
         <select class="csv-filter" id="csv-filter" onchange="renderAdminTable()">
           <option value="all">All Opt-ins</option>
           <option value="yes">Yes Only</option>
@@ -1445,11 +1446,21 @@ function escapeHtml(str) {
     .replace(/'/g, '&#39;');
 }
 
+let sortOrder = 'desc';
+
+function toggleSortOrder() {
+  sortOrder = sortOrder === 'desc' ? 'asc' : 'desc';
+  document.getElementById('sort-btn').innerHTML = sortOrder === 'desc' ? 'Newest First &#8595;' : 'Oldest First &#8593;';
+  renderAdminTable();
+}
+
 function getFilteredRecords() {
   const filter = document.getElementById('csv-filter').value;
-  if (filter === 'yes') return adminRecords.filter(r => r.optin === 'Yes');
-  if (filter === 'no') return adminRecords.filter(r => r.optin !== 'Yes');
-  return adminRecords;
+  let records = adminRecords;
+  if (filter === 'yes') records = records.filter(r => r.optin === 'Yes');
+  if (filter === 'no') records = records.filter(r => r.optin !== 'Yes');
+  records = records.slice().sort((a, b) => sortOrder === 'desc' ? b.row - a.row : a.row - b.row);
+  return records;
 }
 
 function renderAdminTable() {
