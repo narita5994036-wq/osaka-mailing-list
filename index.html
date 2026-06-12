@@ -669,7 +669,45 @@
   }
   .logout-btn:hover { color: var(--black); border-color: var(--black); }
 
-  tbody tr.row-pressing { background: var(--bg2); }
+  .email-link {
+    cursor: pointer;
+    text-decoration: underline dotted;
+    text-decoration-color: var(--border);
+  }
+
+  .email-actions-menu {
+    display: none;
+    position: absolute;
+    z-index: 1001;
+    background: #fff;
+    border: 0.5px solid var(--border);
+    box-shadow: 0 4px 16px rgba(17,17,17,0.12);
+    min-width: 150px;
+  }
+
+  .email-action-btn {
+    display: block;
+    width: 100%;
+    text-align: left;
+    font-family: 'Inter', 'Hiragino Sans', 'Hiragino Kaku Gothic ProN', 'PingFang SC', 'Microsoft YaHei', 'Noto Sans CJK SC', sans-serif;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    background: none;
+    color: var(--black);
+    border: none;
+    border-bottom: 0.5px solid var(--border);
+    padding: 12px 16px;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  .email-action-btn:last-child { border-bottom: none; }
+  .email-action-btn:hover { background: var(--bg2); }
+  .email-action-btn:disabled {
+    color: var(--light);
+    cursor: default;
+    background: none;
+  }
 
   /* ── MAIL COMPOSE MODAL ── */
   .mail-modal-overlay {
@@ -957,6 +995,11 @@
       </table>
       <div class="empty-state" id="empty-state" style="display:none;">No registrations yet.</div>
     </div>
+  </div>
+
+  <div class="email-actions-menu" id="email-actions-menu">
+    <button class="email-action-btn" onclick="copyEmailAddress()">Copy Email</button>
+    <button class="email-action-btn" id="email-action-compose" onclick="composeFromEmailActions()">Compose Mail</button>
   </div>
 
   <div class="mail-modal-overlay" id="mail-modal-overlay" onclick="closeMailModalOnOverlay(event)">
@@ -1423,48 +1466,76 @@ function renderAdminTable() {
   empty.style.display = 'none';
 
   tbody.innerHTML = records.map((r, i) => `
-    <tr data-row="${r.row}" title="Long-press to compose a follow-up email">
+    <tr data-row="${r.row}">
       <td style="color:var(--light); font-size:10px;">${i + 1}</td>
       <td style="font-size:10px; color:var(--mid);">${escapeHtml(r.timestamp)}</td>
       <td>${escapeHtml(r.name)}</td>
       <td>${escapeHtml(r.country)}</td>
-      <td style="color:#185FA5;">${escapeHtml(r.email)}</td>
+      <td><span class="email-link" style="color:#185FA5;" onclick="showEmailActions(event, ${r.row})">${escapeHtml(r.email)}</span></td>
       <td><span class="${r.optin === 'Yes' ? 'badge-yes' : 'badge-no'}">${escapeHtml(r.optin)}</span></td>
       <td style="text-transform:uppercase; font-size:10px; color:var(--mid);">${escapeHtml(r.lang)}</td>
       <td><button class="row-delete-btn" onclick="deleteRecord(${r.row})" title="Delete this record" aria-label="Delete this record">&times;</button></td>
     </tr>
   `).join('');
-
-  tbody.querySelectorAll('tr').forEach(tr => {
-    const record = records.find(r => String(r.row) === tr.dataset.row);
-    attachLongPress(tr, record);
-  });
 }
 
-const LONG_PRESS_MS = 600;
+let emailActionsRecord = null;
 
-function attachLongPress(tr, record) {
-  let timer = null;
-  const start = (e) => {
-    if (e.target.closest('.row-delete-btn')) return;
-    tr.classList.add('row-pressing');
-    timer = setTimeout(() => {
-      tr.classList.remove('row-pressing');
-      openMailCompose(record);
-    }, LONG_PRESS_MS);
-  };
-  const cancel = () => {
-    clearTimeout(timer);
-    tr.classList.remove('row-pressing');
-  };
-  tr.addEventListener('mousedown', start);
-  tr.addEventListener('mouseup', cancel);
-  tr.addEventListener('mouseleave', cancel);
-  tr.addEventListener('touchstart', start, { passive: true });
-  tr.addEventListener('touchend', cancel);
-  tr.addEventListener('touchmove', cancel);
-  tr.addEventListener('contextmenu', (e) => e.preventDefault());
+function showEmailActions(event, row) {
+  event.stopPropagation();
+  emailActionsRecord = adminRecords.find(r => r.row === row);
+  if (!emailActionsRecord) return;
+
+  const menu = document.getElementById('email-actions-menu');
+  const composeBtn = document.getElementById('email-action-compose');
+  composeBtn.disabled = emailActionsRecord.optin !== 'Yes';
+
+  menu.style.display = 'block';
+  const rect = event.target.getBoundingClientRect();
+  const menuRect = menu.getBoundingClientRect();
+  let top = rect.bottom + window.scrollY + 4;
+  let left = rect.left + window.scrollX;
+  if (left + menuRect.width > window.innerWidth - 8) {
+    left = window.innerWidth - menuRect.width - 8;
+  }
+  menu.style.top = top + 'px';
+  menu.style.left = left + 'px';
 }
+
+function closeEmailActions() {
+  document.getElementById('email-actions-menu').style.display = 'none';
+  emailActionsRecord = null;
+}
+
+async function copyEmailAddress() {
+  if (!emailActionsRecord) return;
+  try {
+    await navigator.clipboard.writeText(emailActionsRecord.email);
+  } catch (err) {
+    const ta = document.createElement('textarea');
+    ta.value = emailActionsRecord.email;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+  }
+  closeEmailActions();
+}
+
+function composeFromEmailActions() {
+  if (!emailActionsRecord || emailActionsRecord.optin !== 'Yes') return;
+  const record = emailActionsRecord;
+  closeEmailActions();
+  openMailCompose(record);
+}
+
+document.addEventListener('click', (e) => {
+  const menu = document.getElementById('email-actions-menu');
+  if (menu && menu.style.display === 'block' && !menu.contains(e.target)) {
+    closeEmailActions();
+  }
+});
+
 
 async function deleteRecord(row) {
   if (!confirm('Delete this registration record? This cannot be undone.')) return;
