@@ -626,6 +626,27 @@
     padding: 3px 8px;
   }
 
+  .followup-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 8px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 3px 8px;
+    border: none;
+    cursor: pointer;
+    font-family: 'Inter', 'Hiragino Sans', 'Hiragino Kaku Gothic ProN', 'PingFang SC', 'Microsoft YaHei', 'Noto Sans CJK SC', sans-serif;
+  }
+  .followup-badge:disabled { cursor: default; }
+  .followup-na { color: var(--light); background: none; font-size: 8px; letter-spacing: 0.1em; }
+  .followup-pending { color: var(--mid); background: var(--bg2); }
+  .followup-due { color: #946200; background: #fff4e0; }
+  .followup-overdue { color: var(--red); background: #fde8e8; }
+  .followup-done { color: var(--green); background: #e8f5ee; }
+  .followup-done:hover, .followup-pending:hover, .followup-due:hover, .followup-overdue:hover { opacity: 0.75; }
+
   .row-delete-btn {
     font-family: 'Inter', 'Hiragino Sans', 'Hiragino Kaku Gothic ProN', 'PingFang SC', 'Microsoft YaHei', 'Noto Sans CJK SC', sans-serif;
     font-size: 13px;
@@ -979,6 +1000,7 @@
             <th>Country</th>
             <th>Email</th>
             <th>Opt-in</th>
+            <th>Follow-up</th>
             <th>Lang</th>
             <th></th>
           </tr>
@@ -1490,6 +1512,59 @@ function formatTimestamp(ts) {
   return `${parts.weekday} ${parts.month} ${parts.day} ${parts.year} ${parts.hour}:${parts.minute}`;
 }
 
+// ── FOLLOW-UP TASK TRACKING ──
+const FOLLOWUP_WINDOW_MS = 7 * 24 * 60 * 60 * 1000;
+const FOLLOWUP_DUE_SOON_MS = 2 * 24 * 60 * 60 * 1000;
+const FOLLOWUP_STORAGE_KEY = 'mykita_followup_sent';
+
+function getFollowupSentRows() {
+  try {
+    return JSON.parse(localStorage.getItem(FOLLOWUP_STORAGE_KEY) || '[]');
+  } catch (err) {
+    return [];
+  }
+}
+
+function isFollowupSent(row) {
+  return getFollowupSentRows().includes(row);
+}
+
+function setFollowupSent(row, sent) {
+  let rows = getFollowupSentRows();
+  rows = rows.filter(r => r !== row);
+  if (sent) rows.push(row);
+  localStorage.setItem(FOLLOWUP_STORAGE_KEY, JSON.stringify(rows));
+}
+
+function toggleFollowupSent(row) {
+  setFollowupSent(row, !isFollowupSent(row));
+  renderAdminTable();
+}
+
+function renderFollowupBadge(r) {
+  if (r.optin !== 'Yes') return '<span class="followup-badge followup-na">&mdash;</span>';
+
+  if (isFollowupSent(r.row)) {
+    return `<button class="followup-badge followup-done" onclick="toggleFollowupSent(${r.row})" title="Mark as not sent">&check; Sent</button>`;
+  }
+
+  const sentAt = new Date(r.timestamp).getTime();
+  let label, cls;
+  if (isNaN(sentAt)) {
+    label = 'Pending'; cls = 'followup-pending';
+  } else {
+    const elapsed = Date.now() - sentAt;
+    if (elapsed >= FOLLOWUP_WINDOW_MS) {
+      label = 'Overdue'; cls = 'followup-overdue';
+    } else if (elapsed >= FOLLOWUP_WINDOW_MS - FOLLOWUP_DUE_SOON_MS) {
+      label = 'Due Soon'; cls = 'followup-due';
+    } else {
+      label = 'Pending'; cls = 'followup-pending';
+    }
+  }
+  return `<button class="followup-badge ${cls}" onclick="toggleFollowupSent(${r.row})" title="Mark as sent">${label}</button>`;
+}
+
 let sortOrder = 'desc';
 
 function toggleSortOrder() {
@@ -1531,6 +1606,7 @@ function renderAdminTable() {
       <td>${escapeHtml(r.country)}</td>
       <td><span class="email-link" style="color:#185FA5;" onclick="showEmailActions(event, ${r.row})">${escapeHtml(r.email)}</span></td>
       <td><span class="${r.optin === 'Yes' ? 'badge-yes' : 'badge-no'}">${escapeHtml(r.optin)}</span></td>
+      <td>${renderFollowupBadge(r)}</td>
       <td style="text-transform:uppercase; font-size:10px; color:var(--mid);">${escapeHtml(r.lang)}</td>
       <td><button class="row-delete-btn" onclick="deleteRecord(${r.row})" title="Delete this record" aria-label="Delete this record">&times;</button></td>
     </tr>
