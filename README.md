@@ -1,1 +1,1 @@
-# OSAKA-mailing-list
+# osaka-mailing-list
