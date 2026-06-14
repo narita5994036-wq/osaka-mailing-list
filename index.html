@@ -659,6 +659,21 @@
   .followup-notneeded { color: var(--light); background: var(--bg2); }
   .followup-done:hover, .followup-pending:hover, .followup-due:hover, .followup-overdue:hover, .followup-notneeded:hover { opacity: 0.75; }
 
+  .note-input {
+    width: 160px;
+    font-family: 'Inter', 'Hiragino Sans', 'Hiragino Kaku Gothic ProN', 'PingFang SC', 'Microsoft YaHei', 'Noto Sans CJK SC', sans-serif;
+    font-size: 11px;
+    color: var(--black);
+    background: none;
+    border: none;
+    border-bottom: 0.5px solid transparent;
+    padding: 4px 2px;
+    outline: none;
+  }
+  .note-input::placeholder { color: var(--light); }
+  .note-input:hover { border-bottom-color: var(--border); }
+  .note-input:focus { border-bottom-color: var(--black); }
+
   .row-delete-btn {
     font-family: 'Inter', 'Hiragino Sans', 'Hiragino Kaku Gothic ProN', 'PingFang SC', 'Microsoft YaHei', 'Noto Sans CJK SC', sans-serif;
     font-size: 13px;
@@ -1014,6 +1029,7 @@
             <th>Email</th>
             <th>Opt-in</th>
             <th>Follow-up</th>
+            <th>Notes</th>
             <th>Lang</th>
             <th></th>
           </tr>
@@ -1600,6 +1616,32 @@ function renderFollowupBadge(r) {
   return `<button class="followup-badge ${cls}" onclick="cycleFollowupStatus(${r.row})" title="Mark as sent">${label}</button>`;
 }
 
+// ── STAFF NOTES ──
+async function saveNote(input) {
+  const row = parseInt(input.dataset.row, 10);
+  const record = adminRecords.find(r => r.row === row);
+  if (!record) return;
+  const text = input.value.trim();
+  if (text === (record.note || '')) return;
+
+  input.disabled = true;
+  try {
+    const json = await adminRequest({ op: 'note', row: row, text: text });
+    if (json.ok) {
+      record.note = text;
+      input.value = text;
+    } else {
+      input.value = record.note || '';
+      alert('Failed to save note. Please try again.');
+    }
+  } catch (err) {
+    input.value = record.note || '';
+    alert('Connection error. Please try again.');
+  } finally {
+    input.disabled = false;
+  }
+}
+
 let sortOrder = 'desc';
 
 function toggleSortOrder() {
@@ -1642,6 +1684,7 @@ function renderAdminTable() {
       <td><span class="email-link" style="color:#185FA5;" onclick="showEmailActions(event, ${r.row})">${escapeHtml(r.email)}</span></td>
       <td><span class="${r.optin === 'Yes' ? 'badge-yes' : 'badge-no'}">${escapeHtml(r.optin)}</span></td>
       <td>${renderFollowupBadge(r)}</td>
+      <td><input type="text" class="note-input" value="${escapeHtml(r.note || '')}" placeholder="&mdash;" data-row="${r.row}" onblur="saveNote(this)" onkeydown="if(event.key==='Enter') this.blur();"></td>
       <td style="text-transform:uppercase; font-size:10px; color:var(--mid);">${escapeHtml(r.lang)}</td>
       <td><button class="row-delete-btn" onclick="deleteRecord(${r.row})" title="Delete this record" aria-label="Delete this record">&times;</button></td>
     </tr>
@@ -1745,7 +1788,7 @@ function downloadCSV() {
 
   if (records.length === 0) { alert('No records to export.'); return; }
 
-  const header = ['No.', 'Timestamp', 'Name', 'Country', 'Email', 'Email Opt-in', 'Language'];
+  const header = ['No.', 'Timestamp', 'Name', 'Country', 'Email', 'Email Opt-in', 'Language', 'Notes'];
   const rows = records.map((r, i) => [
     i + 1,
     r.timestamp,
@@ -1753,7 +1796,8 @@ function downloadCSV() {
     r.country,
     r.email,
     r.optin,
-    String(r.lang).toUpperCase()
+    String(r.lang).toUpperCase(),
+    `"${String(r.note || '').replace(/"/g, '""')}"`
   ]);
 
   const csv = [header, ...rows].map(r => r.join(',')).join('\r\n');

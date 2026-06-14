@@ -4,14 +4,14 @@
  * resulting /exec URL into SHEET_WEBHOOK_URL in index.html.
  *
  * Spreadsheet column order:
- * Timestamp | Name | Email | Opt-in | Country | Language | 会員番号 | Follow-up Sent
+ * Timestamp | Name | Email | Opt-in | Country | Language | 会員番号 | Follow-up Sent | Staff Notes
  * (会員番号 is filled in manually in the sheet, so it is left blank here.)
  */
 function doPost(e) {
   var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
   var data = JSON.parse(e.postData.contents);
 
-  var headers = ['Timestamp', 'Name', 'Email', 'Opt-in', 'Country', 'Language', '会員番号', 'Follow-up Sent'];
+  var headers = ['Timestamp', 'Name', 'Email', 'Opt-in', 'Country', 'Language', '会員番号', 'Follow-up Sent', 'Staff Notes'];
   if (sheet.getLastRow() === 0) {
     sheet.appendRow(headers);
   }
@@ -29,6 +29,7 @@ function doPost(e) {
     country,
     (data.lang || '').toUpperCase(),
     data.memberNo || '',
+    '',
     ''
   ]);
 
@@ -44,6 +45,7 @@ function doPost(e) {
  *   action=admin & password=...                → list records
  *   action=admin & password=... & op=delete & row=N → delete row N
  *   action=admin & password=... & op=followup & row=N & status=pending|sent|na → set follow-up status
+ *   action=admin & password=... & op=note & row=N & text=... → set staff notes
  */
 function doGet(e) {
   var params = e.parameter || {};
@@ -89,6 +91,15 @@ function handleAdminRequest(params) {
     return { ok: true };
   }
 
+  if (op === 'note') {
+    var noteRow = parseInt(params.row, 10);
+    if (!noteRow || noteRow < 2 || noteRow > sheet.getLastRow()) {
+      return { ok: false, error: 'invalid row' };
+    }
+    sheet.getRange(noteRow, 9).setValue(params.text || '');
+    return { ok: true };
+  }
+
   return { ok: true, records: readRecords(sheet) };
 }
 
@@ -96,7 +107,7 @@ function readRecords(sheet) {
   var lastRow = sheet.getLastRow();
   if (lastRow < 2) { return []; }
 
-  var values = sheet.getRange(2, 1, lastRow - 1, 8).getValues();
+  var values = sheet.getRange(2, 1, lastRow - 1, 9).getValues();
   var records = [];
   for (var i = 0; i < values.length; i++) {
     var row = values[i];
@@ -109,7 +120,8 @@ function readRecords(sheet) {
       country: row[4] || '',
       lang: row[5] || '',
       memberNo: row[6] || '',
-      followupStatus: row[7] === 'Yes' ? 'sent' : row[7] === 'N/A' ? 'na' : ''
+      followupStatus: row[7] === 'Yes' ? 'sent' : row[7] === 'N/A' ? 'na' : '',
+      note: row[8] || ''
     });
   }
   return records;
