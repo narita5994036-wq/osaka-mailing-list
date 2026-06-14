@@ -1515,36 +1515,28 @@ function formatTimestamp(ts) {
 // ── FOLLOW-UP TASK TRACKING ──
 const FOLLOWUP_WINDOW_MS = 7 * 24 * 60 * 60 * 1000;
 const FOLLOWUP_DUE_SOON_MS = 2 * 24 * 60 * 60 * 1000;
-const FOLLOWUP_STORAGE_KEY = 'mykita_followup_sent';
 
-function getFollowupSentRows() {
+async function toggleFollowupSent(row) {
+  const record = adminRecords.find(r => r.row === row);
+  if (!record) return;
+  const newSent = !record.followupSent;
   try {
-    return JSON.parse(localStorage.getItem(FOLLOWUP_STORAGE_KEY) || '[]');
+    const json = await adminRequest({ op: 'followup', row: row, sent: newSent ? 'true' : 'false' });
+    if (json.ok) {
+      record.followupSent = newSent;
+      renderAdminTable();
+    } else {
+      alert('Failed to update follow-up status. Please try again.');
+    }
   } catch (err) {
-    return [];
+    alert('Connection error. Please try again.');
   }
-}
-
-function isFollowupSent(row) {
-  return getFollowupSentRows().includes(row);
-}
-
-function setFollowupSent(row, sent) {
-  let rows = getFollowupSentRows();
-  rows = rows.filter(r => r !== row);
-  if (sent) rows.push(row);
-  localStorage.setItem(FOLLOWUP_STORAGE_KEY, JSON.stringify(rows));
-}
-
-function toggleFollowupSent(row) {
-  setFollowupSent(row, !isFollowupSent(row));
-  renderAdminTable();
 }
 
 function renderFollowupBadge(r) {
   if (r.optin !== 'Yes') return '<span class="followup-badge followup-na">&mdash;</span>';
 
-  if (isFollowupSent(r.row)) {
+  if (r.followupSent) {
     return `<button class="followup-badge followup-done" onclick="toggleFollowupSent(${r.row})" title="Mark as not sent">&check; Sent</button>`;
   }
 
