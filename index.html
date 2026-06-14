@@ -1559,7 +1559,7 @@ async function toggleFollowupSent(row) {
 }
 
 function renderFollowupBadge(r) {
-  if (r.optin !== 'Yes') return '<span class="followup-badge followup-na">&mdash;</span>';
+  if (String(r.email).trim().toLowerCase() === 'none') return '<span class="followup-badge followup-na">&mdash;</span>';
 
   if (r.followupSent) {
     return `<button class="followup-badge followup-done" onclick="toggleFollowupSent(${r.row})" title="Mark as not sent">&check; Sent</button>`;
@@ -1639,7 +1639,7 @@ function showEmailActions(event, row) {
 
   const menu = document.getElementById('email-actions-menu');
   const composeBtn = document.getElementById('email-action-compose');
-  composeBtn.disabled = emailActionsRecord.optin !== 'Yes';
+  composeBtn.disabled = String(emailActionsRecord.email).trim().toLowerCase() === 'none';
 
   menu.style.display = 'block';
   const rect = event.target.getBoundingClientRect();
@@ -1674,7 +1674,7 @@ async function copyEmailAddress() {
 }
 
 function composeFromEmailActions() {
-  if (!emailActionsRecord || emailActionsRecord.optin !== 'Yes') return;
+  if (!emailActionsRecord || String(emailActionsRecord.email).trim().toLowerCase() === 'none') return;
   const record = emailActionsRecord;
   closeEmailActions();
   openMailCompose(record);
