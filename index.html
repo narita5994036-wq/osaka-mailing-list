@@ -908,6 +908,7 @@
           </label>
         </div>
         <div class="err-msg" id="e-optin">Please select Yes or No.</div>
+        <p class="optin-desc" id="lbl-optin-note" style="margin-top:10px; margin-bottom:0;">Even if you select "No," we will still send you a confirmation email regarding your registration at a later date.</p>
       </div>
 
       <div class="privacy-box" id="privacy-box">
@@ -1079,6 +1080,7 @@ const i18n = {
     optinYes: 'Yes',
     optinNo: 'No',
     eOptin: 'Please select Yes or No.',
+    lblOptinNote: 'Even if you select "No," we will still send you a confirmation email regarding your registration at a later date.',
     privTitle: 'Privacy Policy',
     privBody: 'Your personal data (name, country, email address) is collected by MYKITA OSAKA for the purpose of frame warranty registration and, if consented, for sending promotional communications. Your data will be stored securely and will not be shared with third parties except as required to fulfill the warranty service. You may request deletion or correction of your data at any time by contacting us in-store. By submitting this form, you acknowledge that you have read and understood this policy.',
     lblAgree: 'I have read and agree to the Privacy Policy.',
@@ -1113,6 +1115,7 @@ const i18n = {
     optinYes: 'はい',
     optinNo: 'いいえ',
     eOptin: '「はい」または「いいえ」を選択してください。',
+    lblOptinNote: '「いいえ」を選択された場合でも、後日登録完了の確認メールをお送りいたします。',
     privTitle: 'プライバシーポリシー',
     privBody: 'お客様の個人情報（お名前、国名、メールアドレス）は、フレーム保証登録およびメールマガジン配信（同意いただいた場合）の目的にのみMYKITA OSAKAが取得します。取得した情報は安全に管理され、サービス提供に必要な範囲を除き第三者に提供することはございません。情報の削除・訂正は店頭にていつでもお申し出いただけます。',
     lblAgree: 'プライバシーポリシーを読み、内容に同意します。',
@@ -1147,6 +1150,7 @@ const i18n = {
     optinYes: '是',
     optinNo: '否',
     eOptin: '请选择「是」或「否」。',
+    lblOptinNote: '即使您选择「否」，我们仍会在日后向您发送登记完成的确认邮件。',
     privTitle: '隐私数据政策',
     privBody: '您的个人信息（姓名、国家、电子邮件）仅用于镜架保修登记及（如已同意）发送推广邮件。所有信息将安全保存，除提供保修服务所必需外，不会共享给第三方。如需删除或更正您的数据，请随时到店联系我们。提交表格即表示您已阅读并理解本政策。',
     lblAgree: '我已阅读并同意隐私数据政策。',
@@ -1181,6 +1185,7 @@ const i18n = {
     optinYes: '예',
     optinNo: '아니오',
     eOptin: '예 또는 아니오를 선택해 주세요.',
+    lblOptinNote: '"아니오"를 선택하셔도, 등록 확인을 위한 메일은 추후 발송됩니다.',
     privTitle: '개인정보 처리방침',
     privBody: '고객님의 개인정보(이름, 국가, 이메일 주소)는 프레임 보증 등록 및 (동의하신 경우) 홍보 메일 발송 목적으로만 MYKITA OSAKA가 수집합니다. 수집된 정보는 안전하게 보관되며, 보증 서비스 제공에 필요한 경우를 제외하고 제3자에게 제공되지 않습니다. 정보의 삭제 또는 수정은 매장에서 언제든지 요청하실 수 있습니다. 양식을 제출하시면 본 방침을 읽고 이해하신 것으로 간주됩니다.',
     lblAgree: '개인정보 처리방침을 읽었으며 이에 동의합니다.',
@@ -1219,6 +1224,7 @@ function setLang(lang) {
   setLabelWithReq('lbl-optin-q', t.lblOptinQ);
   document.getElementById('lbl-optin-yes').textContent = t.optinYes;
   document.getElementById('lbl-optin-no').textContent = t.optinNo;
+  document.getElementById('lbl-optin-note').textContent = t.lblOptinNote;
   document.getElementById('priv-title').textContent = t.privTitle;
   document.getElementById('priv-body').textContent = t.privBody;
   document.getElementById('lbl-agree').innerHTML = t.lblAgree + ' <span class="req">*</span>';
