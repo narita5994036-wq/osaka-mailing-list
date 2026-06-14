@@ -881,7 +881,6 @@
           <div class="ac-dropdown" id="email-dropdown"></div>
         </div>
         <div class="err-msg" id="e-email">Please enter a valid email address.</div>
-        <p class="optin-desc" id="lbl-email-hint" style="margin-top:6px; margin-bottom:0;">If you prefer not to share your email address, you may enter "none".</p>
       </div>
 
       <div class="field">
@@ -1091,7 +1090,6 @@ const i18n = {
     eCountry: 'Please select your country.',
     eEmail: 'Please enter a valid email address.',
     eEmailOptinNone: 'Please enter a valid email address to receive email communications, or select "No" above.',
-    lblEmailHint: 'If you prefer not to share your email address, you may enter "none".',
     eAgree: 'You must agree to the Privacy Policy.',
     thanksTitle: 'Registration Complete',
     thanksBody: 'Thank you for registering your MYKITA frame.\nYour warranty has been recorded successfully.\n\nPlease visit us in-store if you have any questions.',
@@ -1128,7 +1126,6 @@ const i18n = {
     eCountry: '国・地域を選択してください。',
     eEmail: '有効なメールアドレスを入力してください。',
     eEmailOptinNone: 'メール配信を希望される場合は、有効なメールアドレスを入力するか、上記で「いいえ」を選択してください。',
-    lblEmailHint: 'メールアドレスを伝えたくない場合は、「none」と入力してください。',
     eAgree: 'プライバシーポリシーに同意してください。',
     thanksTitle: '登録完了',
     thanksBody: 'MYKITAフレームの登録ありがとうございます。\n保証登録が完了しました。\n\nご不明な点は店頭スタッフまでお気軽にお申し付けください。',
@@ -1165,7 +1162,6 @@ const i18n = {
     eCountry: '请选择国家。',
     eEmail: '请输入有效的电子邮件地址。',
     eEmailOptinNone: '如需接收邮件，请输入有效的电子邮件地址，或在上方选择「否」。',
-    lblEmailHint: '如果您不想提供电子邮件地址，可以输入「none」。',
     eAgree: '请同意隐私数据政策。',
     thanksTitle: '登记完成',
     thanksBody: '感谢您登记MYKITA镜架保修。\n登记已成功保存。\n\n如有任何疑问，欢迎到店咨询。',
@@ -1202,7 +1198,6 @@ const i18n = {
     eCountry: '국가를 선택해 주세요.',
     eEmail: '유효한 이메일 주소를 입력해 주세요.',
     eEmailOptinNone: '이메일 수신을 원하시면 유효한 이메일 주소를 입력하거나 위에서 "아니오"를 선택해 주세요.',
-    lblEmailHint: '이메일 주소를 공유하고 싶지 않으신 경우 "none"이라고 입력해 주세요.',
     eAgree: '개인정보 처리방침에 동의해 주세요.',
     thanksTitle: '등록 완료',
     thanksBody: 'MYKITA 프레임을 등록해 주셔서 감사합니다.\n보증 등록이 정상적으로 저장되었습니다.\n\n문의 사항이 있으시면 매장으로 편하게 연락해 주세요.',
@@ -1243,7 +1238,6 @@ function setLang(lang) {
   document.getElementById('e-name').textContent = t.eName;
   document.getElementById('e-country').textContent = t.eCountry;
   document.getElementById('e-email').textContent = t.eEmail;
-  document.getElementById('lbl-email-hint').textContent = t.lblEmailHint;
   document.getElementById('e-optin').textContent = t.eOptin;
   document.getElementById('e-agree').textContent = t.eAgree;
 }
