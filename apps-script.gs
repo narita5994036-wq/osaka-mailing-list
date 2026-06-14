@@ -43,7 +43,7 @@ function doPost(e) {
  * GET params:
  *   action=admin & password=...                → list records
  *   action=admin & password=... & op=delete & row=N → delete row N
- *   action=admin & password=... & op=followup & row=N & sent=true|false → set follow-up status
+ *   action=admin & password=... & op=followup & row=N & status=pending|sent|na → set follow-up status
  */
 function doGet(e) {
   var params = e.parameter || {};
@@ -82,7 +82,10 @@ function handleAdminRequest(params) {
     if (!fuRow || fuRow < 2 || fuRow > sheet.getLastRow()) {
       return { ok: false, error: 'invalid row' };
     }
-    sheet.getRange(fuRow, 8).setValue(params.sent === 'true' ? 'Yes' : '');
+    var value = '';
+    if (params.status === 'sent') value = 'Yes';
+    else if (params.status === 'na') value = 'N/A';
+    sheet.getRange(fuRow, 8).setValue(value);
     return { ok: true };
   }
 
@@ -106,7 +109,7 @@ function readRecords(sheet) {
       country: row[4] || '',
       lang: row[5] || '',
       memberNo: row[6] || '',
-      followupSent: row[7] === 'Yes'
+      followupStatus: row[7] === 'Yes' ? 'sent' : row[7] === 'N/A' ? 'na' : ''
     });
   }
   return records;

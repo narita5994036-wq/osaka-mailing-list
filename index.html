@@ -645,7 +645,8 @@
   .followup-due { color: #946200; background: #fff4e0; }
   .followup-overdue { color: var(--red); background: #fde8e8; }
   .followup-done { color: var(--green); background: #e8f5ee; }
-  .followup-done:hover, .followup-pending:hover, .followup-due:hover, .followup-overdue:hover { opacity: 0.75; }
+  .followup-notneeded { color: var(--light); background: var(--bg2); }
+  .followup-done:hover, .followup-pending:hover, .followup-due:hover, .followup-overdue:hover, .followup-notneeded:hover { opacity: 0.75; }
 
   .row-delete-btn {
     font-family: 'Inter', 'Hiragino Sans', 'Hiragino Kaku Gothic ProN', 'PingFang SC', 'Microsoft YaHei', 'Noto Sans CJK SC', sans-serif;
@@ -1541,14 +1542,16 @@ function formatTimestamp(ts) {
 const FOLLOWUP_WINDOW_MS = 7 * 24 * 60 * 60 * 1000;
 const FOLLOWUP_DUE_SOON_MS = 2 * 24 * 60 * 60 * 1000;
 
-async function toggleFollowupSent(row) {
+const FOLLOWUP_STATUS_CYCLE = { '': 'sent', sent: 'na', na: '' };
+
+async function cycleFollowupStatus(row) {
   const record = adminRecords.find(r => r.row === row);
   if (!record) return;
-  const newSent = !record.followupSent;
+  const newStatus = FOLLOWUP_STATUS_CYCLE[record.followupStatus] || '';
   try {
-    const json = await adminRequest({ op: 'followup', row: row, sent: newSent ? 'true' : 'false' });
+    const json = await adminRequest({ op: 'followup', row: row, status: newStatus });
     if (json.ok) {
-      record.followupSent = newSent;
+      record.followupStatus = newStatus;
       renderAdminTable();
     } else {
       alert('Failed to update follow-up status. Please try again.');
@@ -1561,8 +1564,12 @@ async function toggleFollowupSent(row) {
 function renderFollowupBadge(r) {
   if (String(r.email).trim().toLowerCase() === 'none') return '<span class="followup-badge followup-na">&mdash;</span>';
 
-  if (r.followupSent) {
-    return `<button class="followup-badge followup-done" onclick="toggleFollowupSent(${r.row})" title="Mark as not sent">&check; Sent</button>`;
+  if (r.followupStatus === 'sent') {
+    return `<button class="followup-badge followup-done" onclick="cycleFollowupStatus(${r.row})" title="Mark as not needed">&check; Sent</button>`;
+  }
+
+  if (r.followupStatus === 'na') {
+    return `<button class="followup-badge followup-notneeded" onclick="cycleFollowupStatus(${r.row})" title="Mark as pending">Not Needed</button>`;
   }
 
   const sentAt = new Date(r.timestamp).getTime();
@@ -1579,7 +1586,7 @@ function renderFollowupBadge(r) {
       label = 'Pending'; cls = 'followup-pending';
     }
   }
-  return `<button class="followup-badge ${cls}" onclick="toggleFollowupSent(${r.row})" title="Mark as sent">${label}</button>`;
+  return `<button class="followup-badge ${cls}" onclick="cycleFollowupStatus(${r.row})" title="Mark as sent">${label}</button>`;
 }
 
 let sortOrder = 'desc';
