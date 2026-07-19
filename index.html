@@ -1163,17 +1163,13 @@ async function handleSubmit() {
   };
 
   try {
-    const res = await fetch(SHEET_WEBHOOK_URL, {
+    await fetch(SHEET_WEBHOOK_URL, {
       method: 'POST',
+      mode: 'no-cors',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(record)
     });
-    const json = await res.json();
-    if (json.result === 'success') {
-      showThanks();
-    } else {
-      throw new Error('Server error');
-    }
+    showThanks();
   } catch (err) {
     btn.disabled = false;
     btn.textContent = i18n[currentLang].submit;
