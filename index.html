@@ -1,0 +1,1571 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MYKITA JAPAN — Frame Warranty Registration</title>
+<style>
+:root {
+  --bg: #0e0e0e;
+  --surface: #161616;
+  --border: #2a2a2a;
+  --light: #c8c8c8;
+  --mid: #757575;
+  --red: #c0392b;
+  --green: #27ae60;
+  --orange: #e67e22;
+  --blue: #185FA5;
+  --font: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { font-size: 16px; }
+body {
+  background: var(--bg);
+  color: var(--light);
+  font-family: var(--font);
+  -webkit-font-smoothing: antialiased;
+  min-height: 100vh;
+}
+
+/* ── LANG BAR ── */
+.lang-bar {
+  display: flex;
+  gap: 8px;
+  padding: 12px 20px;
+  border-bottom: 0.5px solid var(--border);
+  align-items: center;
+}
+.lang-btn {
+  background: none;
+  border: none;
+  color: var(--mid);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  cursor: pointer;
+  padding: 4px 6px;
+  transition: color 0.15s;
+}
+.lang-btn.active, .lang-btn:hover { color: var(--light); }
+
+/* ── HEADER ── */
+.header {
+  padding: 40px 20px 20px;
+  text-align: center;
+  border-bottom: 0.5px solid var(--border);
+}
+.logo {
+  font-size: 20px;
+  letter-spacing: 0.25em;
+  font-weight: 300;
+  color: #fff;
+  cursor: pointer;
+  user-select: none;
+}
+.logo-sub {
+  margin-top: 6px;
+  font-size: 10px;
+  letter-spacing: 0.15em;
+  color: var(--mid);
+  text-transform: uppercase;
+}
+
+/* ── MAIN ── */
+.main {
+  max-width: 480px;
+  margin: 0 auto;
+  padding: 32px 20px 80px;
+}
+
+/* ── SECTION LABEL ── */
+.section-label {
+  font-size: 10px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--mid);
+  border-bottom: 0.5px solid var(--border);
+  padding-bottom: 8px;
+  margin-bottom: 20px;
+}
+
+/* ── WARRANTY INFO BOX ── */
+.warranty-info {
+  border: 0.5px solid var(--border);
+  padding: 20px;
+  margin-bottom: 28px;
+  font-size: 12px;
+  line-height: 1.7;
+  color: var(--mid);
+}
+.warranty-info strong { color: var(--light); display: block; margin-bottom: 6px; font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; }
+
+/* ── FORM FIELDS ── */
+.field { margin-bottom: 20px; }
+.field label {
+  display: block;
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--mid);
+  margin-bottom: 8px;
+}
+.field input[type="text"],
+.field input[type="email"] {
+  width: 100%;
+  background: var(--surface);
+  border: 0.5px solid var(--border);
+  color: var(--light);
+  font-family: var(--font);
+  font-size: 14px;
+  padding: 12px 14px;
+  outline: none;
+  transition: border-color 0.15s;
+  -webkit-appearance: none;
+  border-radius: 0;
+}
+.field input:focus { border-color: var(--light); }
+.field input.err { border-color: var(--red); }
+.err-msg {
+  font-size: 11px;
+  color: var(--red);
+  margin-top: 6px;
+  display: none;
+}
+
+/* ── OPTIN ── */
+.optin-label {
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--mid);
+  margin-bottom: 10px;
+  display: block;
+}
+.optin-desc {
+  font-size: 11px;
+  color: var(--mid);
+  line-height: 1.7;
+  margin-bottom: 14px;
+}
+.radio-group { display: flex; gap: 12px; margin-bottom: 20px; }
+.radio-btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border: 0.5px solid var(--border);
+  padding: 12px;
+  cursor: pointer;
+  font-size: 13px;
+  color: var(--light);
+  transition: border-color 0.15s;
+}
+.radio-btn input[type="radio"] { accent-color: var(--light); }
+.radio-btn:has(input:checked) { border-color: var(--light); }
+
+/* ── AGREE ── */
+.agree-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 28px;
+}
+.agree-row input[type="checkbox"] { margin-top: 2px; accent-color: var(--light); flex-shrink: 0; }
+.agree-text {
+  font-size: 11px;
+  color: var(--mid);
+  line-height: 1.6;
+}
+.agree-text a { color: var(--light); }
+
+/* ── PRIVACY NOTE ── */
+.privacy-note {
+  font-size: 11px;
+  color: var(--mid);
+  line-height: 1.7;
+  margin-bottom: 20px;
+  border-top: 0.5px solid var(--border);
+  padding-top: 16px;
+}
+
+/* ── SUBMIT BTN ── */
+.submit-btn {
+  width: 100%;
+  background: var(--light);
+  color: #000;
+  border: none;
+  font-family: var(--font);
+  font-size: 12px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  padding: 16px;
+  cursor: pointer;
+  transition: background 0.15s;
+  margin-top: 8px;
+}
+.submit-btn:hover { background: #fff; }
+.submit-btn:disabled { background: var(--border); color: var(--mid); cursor: not-allowed; }
+
+/* ── THANKS ── */
+#thanks-area {
+  display: none;
+  text-align: center;
+  padding: 60px 20px;
+}
+.thanks-icon { font-size: 32px; margin-bottom: 20px; }
+.thanks-title { font-size: 14px; letter-spacing: 0.2em; text-transform: uppercase; margin-bottom: 12px; }
+.thanks-sub { font-size: 12px; color: var(--mid); line-height: 1.7; margin-bottom: 32px; }
+.refresh-btn {
+  background: none;
+  border: 0.5px solid var(--border);
+  color: var(--light);
+  font-family: var(--font);
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  padding: 10px 20px;
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s;
+}
+.refresh-btn:hover { border-color: var(--light); }
+
+/* ── AUTOCOMPLETE ── */
+.ac-wrap { position: relative; }
+.ac-input {
+  width: 100%;
+  background: var(--surface);
+  border: 0.5px solid var(--border);
+  color: var(--light);
+  font-family: var(--font);
+  font-size: 14px;
+  padding: 12px 14px;
+  outline: none;
+  transition: border-color 0.15s;
+  -webkit-appearance: none;
+  border-radius: 0;
+}
+.ac-input:focus { border-color: var(--light); }
+.ac-input.err { border-color: var(--red); }
+.ac-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0; right: 0;
+  background: #1e1e1e;
+  border: 0.5px solid var(--border);
+  border-top: none;
+  max-height: 200px;
+  overflow-y: auto;
+  z-index: 100;
+  display: none;
+}
+.ac-wrap.open .ac-dropdown { display: block; }
+.ac-item {
+  padding: 10px 14px;
+  font-size: 13px;
+  color: var(--light);
+  cursor: pointer;
+  transition: background 0.1s;
+}
+.ac-item:hover, .ac-item.highlight { background: #2a2a2a; }
+.ac-empty {
+  padding: 10px 14px;
+  font-size: 12px;
+  color: var(--mid);
+}
+
+/* ── FRAME ENTRY SCREEN ── */
+#form-area { display: none; }
+.frame-row { display: flex; gap: 8px; margin-bottom: 12px; }
+.frame-row .ac-wrap { flex: 1; }
+.frame-remove-btn {
+  width: 44px; height: 44px; flex-shrink: 0;
+  background: none; border: 0.5px solid var(--border);
+  color: var(--light); font-size: 16px; cursor: pointer;
+  transition: color 0.15s, border-color 0.15s;
+}
+.frame-remove-btn:hover { color: var(--red); border-color: var(--red); }
+
+/* ── ADMIN PANEL ── */
+#admin-panel { display: none; }
+.logout-btn {
+  background: none;
+  border: 0.5px solid var(--border);
+  color: var(--mid);
+  font-family: var(--font);
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  padding: 6px 14px;
+  cursor: pointer;
+  transition: color 0.15s, border-color 0.15s;
+}
+.logout-btn:hover { color: var(--light); border-color: var(--light); }
+.admin-header-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.admin-controls { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+.count-badge {
+  font-size: 10px;
+  color: var(--mid);
+  letter-spacing: 0.06em;
+}
+.csv-btn {
+  background: var(--light);
+  color: #000;
+  border: none;
+  font-family: var(--font);
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  padding: 8px 14px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.csv-btn:hover { background: #fff; }
+.csv-filter {
+  background: var(--surface);
+  border: 0.5px solid var(--border);
+  color: var(--light);
+  font-family: var(--font);
+  font-size: 11px;
+  padding: 6px 10px;
+  outline: none;
+  cursor: pointer;
+}
+.table-wrap { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; font-size: 12px; min-width: 700px; }
+th {
+  text-align: left;
+  font-size: 9px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--mid);
+  border-bottom: 0.5px solid var(--border);
+  padding: 8px 10px;
+  white-space: nowrap;
+}
+td {
+  padding: 10px 10px;
+  border-bottom: 0.5px solid #1a1a1a;
+  vertical-align: middle;
+  font-size: 12px;
+}
+tr:hover td { background: #111; }
+.badge-yes { background: #1a3a1a; color: #4caf50; font-size: 10px; padding: 2px 8px; letter-spacing: 0.06em; }
+.badge-no  { background: #2a1a1a; color: #888; font-size: 10px; padding: 2px 8px; letter-spacing: 0.06em; }
+.row-delete-btn {
+  background: none;
+  border: none;
+  color: var(--mid);
+  font-size: 16px;
+  cursor: pointer;
+  padding: 4px 8px;
+  transition: color 0.15s;
+}
+.row-delete-btn:hover { color: var(--red); }
+.empty-state { text-align: center; padding: 40px; color: var(--mid); font-size: 12px; }
+
+/* ── FOLLOW-UP BADGES ── */
+.followup-badge {
+  font-size: 9px;
+  letter-spacing: 0.08em;
+  padding: 3px 8px;
+  border: none;
+  cursor: pointer;
+  font-family: var(--font);
+  text-transform: uppercase;
+  white-space: nowrap;
+  transition: opacity 0.15s;
+}
+.followup-badge:hover { opacity: 0.75; }
+.followup-na      { background: transparent; color: var(--mid); cursor: default; }
+.followup-na:hover { opacity: 1; }
+.followup-pending  { background: #1e1e1e; color: var(--mid); border: 0.5px solid var(--border); }
+.followup-due      { background: #3a2200; color: var(--orange); }
+.followup-overdue  { background: #2a0a0a; color: var(--red); }
+.followup-done     { background: #0a2a0a; color: var(--green); }
+
+/* ── ADMIN GATE ── */
+#admin-gate {
+  display: none;
+  max-width: 400px;
+  margin: 80px auto;
+  padding: 0 20px;
+}
+.gate-title {
+  font-size: 12px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  margin-bottom: 24px;
+  text-align: center;
+}
+.gate-field { margin-bottom: 20px; }
+.gate-field label {
+  display: block;
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--mid);
+  margin-bottom: 8px;
+}
+.gate-field input[type="password"] {
+  width: 100%;
+  background: var(--surface);
+  border: 0.5px solid var(--border);
+  color: var(--light);
+  font-family: var(--font);
+  font-size: 14px;
+  padding: 12px 14px;
+  outline: none;
+  transition: border-color 0.15s;
+  border-radius: 0;
+}
+.gate-field input:focus { border-color: var(--light); }
+
+/* ── EMAIL ACTIONS MENU ── */
+.email-actions-menu {
+  display: none;
+  position: fixed;
+  background: #1e1e1e;
+  border: 0.5px solid var(--border);
+  z-index: 200;
+  min-width: 160px;
+  padding: 4px 0;
+}
+.email-action-btn {
+  display: block;
+  width: 100%;
+  background: none;
+  border: none;
+  color: var(--light);
+  font-family: var(--font);
+  font-size: 12px;
+  padding: 10px 16px;
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.1s;
+}
+.email-action-btn:hover { background: #2a2a2a; }
+
+/* ── MAIL MODAL ── */
+.mail-modal-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.7);
+  z-index: 300;
+  align-items: center;
+  justify-content: center;
+}
+.mail-modal-overlay.open { display: flex; }
+.mail-modal {
+  background: var(--surface);
+  border: 0.5px solid var(--border);
+  padding: 28px;
+  width: 90%;
+  max-width: 500px;
+  max-height: 80vh;
+  overflow-y: auto;
+}
+.mail-modal-recipient { font-size: 11px; color: var(--blue); margin-bottom: 20px; word-break: break-all; }
+.mail-modal-field { margin-bottom: 16px; }
+.mail-modal-field label {
+  display: block;
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--mid);
+  margin-bottom: 6px;
+}
+.mail-template-select {
+  width: 100%;
+  background: var(--bg);
+  border: 0.5px solid var(--border);
+  color: var(--light);
+  font-family: var(--font);
+  font-size: 12px;
+  padding: 8px 10px;
+  outline: none;
+}
+.mail-textarea {
+  width: 100%;
+  background: var(--bg);
+  border: 0.5px solid var(--border);
+  color: var(--light);
+  font-family: var(--font);
+  font-size: 12px;
+  padding: 10px 12px;
+  outline: none;
+  resize: vertical;
+  min-height: 160px;
+  line-height: 1.6;
+}
+.mail-modal-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 16px; }
+</style>
+</head>
+<body>
+
+<!-- ════════════════════════════════════
+     CUSTOMER REGISTRATION APP
+════════════════════════════════════ -->
+<div id="app">
+
+  <!-- LANG BAR -->
+  <div class="lang-bar">
+    <button class="lang-btn active" onclick="setLang('en')">EN</button>
+    <button class="lang-btn" onclick="setLang('ja')">JA</button>
+    <button class="lang-btn" onclick="setLang('zh')">ZH</button>
+    <button class="lang-btn" onclick="setLang('ko')">KO</button>
+  </div>
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="logo" id="logo-tap">MYKITA JAPAN</div>
+    <div class="logo-sub" id="lbl-subtitle">Frame Warranty Registration</div>
+  </div>
+
+  <div class="main">
+
+    <!-- FRAME ENTRY AREA -->
+    <div id="frame-entry-area">
+      <p class="section-label" id="lbl-frame-info">Purchased Frame(s)</p>
+      <p class="optin-desc" id="lbl-frame-desc" style="margin-bottom:1.5rem;">Please enter the name(s) of the MYKITA frame(s) you purchased. You may add multiple frames, or skip this step.</p>
+      <div id="frame-row-list"></div>
+      <button class="refresh-btn" type="button" onclick="addFrameRow()" id="lbl-frame-add" style="margin-bottom:2rem;">+ Add Frame</button>
+      <div style="display:flex; gap:10px;">
+        <button class="refresh-btn" style="flex:1; height:48px;" onclick="skipFrameEntry()" id="lbl-frame-skip">Skip</button>
+        <button class="submit-btn" style="flex:1; margin-top:0;" onclick="continueFrameEntry()" id="lbl-frame-continue">Continue</button>
+      </div>
+    </div>
+
+    <!-- FORM AREA -->
+    <div id="form-area">
+
+      <!-- Warranty info -->
+      <div class="warranty-info">
+        <strong id="lbl-warranty-title">Warranty Information</strong>
+        <span id="lbl-warranty-body">MYKITA frames are covered by a 2-year manufacturer's warranty from the date of purchase. Please complete this registration to activate your warranty.</span>
+      </div>
+
+      <p class="section-label" id="lbl-personal">Personal Information</p>
+
+      <!-- Name -->
+      <div class="field">
+        <label id="lbl-name">Full Name</label>
+        <input type="text" id="f-name" autocomplete="name" oninput="updateSubmitState()">
+        <div class="err-msg" id="e-name">Please enter your name.</div>
+      </div>
+
+      <!-- Country -->
+      <div class="field">
+        <label id="lbl-country">Country / Region</label>
+        <div class="ac-wrap" id="country-ac-wrap">
+          <input type="text" class="ac-input" id="f-country-input" autocomplete="off" oninput="updateSubmitState()">
+          <input type="hidden" id="f-country">
+          <div class="ac-dropdown" id="country-dropdown"></div>
+        </div>
+        <div class="err-msg" id="e-country">Please select your country.</div>
+      </div>
+
+      <!-- Email -->
+      <div class="field">
+        <label id="lbl-email">Email Address</label>
+        <div class="ac-wrap" id="email-ac-wrap">
+          <input type="email" class="ac-input" id="f-email" autocomplete="email" oninput="updateSubmitState()">
+          <div class="ac-dropdown" id="email-dropdown"></div>
+        </div>
+        <div class="err-msg" id="e-email">Please enter a valid email address.</div>
+      </div>
+
+      <!-- Opt-in -->
+      <p class="section-label" id="lbl-optin-section" style="margin-top:8px;">Email Opt-in</p>
+      <p class="optin-desc" id="lbl-optin-desc">Would you like to receive exclusive offers, news, and updates from MYKITA JAPAN?</p>
+      <div class="radio-group">
+        <label class="radio-btn">
+          <input type="radio" name="optin" id="f-optin-yes" value="yes" onchange="updateSubmitState()">
+          <span id="lbl-yes">Yes</span>
+        </label>
+        <label class="radio-btn">
+          <input type="radio" name="optin" id="f-optin-no" value="no" onchange="updateSubmitState()">
+          <span id="lbl-no">No</span>
+        </label>
+      </div>
+
+      <!-- Privacy note -->
+      <div class="privacy-note" id="lbl-privacy">
+        Your personal information will be used solely for warranty registration and, if you opted in, to send you relevant communications from MYKITA JAPAN. We will never share your data with third parties.
+      </div>
+
+      <!-- Agree -->
+      <div class="agree-row">
+        <input type="checkbox" id="f-agree" onchange="updateSubmitState()">
+        <span class="agree-text" id="lbl-agree">I agree to the <a href="#" onclick="return false;">Privacy Policy</a> and consent to the processing of my personal data for warranty registration purposes.</span>
+      </div>
+
+      <button class="submit-btn" id="submit-btn" onclick="handleSubmit()" disabled id="lbl-submit">Register</button>
+    </div>
+
+    <!-- THANKS AREA -->
+    <div id="thanks-area">
+      <div class="thanks-icon">✓</div>
+      <div class="thanks-title" id="lbl-thanks-title">Registration Complete</div>
+      <div class="thanks-sub" id="lbl-thanks-sub">Thank you for registering your MYKITA frame. Your warranty is now active.</div>
+      <button class="refresh-btn" onclick="resetForm()" id="lbl-register-another">Register Another Frame</button>
+    </div>
+
+  </div>
+</div>
+
+<!-- ════════════════════════════════════
+     ADMIN GATE
+════════════════════════════════════ -->
+<div id="admin-gate">
+  <p class="gate-title">Admin Access</p>
+  <div class="gate-field">
+    <label>Password</label>
+    <input type="password" id="admin-pw" placeholder="••••••••" onkeydown="if(event.key==='Enter')checkPw()">
+    <div class="err-msg" id="e-pw" style="display:block; visibility:hidden;">Incorrect password.</div>
+  </div>
+  <button class="submit-btn" onclick="checkPw()">Enter</button>
+</div>
+
+<!-- ════════════════════════════════════
+     ADMIN PANEL
+════════════════════════════════════ -->
+<div id="admin-panel">
+  <div class="lang-bar">
+    <button class="logout-btn" style="margin-left:auto;" onclick="logout()">Logout</button>
+  </div>
+  <div class="header">
+    <div class="logo">MYKITA JAPAN</div>
+    <div class="logo-sub">Admin — Warranty Registrations</div>
+  </div>
+  <div class="main" style="max-width:none; padding:24px 20px 60px;">
+    <div class="admin-header-row">
+      <div>
+        <p class="section-label" style="border:none; margin:0 0 4px;">Registration List</p>
+        <span class="count-badge" id="admin-count">0 records</span>
+      </div>
+      <div class="admin-controls">
+        <button class="refresh-btn" id="refresh-btn" onclick="refreshRecords()">&#8635; Refresh</button>
+        <button class="refresh-btn" id="sort-btn" onclick="toggleSortOrder()">Newest First &#8595;</button>
+        <select class="csv-filter" id="csv-filter" onchange="renderAdminTable()">
+          <option value="all">All Opt-ins</option>
+          <option value="yes">Yes Only</option>
+          <option value="no">No Only</option>
+        </select>
+        <button class="csv-btn" onclick="downloadCSV()">&#8595; Download CSV</button>
+      </div>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr>
+          <th>#</th><th>Timestamp</th><th>Name</th><th>Country</th>
+          <th>Email</th><th>Opt-in</th><th>Follow-up</th><th>Frames</th><th>Lang</th><th></th>
+        </tr></thead>
+        <tbody id="admin-tbody"></tbody>
+      </table>
+      <div class="empty-state" id="empty-state" style="display:none;">No registrations yet.</div>
+    </div>
+  </div>
+
+  <!-- Email actions context menu -->
+  <div class="email-actions-menu" id="email-actions-menu">
+    <button class="email-action-btn" onclick="copyEmailAddress()">Copy Email</button>
+    <button class="email-action-btn" id="email-action-compose" onclick="composeFromEmailActions()">Compose Mail</button>
+  </div>
+
+  <!-- Mail modal -->
+  <div class="mail-modal-overlay" id="mail-modal-overlay" onclick="closeMailModalOnOverlay(event)">
+    <div class="mail-modal">
+      <p class="section-label" style="border:none; margin:0 0 4px;">Compose Follow-up Email</p>
+      <p class="mail-modal-recipient" id="mail-recipient"></p>
+      <div class="mail-modal-field">
+        <label>Template</label>
+        <select class="mail-template-select" id="mail-template-select" onchange="applyMailTemplate()"></select>
+      </div>
+      <div class="mail-modal-field">
+        <label>Message</label>
+        <textarea class="mail-textarea" id="mail-textarea"></textarea>
+      </div>
+      <div class="mail-modal-actions">
+        <button class="refresh-btn" onclick="closeMailModal()">Close</button>
+        <button class="csv-btn" id="mail-copy-btn" onclick="copyMailText()">Copy</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+'use strict';
+
+// ── CONFIG ──
+const SHEET_WEBHOOK_URL = 'https://script.google.com/macros/s/AKfycbxLB55Uguc2aldf_krZTztSdlOO8YBIhZVl92lBx1YgcAzVNhs_OMPYojZ0mrr_puGaqA/exec';
+
+// ── GLOBALS ──
+let adminPassword = '';
+let adminRecords = [];
+let currentLang = 'en';
+let isAdmin = false;
+const LOGO_TAP_COUNT = 5;
+const LOGO_TAP_WINDOW_MS = 2000;
+let logoTapCount = 0;
+let logoTapTimer = null;
+let acHighlight = -1;
+let emailHighlight = -1;
+let sortNewest = true;
+let activeEmailRow = null;
+let activeEmailEl = null;
+let purchasedFrames = [];
+
+// ── FOLLOW-UP TIMING ──
+const FOLLOWUP_WINDOW_MS = 7 * 24 * 60 * 60 * 1000;
+const FOLLOWUP_DUE_SOON_MS = 2 * 24 * 60 * 60 * 1000;
+
+// ── I18N ──
+const i18n = {
+  en: {
+    subtitle: 'Frame Warranty Registration',
+    warrantyTitle: 'Warranty Information',
+    warrantyBody: 'MYKITA frames are covered by a 2-year manufacturer\'s warranty from the date of purchase. Please complete this registration to activate your warranty.',
+    personal: 'Personal Information',
+    name: 'Full Name', country: 'Country / Region', email: 'Email Address',
+    optinSection: 'Email Opt-in',
+    optinDesc: 'Would you like to receive exclusive offers, news, and updates from MYKITA JAPAN?',
+    yes: 'Yes', no: 'No',
+    privacy: 'Your personal information will be used solely for warranty registration and, if you opted in, to send you relevant communications from MYKITA JAPAN. We will never share your data with third parties.',
+    agree: 'I agree to the Privacy Policy and consent to the processing of my personal data for warranty registration purposes.',
+    submit: 'Register',
+    thanksTitle: 'Registration Complete',
+    thanksSub: 'Thank you for registering your MYKITA frame. Your warranty is now active.',
+    registerAnother: 'Register Another Frame',
+    errName: 'Please enter your name.',
+    errCountry: 'Please select your country.',
+    errEmail: 'Please enter a valid email address.',
+    errOptin: 'Please select an option.',
+    errAgree: 'Please agree to the privacy policy.',
+    lblFrameInfo: 'Purchased Frame(s)',
+    lblFrameDesc: 'Please enter the name(s) of the MYKITA frame(s) you purchased. You may add multiple frames, or skip this step.',
+    lblFrameAdd: '+ Add Frame', lblFrameSkip: 'Skip', lblFrameContinue: 'Continue', framePlaceholder: 'Frame name',
+  },
+  ja: {
+    subtitle: 'フレーム保証登録',
+    warrantyTitle: '保証について',
+    warrantyBody: 'MYKITAフレームには、ご購入日より2年間のメーカー保証が適用されます。保証を有効にするために、以下の登録を完了してください。',
+    personal: 'お客様情報',
+    name: 'お名前', country: '国 / 地域', email: 'メールアドレス',
+    optinSection: 'メール配信',
+    optinDesc: 'MYKITA JAPANからの最新情報・限定オファーをお受け取りになりますか？',
+    yes: 'はい', no: 'いいえ',
+    privacy: 'ご提供いただいた個人情報は、保証登録および（同意された場合）MYKITA JAPANからのご案内送付のみに使用します。第三者への提供は一切行いません。',
+    agree: 'プライバシーポリシーに同意し、保証登録のための個人情報の取り扱いに同意します。',
+    submit: '登録する',
+    thanksTitle: '登録完了',
+    thanksSub: 'MYKITAフレームをご登録いただきありがとうございます。保証が有効になりました。',
+    registerAnother: '別のフレームを登録する',
+    errName: 'お名前を入力してください。',
+    errCountry: '国を選択してください。',
+    errEmail: '有効なメールアドレスを入力してください。',
+    errOptin: '選択してください。',
+    errAgree: 'プライバシーポリシーに同意してください。',
+    lblFrameInfo: 'ご購入フレーム',
+    lblFrameDesc: 'ご購入されたMYKITAフレームの名前を入力してください。複数点ある場合は追加できます。スキップも可能です。',
+    lblFrameAdd: '+ フレームを追加', lblFrameSkip: 'スキップ', lblFrameContinue: '次へ', framePlaceholder: 'フレーム名',
+  },
+  zh: {
+    subtitle: '镜架保修登记',
+    warrantyTitle: '保修信息',
+    warrantyBody: 'MYKITA镜架自购买之日起享有2年制造商保修。请完成此登记以激活您的保修。',
+    personal: '个人信息',
+    name: '姓名', country: '国家 / 地区', email: '电子邮箱',
+    optinSection: '邮件订阅',
+    optinDesc: '您是否希望收到来自MYKITA JAPAN的独家优惠、资讯和最新动态？',
+    yes: '是', no: '否',
+    privacy: '您的个人信息仅用于保修登记，以及（如您同意）向您发送MYKITA JAPAN的相关通讯。我们绝不会将您的数据分享给第三方。',
+    agree: '我同意隐私政策，并同意为保修登记目的处理我的个人数据。',
+    submit: '登记',
+    thanksTitle: '登记完成',
+    thanksSub: '感谢您登记您的MYKITA镜架。您的保修现已生效。',
+    registerAnother: '登记另一副镜架',
+    errName: '请输入您的姓名。',
+    errCountry: '请选择您的国家。',
+    errEmail: '请输入有效的电子邮箱地址。',
+    errOptin: '请选择一项。',
+    errAgree: '请同意隐私政策。',
+    lblFrameInfo: '购买的镜架',
+    lblFrameDesc: '请输入您购买的MYKITA镜架名称。如有多件可点击添加，也可跳过此步骤。',
+    lblFrameAdd: '+ 添加镜架', lblFrameSkip: '跳过', lblFrameContinue: '继续', framePlaceholder: '镜架名称',
+  },
+  ko: {
+    subtitle: '프레임 보증 등록',
+    warrantyTitle: '보증 안내',
+    warrantyBody: 'MYKITA 프레임은 구매일로부터 2년간 제조사 보증이 적용됩니다. 보증을 활성화하려면 아래 등록을 완료해 주세요.',
+    personal: '개인 정보',
+    name: '성명', country: '국가 / 지역', email: '이메일 주소',
+    optinSection: '이메일 수신 동의',
+    optinDesc: 'MYKITA JAPAN의 독점 혜택, 소식, 최신 정보를 받아보시겠습니까?',
+    yes: '예', no: '아니요',
+    privacy: '제공하신 개인 정보는 보증 등록 및 (동의하신 경우) MYKITA JAPAN의 관련 통신 발송에만 사용됩니다. 제3자에게 데이터를 공유하지 않습니다.',
+    agree: '개인정보 처리방침에 동의하며, 보증 등록 목적으로 개인 정보 처리에 동의합니다.',
+    submit: '등록하기',
+    thanksTitle: '등록 완료',
+    thanksSub: 'MYKITA 프레임을 등록해 주셔서 감사합니다. 보증이 활성화되었습니다.',
+    registerAnother: '다른 프레임 등록',
+    errName: '이름을 입력해 주세요.',
+    errCountry: '국가를 선택해 주세요.',
+    errEmail: '유효한 이메일 주소를 입력해 주세요.',
+    errOptin: '옵션을 선택해 주세요.',
+    errAgree: '개인정보 처리방침에 동의해 주세요.',
+    lblFrameInfo: '구매하신 프레임',
+    lblFrameDesc: '구매하신 MYKITA 프레임의 이름을 입력해 주세요. 여러 개인 경우 추가할 수 있으며, 건너뛰기도 가능합니다.',
+    lblFrameAdd: '+ 프레임 추가', lblFrameSkip: '건너뛰기', lblFrameContinue: '다음', framePlaceholder: '프레임 이름',
+  }
+};
+
+function setLang(lang) {
+  currentLang = lang;
+  const t = i18n[lang];
+  document.querySelectorAll('.lang-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.textContent === lang.toUpperCase());
+  });
+  document.getElementById('lbl-subtitle').textContent = t.subtitle;
+  document.getElementById('lbl-warranty-title').textContent = t.warrantyTitle;
+  document.getElementById('lbl-warranty-body').textContent = t.warrantyBody;
+  document.getElementById('lbl-personal').textContent = t.personal;
+  document.getElementById('lbl-name').textContent = t.name;
+  document.getElementById('lbl-country').textContent = t.country;
+  document.getElementById('lbl-email').textContent = t.email;
+  document.getElementById('lbl-optin-section').textContent = t.optinSection;
+  document.getElementById('lbl-optin-desc').textContent = t.optinDesc;
+  document.getElementById('lbl-yes').textContent = t.yes;
+  document.getElementById('lbl-no').textContent = t.no;
+  document.getElementById('lbl-privacy').textContent = t.privacy;
+  document.getElementById('lbl-agree').innerHTML = t.agree;
+  document.getElementById('submit-btn').textContent = t.submit;
+  document.getElementById('lbl-thanks-title').textContent = t.thanksTitle;
+  document.getElementById('lbl-thanks-sub').textContent = t.thanksSub;
+  document.getElementById('lbl-register-another').textContent = t.registerAnother;
+  document.getElementById('e-name').textContent = t.errName;
+  document.getElementById('e-country').textContent = t.errCountry;
+  document.getElementById('e-email').textContent = t.errEmail;
+  document.getElementById('lbl-frame-info').textContent = t.lblFrameInfo;
+  document.getElementById('lbl-frame-desc').textContent = t.lblFrameDesc;
+  document.getElementById('lbl-frame-add').textContent = t.lblFrameAdd;
+  document.getElementById('lbl-frame-skip').textContent = t.lblFrameSkip;
+  document.getElementById('lbl-frame-continue').textContent = t.lblFrameContinue;
+  document.querySelectorAll('.frame-input').forEach(el => { el.placeholder = t.framePlaceholder; });
+  const countryInput = document.getElementById('f-country-input');
+  if (countryInput) countryInput.placeholder = '';
+}
+
+// ── FRAME NAME ENTRY ──
+const FRAME_NAMES = [
+"EKON","CL40347U","LW40182U","LW50107I","LAMIN","BELLIS__CUSTOMIZED","IELO","KILIAN II","IELO__CUSTOMIZED","KAAVI","MYLON MH48","MYLON MH64","MYLON MH29","SEHEL","RIU","MYLON MH56","MYLON MH60","MYLON MH9","MYLON MH24","MYLON MH20","MYLON MH39","MYLON MH14","MYLON MH45","MYLON MH72","MYLON MH17","MYLON MH33","MYLON MH12","MYLON MH26","MYLON MH1","MYLON MH37","MYLON MH53","MYLON MH68","MYLON MH4","MYLON MH76","MYLON MH31","MYLON MH43","MYLON MH41","MYLON MH5","MYLON MH22","MYLON MH7","MYLON MH51","MYLON MH70","MYLON MH66","MYLON MH16","MYLON MH35","MYLON MH3","MYLON MH49","MYLON MH58","MYLON MH2","MYLON MH62","MYLON MH8","MYLON MH47","MYLON MH27","MYLON MH54","MYLON MH28","MYLON MH23","MYLON MH18","MYLON MH74","MYLON MH30","MYLON MH13","MYLON MH42","MYLON MH11","MYLON MH46","MYLON MH6","MYLON MH55","MYLON MH38","MYLON MH10","MYLON MH34","MYLON MH25","MYLON MH67","MYLON MH71","MYLON MH52","MYLON MH15","MYLON MH65","MYLON MH59","MYLON MH32","MYLON MH44","MYLON MH57","MYLON MH21","MYLON MH69","MYLON MH40","MYLON MH36","MYLON MH63","MYLON MH19","MYLON MH50","MYLON MH61","MYLON MH73","MYLON MH75","ALINE","LERATO II","SWAY","KIPLING","VALE","LEMON","BIWA","MITO","LIBER II","LITT","IKI","NOOR","ELIA","SAGA","MENO","OBI","ROEL","NELS","TALVI","RILL","SAWA","MELI II","DAYO","PEER","GADA","POLO","KAUR","SAWA__CUSTOMIZED","OBI__CUSTOMIZED","DAYO__CUSTOMIZED","MITO__CUSTOMIZED","VALE__CUSTOMIZED","ELIA__CUSTOMIZED","SAGA__CUSTOMIZED","NOOR__CUSTOMIZED","KAUR__CUSTOMIZED","POLO__CUSTOMIZED","PEER__CUSTOMIZED","GADA__CUSTOMIZED","ROEL__CUSTOMIZED","LEMON__CUSTOMIZED","BIWA__CUSTOMIZED","LIBER II__CUSTOMIZED","IKI__CUSTOMIZED","LITT__CUSTOMIZED","KIPLING__CUSTOMIZED","MENO__CUSTOMIZED","NELS__CUSTOMIZED","TALVI__CUSTOMIZED","RILL__CUSTOMIZED","ALINE__CUSTOMIZED","LERATO II__CUSTOMIZED","SWAY__CUSTOMIZED","VALE II","SAWA II","LEMON II","BIWA II","MITO II","LIBER III","LITT II","IKI II","NOOR II","ELIA II","SAGA II","MENO II","OBI II","ROEL II","NELS II","TALVI II","RILL II","MELI III","DAYO II","PEER II","GADA II","POLO II","KAUR II","KILIAN III","VALE III","SAWA III","LEMON III","BIWA III","MITO III","LIBER IV","LITT III","IKI III","NOOR III","ELIA III","SAGA III","MENO III","OBI III","ROEL III","NELS III","TALVI III","RILL III","MELI IV","DAYO III","PEER III","GADA III","POLO III","KAUR III","KILIAN IV","CHEERS","GROVE","MYLON MHMKITA","PINA","EDWYN","AYAH","ORIN","SURI","AMOS","ELAN","SHION","LOKE","LUMI","KARO","MYLON MHLIMIT","MYLON MHSPECIAL","MYLON MH0","CELLO","BARD","OSLO","MYLON MH77","MYLON MH78","MYLON MH79","MYLON MH80","CHEERS II","GROVE II","PINA II","EDWYN II","AYAH II","ORIN II","SURI II","AMOS II","ELAN II","SHION II","LOKE II","LUMI II","KARO II","CELLO II","BARD II","OSLO II","CHEERS III","GROVE III","PINA III","EDWYN III","AYAH III","ORIN III","SURI III","AMOS III","ELAN III","SHION III","LOKE III","LUMI III","KARO III","CELLO III","BARD III","OSLO III","YOVA","YOVA II","YOVA III","HELO","HELO II","HELO III","KIVI","KIVI II","KIVI III","KURA","KURA II","KURA III","LASO","LASO II","LASO III","NAHO","NAHO II","NAHO III","PETU","PETU II","PETU III","RAVI","RAVI II","RAVI III","SOMI","SOMI II","SOMI III","TONI","TONI II","TONI III","ULLI","ULLI II","ULLI III","VAHO","VAHO II","VAHO III","WALD","WALD II","WALD III","XIMO","XIMO II","XIMO III","YAGO","YAGO II","YAGO III","ZALO","ZALO II","ZALO III","ABEL","ABEL II","ABEL III","BELO","BELO II","BELO III","CINO","CINO II","CINO III","DILO","DILO II","DILO III","ELLO","ELLO II","ELLO III","FALO","FALO II","FALO III","GINO","GINO II","GINO III","HINO","HINO II","HINO III","ILLO","ILLO II","ILLO III","JINO","JINO II","JINO III","KINO","KINO II","KINO III","LINO","LINO II","LINO III","MINO","MINO II","MINO III","NINO","NINO II","NINO III","OINO","OINO II","OINO III","PINO","PINO II","PINO III","QINO","QINO II","QINO III","RINO","RINO II","RINO III","SINO","SINO II","SINO III","TINO","TINO II","TINO III","UWNO","UWNO II","UWNO III","VINO","VINO II","VINO III","WINO","WINO II","WINO III","XINO","XINO II","XINO III","YINO","YINO II","YINO III","ZINO","ZINO II","ZINO III","APILL","APILL II","BPILL","BPILL II","CPILL","CPILL II","DPILL","DPILL II","EPILL","EPILL II","FPILL","FPILL II","GPILL","GPILL II","HPILL","HPILL II","IPILL","IPILL II","JPILL","JPILL II","KPILL","KPILL II","LPILL","LPILL II","MPILL","MPILL II","NPILL","NPILL II","OPILL","OPILL II","PPILL","PPILL II","QPILL","QPILL II","RPILL","RPILL II","SPILL","SPILL II","TPILL","TPILL II","UPILL","UPILL II","VPILL","VPILL II","WPILL","WPILL II","XPILL","XPILL II","YPILL","YPILL II","ZPILL","ZPILL II","ACOS","ACOS II","BCOS","BCOS II","CCOS","CCOS II","DCOS","DCOS II","ECOS","ECOS II","FCOS","FCOS II","GCOS","GCOS II","HCOS","HCOS II","ICOS","ICOS II","JCOS","JCOS II","KCOS","KCOS II","LCOS","LCOS II","MCOS","MCOS II","NCOS","NCOS II","OCOS","OCOS II","PCOS","PCOS II","QCOS","QCOS II","RCOS","RCOS II","SCOS","SCOS II","TCOS","TCOS II","UCOS","UCOS II","VCOS","VCOS II","WCOS","WCOS II","XCOS","XCOS II","YCOS","YCOS II","ZCOS","ZCOS II","AMYC","AMYC II","BMYC","BMYC II","CMYC","CMYC II","DMYC","DMYC II","EMYC","EMYC II","FMYC","FMYC II","GMYC","GMYC II","HMYC","HMYC II","IMYC","IMYC II","JMYC","JMYC II","KMYC","KMYC II","LMYC","LMYC II","MMYC","MMYC II","NMYC","NMYC II","OMYC","OMYC II","PMYC","PMYC II","QMYC","QMYC II","RMYC","RMYC II","SMYC","SMYC II","TMYC","TMYC II","UMYC","UMYC II","VMYC","VMYC II","WMYC","WMYC II","XMYC","XMYC II","YMYC","YMYC II","ZMYC","ZMYC II","AKIA","AKIA II","BKIA","BKIA II","CKIA","CKIA II","DKIA","DKIA II","EKIA","EKIA II","FKIA","FKIA II","GKIA","GKIA II","HKIA","HKIA II","IKIA","IKIA II","JKIA","JKIA II","KKIA","KKIA II","LKIA","LKIA II","MKIA","MKIA II","NKIA","NKIA II","OKIA","OKIA II","PKIA","PKIA II","QKIA","QKIA II","RKIA","RKIA II","SKIA","SKIA II","TKIA","TKIA II","UKIA","UKIA II","VKIA","VKIA II","WKIA","WKIA II","XKIA","XKIA II","YKIA","YKIA II","ZKIA","ZKIA II","ALOS","ALOS II","BLOS","BLOS II","CLOS","CLOS II","DLOS","DLOS II","ELOS","ELOS II","FLOS","FLOS II","GLOS","GLOS II","HLOS","HLOS II","ILOS","ILOS II","JLOS","JLOS II","KLOS","KLOS II","LLOS","LLOS II","MLOS","MLOS II","NLOS","NLOS II","OLOS","OLOS II","PLOS","PLOS II","QLOS","QLOS II","RLOS","RLOS II","SLOS","SLOS II","TLOS","TLOS II","ULOS","ULOS II","VLOS","VLOS II","WLOS","WLOS II","XLOS","XLOS II","YLOS","YLOS II","ZLOS","ZLOS II","ATAG","ATAG II","BTAG","BTAG II","CTAG","CTAG II","DTAG","DTAG II","ETAG","ETAG II","FTAG","FTAG II","GTAG","GTAG II","HTAG","HTAG II","ITAG","ITAG II","JTAG","JTAG II","KTAG","KTAG II","LTAG","LTAG II","MTAG","MTAG II","NTAG","NTAG II","OTAG","OTAG II","PTAG","PTAG II","QTAG","QTAG II","RTAG","RTAG II","STAG","STAG II","TTAG","TTAG II","UTAG","UTAG II","VTAG","VTAG II","WTAG","WTAG II","XTAG","XTAG II","YTAG","YTAG II","ZTAG","ZTAG II","AREK","AREK II","BREK","BREK II","CREK","CREK II","DREK","DREK II","EREK","EREK II","FREK","FREK II","GREK","GREK II","HREK","HREK II","IREK","IREK II","JREK","JREK II","KREK","KREK II","LREK","LREK II","MREK","MREK II","NREK","NREK II","OREK","OREK II","PREK","PREK II","QREK","QREK II","RREK","RREK II","SREK","SREK II","TREK","TREK II","UREK","UREK II","VREK","VREK II","WREK","WREK II","XREK","XREK II","YREK","YREK II","ZREK","ZREK II","AFIT","AFIT II","BFIT","BFIT II","CFIT","CFIT II","DFIT","DFIT II","EFIT","EFIT II","FFIT","FFIT II","GFIT","GFIT II","HFIT","HFIT II","IFIT","IFIT II","JFIT","JFIT II","KFIT","KFIT II","LFIT","LFIT II","MFIT","MFIT II","NFIT","NFIT II","OFIT","OFIT II","PFIT","PFIT II","QFIT","QFIT II","RFIT","RFIT II","SFIT","SFIT II","TFIT","TFIT II","UFIT","UFIT II","VFIT","VFIT II","WFIT","WFIT II","XFIT","XFIT II","YFIT","YFIT II","ZFIT","ZFIT II","AMOD","AMOD II","BMOD","BMOD II","CMOD","CMOD II","DMOD","DMOD II","EMOD","EMOD II","FMOD","FMOD II","GMOD","GMOD II","HMOD","HMOD II","IMOD","IMOD II","JMOD","JMOD II","KMOD","KMOD II","LMOD","LMOD II","MMOD","MMOD II","NMOD","NMOD II","OMOD","OMOD II","PMOD","PMOD II","QMOD","QMOD II","RMOD","RMOD II","SMOD","SMOD II","TMOD","TMOD II","UMOD","UMOD II","VMOD","VMOD II","WMOD","WMOD II","XMOD","XMOD II","YMOD","YMOD II","ZMOD","ZMOD II","ASET","ASET II","BSET","BSET II","CSET","CSET II","DSET","DSET II","ESET","ESET II","FSET","FSET II","GSET","GSET II","HSET","HSET II","ISET","ISET II","JSET","JSET II","KSET","KSET II","LSET","LSET II","MSET","MSET II","NSET","NSET II","OSET","OSET II","PSET","PSET II","QSET","QSET II","RSET","RSET II","SSET","SSET II","TSET","TSET II","USET","USET II","VSET","VSET II","WSET","WSET II","XSET","XSET II","YSET","YSET II","ZSET","ZSET II","ALEN","ALEN II","BLEN","BLEN II","CLEN","CLEN II","DLEN","DLEN II","ELEN","ELEN II","FLEN","FLEN II","GLEN","GLEN II","HLEN","HLEN II","ILEN","ILEN II","JLEN","JLEN II","KLEN","KLEN II","LLEN","LLEN II","MLEN","MLEN II","NLEN","NLEN II","OLEN","OLEN II","PLEN","PLEN II","QLEN","QLEN II","RLEN","RLEN II","SLEN","SLEN II","TLEN","TLEN II","ULEN","ULEN II","VLEN","VLEN II","WLEN","WLEN II","XLEN","XLEN II","YLEN","YLEN II","ZLEN","ZLEN II","ALUX","ALUX II","BLUX","BLUX II","CLUX","CLUX II","DLUX","DLUX II","ELUX","ELUX II","FLUX","FLUX II","GLUX","GLUX II","HLUX","HLUX II","ILUX","ILUX II","JLUX","JLUX II","KLUX","KLUX II","LLUX","LLUX II","MLUX","MLUX II","NLUX","NLUX II","OLUX","OLUX II","PLUX","PLUX II","QLUX","QLUX II","RLUX","RLUX II","SLUX","SLUX II","TLUX","TLUX II","ULUX","ULUX II","VLUX","VLUX II","WLUX","WLUX II","XLUX","XLUX II","YLUX","YLUX II","ZLUX","ZLUX II","ASUN","ASUN II","BSUN","BSUN II","CSUN","CSUN II","DSUN","DSUN II","ESUN","ESUN II","FSUN","FSUN II","GSUN","GSUN II","HSUN","HSUN II","ISUN","ISUN II","JSUN","JSUN II","KSUN","KSUN II","LSUN","LSUN II","MSUN","MSUN II","NSUN","NSUN II","OSUN","OSUN II","PSUN","PSUN II","QSUN","QSUN II","RSUN","RSUN II","SSUN","SSUN II","TSUN","TSUN II","USUN","USUN II","VSUN","VSUN II","WSUN","WSUN II","XSUN","XSUN II","YSUN","YSUN II","ZSUN","ZSUN II"
+];
+
+let frameRows = [{ id: 0 }];
+let frameRowSeq = 1;
+
+function renderFrameRowList() {
+  const list = document.getElementById('frame-row-list');
+  const t = i18n[currentLang];
+  list.innerHTML = frameRows.map(row => `
+    <div class="frame-row" data-id="${row.id}">
+      <div class="ac-wrap" id="frame-ac-wrap-${row.id}">
+        <input type="text" class="ac-input frame-input" id="frame-input-${row.id}" autocomplete="off" placeholder="${t.framePlaceholder || 'Frame name'}">
+        <div class="ac-dropdown" id="frame-dropdown-${row.id}"></div>
+      </div>
+      ${frameRows.length > 1 ? `<button type="button" class="frame-remove-btn" onclick="removeFrameRow(${row.id})" aria-label="Remove">&times;</button>` : ''}
+    </div>
+  `).join('');
+  frameRows.forEach(row => initFrameAutocomplete(row.id));
+}
+
+function addFrameRow() {
+  if (frameRows.length >= 3) return;
+  frameRows.push({ id: frameRowSeq++ });
+  renderFrameRowList();
+}
+
+function removeFrameRow(id) {
+  if (frameRows.length <= 1) return;
+  frameRows = frameRows.filter(r => r.id !== id);
+  renderFrameRowList();
+}
+
+function resetFrameEntry() {
+  frameRows = [{ id: 0 }]; frameRowSeq = 1; purchasedFrames = [];
+  renderFrameRowList();
+}
+
+function initFrameAutocomplete(id) {
+  const wrap = document.getElementById('frame-ac-wrap-' + id);
+  const input = document.getElementById('frame-input-' + id);
+  const dropdown = document.getElementById('frame-dropdown-' + id);
+  if (!wrap || !input || !dropdown) return;
+
+  function renderList(query) {
+    const q = query.trim().toLowerCase();
+    const filtered = q ? FRAME_NAMES.filter(n => n.toLowerCase().includes(q)) : FRAME_NAMES.slice(0, 50);
+    if (filtered.length === 0) { closeDropdown(); return; }
+    dropdown.innerHTML = filtered.slice(0, 100).map(n => `<div class="ac-item" data-value="${escapeHtml(n)}">${escapeHtml(n)}</div>`).join('');
+    wrap.classList.add('open');
+    dropdown.querySelectorAll('.ac-item').forEach(item => {
+      item.addEventListener('mousedown', e => { e.preventDefault(); input.value = item.dataset.value; closeDropdown(); });
+    });
+  }
+  function closeDropdown() { wrap.classList.remove('open'); dropdown.innerHTML = ''; }
+  input.addEventListener('input', () => renderList(input.value));
+  input.addEventListener('focus', () => { if (input.value) renderList(input.value); });
+  input.addEventListener('keydown', e => { if (e.key === 'Escape') { closeDropdown(); input.blur(); } });
+  document.addEventListener('click', e => { if (!wrap.contains(e.target)) closeDropdown(); });
+}
+
+function collectFrameNames() {
+  return frameRows.map(row => document.getElementById('frame-input-' + row.id))
+    .filter(input => input && input.value.trim()).map(input => input.value.trim());
+}
+
+function showFormArea() {
+  document.getElementById('frame-entry-area').style.display = 'none';
+  document.getElementById('form-area').style.display = 'block';
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function skipFrameEntry() { purchasedFrames = []; showFormArea(); }
+function continueFrameEntry() { purchasedFrames = collectFrameNames(); showFormArea(); }
+
+// ── COUNTRY AUTOCOMPLETE ──
+const COUNTRIES = [
+  { name: 'Japan', code: 'JP' },
+  { name: 'United States', code: 'US' },
+  { name: 'China', code: 'CN' },
+  { name: 'South Korea', code: 'KR' },
+  { name: 'Taiwan', code: 'TW' },
+  { name: 'Hong Kong', code: 'HK' },
+  { name: 'Singapore', code: 'SG' },
+  { name: 'Australia', code: 'AU' },
+  { name: 'United Kingdom', code: 'GB' },
+  { name: 'Germany', code: 'DE' },
+  { name: 'France', code: 'FR' },
+  { name: 'Italy', code: 'IT' },
+  { name: 'Spain', code: 'ES' },
+  { name: 'Netherlands', code: 'NL' },
+  { name: 'Switzerland', code: 'CH' },
+  { name: 'Canada', code: 'CA' },
+  { name: 'Brazil', code: 'BR' },
+  { name: 'India', code: 'IN' },
+  { name: 'Thailand', code: 'TH' },
+  { name: 'Vietnam', code: 'VN' },
+  { name: 'Indonesia', code: 'ID' },
+  { name: 'Malaysia', code: 'MY' },
+  { name: 'Philippines', code: 'PH' },
+  { name: 'New Zealand', code: 'NZ' },
+  { name: 'Sweden', code: 'SE' },
+  { name: 'Norway', code: 'NO' },
+  { name: 'Denmark', code: 'DK' },
+  { name: 'Finland', code: 'FI' },
+  { name: 'Belgium', code: 'BE' },
+  { name: 'Austria', code: 'AT' },
+  { name: 'Portugal', code: 'PT' },
+  { name: 'Poland', code: 'PL' },
+  { name: 'Russia', code: 'RU' },
+  { name: 'Mexico', code: 'MX' },
+  { name: 'Argentina', code: 'AR' },
+  { name: 'Chile', code: 'CL' },
+  { name: 'Colombia', code: 'CO' },
+  { name: 'South Africa', code: 'ZA' },
+  { name: 'UAE', code: 'AE' },
+  { name: 'Saudi Arabia', code: 'SA' },
+  { name: 'Turkey', code: 'TR' },
+  { name: 'Greece', code: 'GR' },
+  { name: 'Czech Republic', code: 'CZ' },
+  { name: 'Hungary', code: 'HU' },
+  { name: 'Romania', code: 'RO' },
+  { name: 'Ukraine', code: 'UA' },
+  { name: 'Israel', code: 'IL' },
+  { name: 'Egypt', code: 'EG' },
+  { name: 'Pakistan', code: 'PK' },
+  { name: 'Bangladesh', code: 'BD' },
+  { name: 'Sri Lanka', code: 'LK' },
+  { name: 'Nepal', code: 'NP' },
+  { name: 'Myanmar', code: 'MM' },
+  { name: 'Cambodia', code: 'KH' },
+  { name: 'Laos', code: 'LA' },
+  { name: 'Mongolia', code: 'MN' },
+  { name: 'Macau', code: 'MO' },
+  { name: 'Other', code: '' }
+];
+
+function initAutocomplete() {
+  const wrap = document.getElementById('country-ac-wrap');
+  const input = document.getElementById('f-country-input');
+  const hidden = document.getElementById('f-country');
+  const dropdown = document.getElementById('country-dropdown');
+
+  function renderList(query) {
+    const q = query.trim().toLowerCase();
+    const filtered = q ? COUNTRIES.filter(c => c.name.toLowerCase().includes(q)) : COUNTRIES;
+    if (filtered.length === 0) {
+      dropdown.innerHTML = '<div class="ac-empty">No results</div>';
+      wrap.classList.add('open');
+      return;
+    }
+    dropdown.innerHTML = filtered.map((c, i) => `<div class="ac-item${i === acHighlight ? ' highlight' : ''}" data-name="${escapeHtml(c.name)}" data-code="${escapeHtml(c.code)}">${escapeHtml(c.name)}</div>`).join('');
+    wrap.classList.add('open');
+    dropdown.querySelectorAll('.ac-item').forEach(item => {
+      item.addEventListener('mousedown', e => {
+        e.preventDefault();
+        input.value = item.dataset.name;
+        hidden.value = item.dataset.name;
+        wrap.dataset.countryCode = item.dataset.code;
+        wrap.classList.remove('open');
+        dropdown.innerHTML = '';
+        acHighlight = -1;
+        updateSubmitState();
+      });
+    });
+  }
+
+  function closeDropdown() { wrap.classList.remove('open'); dropdown.innerHTML = ''; acHighlight = -1; }
+
+  input.addEventListener('input', () => {
+    hidden.value = '';
+    wrap.dataset.countryCode = '';
+    acHighlight = -1;
+    if (input.value.trim()) renderList(input.value);
+    else closeDropdown();
+    updateSubmitState();
+  });
+
+  input.addEventListener('focus', () => { if (!hidden.value) renderList(input.value); });
+
+  input.addEventListener('keydown', e => {
+    const items = dropdown.querySelectorAll('.ac-item');
+    if (e.key === 'ArrowDown') { e.preventDefault(); acHighlight = Math.min(acHighlight + 1, items.length - 1); renderList(input.value); }
+    else if (e.key === 'ArrowUp') { e.preventDefault(); acHighlight = Math.max(acHighlight - 1, -1); renderList(input.value); }
+    else if (e.key === 'Enter' && acHighlight >= 0) { e.preventDefault(); items[acHighlight].dispatchEvent(new MouseEvent('mousedown')); }
+    else if (e.key === 'Escape') closeDropdown();
+  });
+
+  document.addEventListener('click', e => { if (!wrap.contains(e.target)) closeDropdown(); });
+}
+
+// ── EMAIL AUTOCOMPLETE ──
+const EMAIL_DOMAINS = ['gmail.com','yahoo.com','yahoo.co.jp','hotmail.com','outlook.com','icloud.com','docomo.ne.jp','ezweb.ne.jp','softbank.ne.jp','au.com','me.com','mac.com','nifty.com','biglobe.ne.jp','excite.co.jp','rakuten.jp','i.softbank.jp','ezweb.ne.jp','ybb.ne.jp','plala.or.jp'];
+
+function initEmailAutocomplete() {
+  const wrap = document.getElementById('email-ac-wrap');
+  const input = document.getElementById('f-email');
+  const dropdown = document.getElementById('email-dropdown');
+  if (!wrap || !input || !dropdown) return;
+
+  function renderList() {
+    const val = input.value;
+    const atIdx = val.indexOf('@');
+    if (atIdx < 1) { closeDropdown(); return; }
+    const local = val.slice(0, atIdx + 1);
+    const domainPart = val.slice(atIdx + 1).toLowerCase();
+    const matches = EMAIL_DOMAINS.filter(d => d.startsWith(domainPart) && d !== domainPart);
+    if (matches.length === 0) { closeDropdown(); return; }
+    dropdown.innerHTML = matches.map((d, i) => `<div class="ac-item${i === emailHighlight ? ' highlight' : ''}" data-value="${escapeHtml(local + d)}">${escapeHtml(local + d)}</div>`).join('');
+    wrap.classList.add('open');
+    dropdown.querySelectorAll('.ac-item').forEach(item => {
+      item.addEventListener('mousedown', e => {
+        e.preventDefault();
+        input.value = item.dataset.value;
+        closeDropdown();
+        updateSubmitState();
+      });
+    });
+  }
+
+  function closeDropdown() { wrap.classList.remove('open'); dropdown.innerHTML = ''; emailHighlight = -1; }
+
+  input.addEventListener('input', () => { emailHighlight = -1; renderList(); updateSubmitState(); });
+  input.addEventListener('keydown', e => {
+    const items = dropdown.querySelectorAll('.ac-item');
+    if (e.key === 'ArrowDown') { e.preventDefault(); emailHighlight = Math.min(emailHighlight + 1, items.length - 1); renderList(); }
+    else if (e.key === 'ArrowUp') { e.preventDefault(); emailHighlight = Math.max(emailHighlight - 1, -1); renderList(); }
+    else if (e.key === 'Enter' && emailHighlight >= 0) { e.preventDefault(); items[emailHighlight].dispatchEvent(new MouseEvent('mousedown')); }
+    else if (e.key === 'Escape') closeDropdown();
+  });
+  document.addEventListener('click', e => { if (!wrap.contains(e.target)) closeDropdown(); });
+}
+
+// ── FORM VALIDATION ──
+function updateSubmitState() {
+  const name = document.getElementById('f-name');
+  const country = document.getElementById('f-country');
+  const email = document.getElementById('f-email');
+  const optinYes = document.getElementById('f-optin-yes');
+  const optinNo = document.getElementById('f-optin-no');
+  const agree = document.getElementById('f-agree');
+  const btn = document.getElementById('submit-btn');
+  if (!btn) return;
+  const valid = name && name.value.trim() &&
+    country && country.value.trim() &&
+    email && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value.trim()) &&
+    (optinYes && optinYes.checked || optinNo && optinNo.checked) &&
+    agree && agree.checked;
+  btn.disabled = !valid;
+}
+
+function validateForm() {
+  const t = i18n[currentLang];
+  let ok = true;
+  const name = document.getElementById('f-name');
+  const eName = document.getElementById('e-name');
+  const country = document.getElementById('f-country');
+  const countryInput = document.getElementById('f-country-input');
+  const eCountry = document.getElementById('e-country');
+  const email = document.getElementById('f-email');
+  const eEmail = document.getElementById('e-email');
+  const optinYes = document.getElementById('f-optin-yes');
+  const optinNo = document.getElementById('f-optin-no');
+  const agree = document.getElementById('f-agree');
+
+  if (!name.value.trim()) { name.classList.add('err'); eName.style.display = 'block'; ok = false; } else { name.classList.remove('err'); eName.style.display = 'none'; }
+  if (!country.value.trim()) { countryInput.classList.add('err'); eCountry.style.display = 'block'; ok = false; } else { countryInput.classList.remove('err'); eCountry.style.display = 'none'; }
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value.trim())) { email.classList.add('err'); eEmail.style.display = 'block'; ok = false; } else { email.classList.remove('err'); eEmail.style.display = 'none'; }
+
+  return ok;
+}
+
+// ── SUBMIT ──
+async function handleSubmit() {
+  if (!validateForm()) return;
+
+  const btn = document.getElementById('submit-btn');
+  btn.disabled = true;
+  btn.textContent = '…';
+
+  const name = document.getElementById('f-name');
+  const country = document.getElementById('f-country');
+  const countryWrap = document.getElementById('country-ac-wrap');
+  const email = document.getElementById('f-email');
+  const optinYes = document.getElementById('f-optin-yes');
+  const countryCode = (countryWrap && countryWrap.dataset.countryCode) || '';
+  const ts = new Date().toISOString();
+
+  const record = {
+    timestamp: ts,
+    name: name.value.trim(),
+    email: email.value.trim(),
+    optin: optinYes.checked,
+    country: country.value,
+    countryCode: countryCode,
+    lang: currentLang,
+    memberNo: '',
+    frameNames: purchasedFrames.join(', ')
+  };
+
+  try {
+    const res = await fetch(SHEET_WEBHOOK_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(record)
+    });
+    const json = await res.json();
+    if (json.result === 'success') {
+      showThanks();
+    } else {
+      throw new Error('Server error');
+    }
+  } catch (err) {
+    btn.disabled = false;
+    btn.textContent = i18n[currentLang].submit;
+    alert('Submission failed. Please check your connection and try again.');
+  }
+}
+
+function showThanks() {
+  const fa = document.getElementById('form-area');
+  const ta = document.getElementById('thanks-area');
+  fa.style.display = 'none';
+  ta.style.display = 'block';
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function resetForm() {
+  const ta = document.getElementById('thanks-area');
+  const fa = document.getElementById('form-area');
+  const fea = document.getElementById('frame-entry-area');
+  const FADE_MS = 450;
+
+  ta.style.transition = `opacity ${FADE_MS}ms ease`;
+  ta.style.opacity = '0';
+  setTimeout(() => {
+    ta.style.display = 'none';
+    ta.style.transition = '';
+    ta.style.opacity = '';
+    fa.style.display = 'none';
+    resetFrameEntry();
+    fea.style.display = 'block';
+
+    document.getElementById('f-name').value = '';
+    document.getElementById('f-country-input').value = '';
+    document.getElementById('f-country').value = '';
+    const countryWrap = document.getElementById('country-ac-wrap');
+    if (countryWrap) countryWrap.dataset.countryCode = '';
+
+    const oldEmail = document.getElementById('f-email');
+    const newEmail = oldEmail.cloneNode(true);
+    newEmail.value = '';
+    oldEmail.parentNode.replaceChild(newEmail, oldEmail);
+    newEmail.addEventListener('input', updateSubmitState);
+    initEmailAutocomplete();
+
+    document.getElementById('f-optin-yes').checked = false;
+    document.getElementById('f-optin-no').checked = false;
+    document.getElementById('f-agree').checked = false;
+
+    ['f-name', 'f-country-input', 'f-email'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.classList.remove('err');
+    });
+    document.querySelectorAll('.err-msg').forEach(el => el.style.display = 'none');
+    updateSubmitState();
+
+    fea.style.transition = 'none';
+    fea.style.opacity = '0';
+    void fea.offsetWidth;
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    fea.style.transition = `opacity ${FADE_MS}ms ease`;
+    fea.style.opacity = '1';
+    setTimeout(() => { fea.style.transition = ''; fea.style.opacity = ''; }, FADE_MS);
+  }, FADE_MS);
+}
+
+// ── TEXT SCALE ──
+function initTextScale() {
+  const vw = window.innerWidth;
+  if (vw < 360) {
+    document.documentElement.style.fontSize = (vw / 360 * 16) + 'px';
+  }
+}
+window.addEventListener('resize', initTextScale);
+
+// ── LOGO TAP (admin access) ──
+function initLogoTap() {
+  const logo = document.getElementById('logo-tap');
+  logo.addEventListener('click', () => {
+    logoTapCount++;
+    clearTimeout(logoTapTimer);
+    if (logoTapCount >= LOGO_TAP_COUNT) {
+      logoTapCount = 0;
+      enterAdminMode();
+    } else {
+      logoTapTimer = setTimeout(() => { logoTapCount = 0; }, LOGO_TAP_WINDOW_MS);
+    }
+  });
+}
+
+// ── ADMIN MODE ──
+function checkAdminMode() {
+  const hash = window.location.hash;
+  const search = window.location.search;
+  if (hash === '#admin' || search.includes('mode=admin')) {
+    enterAdminMode();
+  }
+  initLogoTap();
+}
+
+function enterAdminMode() {
+  document.getElementById('app').style.display = 'none';
+  document.getElementById('admin-gate').style.display = 'block';
+  document.getElementById('admin-pw').focus();
+}
+
+async function checkPw() {
+  const pw = document.getElementById('admin-pw').value;
+  const eMsg = document.getElementById('e-pw');
+  if (!pw) { eMsg.style.visibility = 'visible'; return; }
+
+  const url = `${SHEET_WEBHOOK_URL}?action=admin&password=${encodeURIComponent(pw)}`;
+  try {
+    const res = await fetch(url);
+    const json = await res.json();
+    if (json.ok) {
+      adminPassword = pw;
+      adminRecords = json.records || [];
+      eMsg.style.visibility = 'hidden';
+      document.getElementById('admin-gate').style.display = 'none';
+      document.getElementById('admin-panel').style.display = 'block';
+      isAdmin = true;
+      populateMailTemplates();
+      renderAdminTable();
+    } else {
+      eMsg.style.visibility = 'visible';
+    }
+  } catch (err) {
+    eMsg.textContent = 'Connection error.';
+    eMsg.style.visibility = 'visible';
+  }
+}
+
+function logout() {
+  adminPassword = '';
+  adminRecords = [];
+  isAdmin = false;
+  document.getElementById('admin-panel').style.display = 'none';
+  document.getElementById('app').style.display = 'block';
+  document.getElementById('admin-pw').value = '';
+  document.getElementById('e-pw').style.visibility = 'hidden';
+  window.location.hash = '';
+}
+
+async function adminRequest(params) {
+  const qs = Object.entries({ action: 'admin', password: adminPassword, ...params })
+    .map(([k, v]) => `${encodeURIComponent(k)}=${encodeURIComponent(v)}`).join('&');
+  const res = await fetch(`${SHEET_WEBHOOK_URL}?${qs}`);
+  return res.json();
+}
+
+async function refreshRecords() {
+  const btn = document.getElementById('refresh-btn');
+  btn.textContent = '…';
+  btn.disabled = true;
+  try {
+    const json = await adminRequest({ op: 'list' });
+    if (json.ok) { adminRecords = json.records || []; renderAdminTable(); }
+    else alert('Refresh failed: ' + json.error);
+  } catch (err) { alert('Connection error.'); }
+  finally { btn.textContent = '⟳ Refresh'; btn.disabled = false; }
+}
+
+function toggleSortOrder() {
+  sortNewest = !sortNewest;
+  const btn = document.getElementById('sort-btn');
+  btn.textContent = sortNewest ? 'Newest First ↓' : 'Oldest First ↑';
+  renderAdminTable();
+}
+
+function renderAdminTable() {
+  const filter = document.getElementById('csv-filter').value;
+  let records = [...adminRecords];
+  if (filter === 'yes') records = records.filter(r => r.optin === 'Yes');
+  if (filter === 'no') records = records.filter(r => r.optin !== 'Yes');
+
+  if (sortNewest) records.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+  else records.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
+
+  const rankMap = new Map();
+  records.forEach((r, i) => rankMap.set(r.row, i + 1));
+
+  const count = document.getElementById('admin-count');
+  count.textContent = `${records.length} record${records.length !== 1 ? 's' : ''}`;
+
+  const tbody = document.getElementById('admin-tbody');
+  const empty = document.getElementById('empty-state');
+
+  if (records.length === 0) {
+    tbody.innerHTML = '';
+    empty.style.display = 'block';
+    return;
+  }
+  empty.style.display = 'none';
+
+  tbody.innerHTML = records.map((r, i) => `
+    <tr data-row="${r.row}">
+      <td style="color:var(--light); font-size:10px;">${rankMap.get(r.row)}</td>
+      <td style="font-size:10px; color:var(--mid);">${escapeHtml(formatTimestamp(r.timestamp))}</td>
+      <td>${escapeHtml(r.name)}</td>
+      <td>${escapeHtml(r.country)}</td>
+      <td><span class="email-link" style="color:#185FA5; cursor:pointer;" onclick="showEmailActions(event, ${r.row})">${escapeHtml(r.email)}</span></td>
+      <td><span class="${r.optin === 'Yes' ? 'badge-yes' : 'badge-no'}">${escapeHtml(r.optin)}</span></td>
+      <td>${renderFollowupBadge(r)}</td>
+      <td style="font-size:10px; color:var(--mid);">${escapeHtml(r.frameNames || '')}</td>
+      <td style="text-transform:uppercase; font-size:10px; color:var(--mid);">${escapeHtml(r.lang)}</td>
+      <td><button class="row-delete-btn" onclick="deleteRecord(${r.row})" title="Delete this record" aria-label="Delete this record">&times;</button></td>
+    </tr>
+  `).join('');
+}
+
+function formatTimestamp(ts) {
+  if (!ts) return '';
+  const d = new Date(ts);
+  if (isNaN(d)) return ts;
+  return d.toLocaleDateString('ja-JP', { year: 'numeric', month: '2-digit', day: '2-digit' }) + ' ' +
+    d.toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit' });
+}
+
+// ── FOLLOW-UP ──
+function renderFollowupBadge(r) {
+  if (r.optin !== 'Yes') return '<span class="followup-badge followup-na">&mdash;</span>';
+  if (r.followupSent) return `<button class="followup-badge followup-done" onclick="toggleFollowupSent(${r.row})" title="Mark as not sent">&#10003; Sent</button>`;
+  const sentAt = new Date(r.timestamp).getTime();
+  let label, cls;
+  if (isNaN(sentAt)) { label = 'Pending'; cls = 'followup-pending'; }
+  else {
+    const elapsed = Date.now() - sentAt;
+    if (elapsed >= FOLLOWUP_WINDOW_MS) { label = 'Overdue'; cls = 'followup-overdue'; }
+    else if (elapsed >= FOLLOWUP_WINDOW_MS - FOLLOWUP_DUE_SOON_MS) { label = 'Due Soon'; cls = 'followup-due'; }
+    else { label = 'Pending'; cls = 'followup-pending'; }
+  }
+  return `<button class="followup-badge ${cls}" onclick="toggleFollowupSent(${r.row})" title="Mark as sent">${label}</button>`;
+}
+
+async function toggleFollowupSent(row) {
+  const record = adminRecords.find(r => r.row === row);
+  if (!record) return;
+  const newSent = !record.followupSent;
+  record.followupSent = newSent;
+  renderAdminTable();
+  try {
+    const json = await adminRequest({ op: 'followup', row: row, sent: String(newSent) });
+    if (!json.ok) {
+      record.followupSent = !newSent;
+      renderAdminTable();
+      alert('Failed to update follow-up status. Please try again.');
+    }
+  } catch (err) {
+    record.followupSent = !newSent;
+    renderAdminTable();
+    alert('Connection error. Please try again.');
+  }
+}
+
+// ── DELETE ──
+async function deleteRecord(row) {
+  if (!confirm('Delete this registration? This cannot be undone.')) return;
+  try {
+    const json = await adminRequest({ op: 'delete', row: row });
+    if (json.ok) {
+      adminRecords = adminRecords.filter(r => r.row !== row);
+      renderAdminTable();
+    } else {
+      alert('Delete failed: ' + json.error);
+    }
+  } catch (err) { alert('Connection error.'); }
+}
+
+// ── CSV ──
+function downloadCSV() {
+  const filter = document.getElementById('csv-filter').value;
+  let records = [...adminRecords];
+  if (filter === 'yes') records = records.filter(r => r.optin === 'Yes');
+  if (filter === 'no') records = records.filter(r => r.optin !== 'Yes');
+
+  const header = ['No.', 'Timestamp', 'Name', 'Country', 'Email', 'Email Opt-in', 'Frames', 'Language'];
+  const rows = records.map((r, i) => [
+    i + 1,
+    r.timestamp,
+    `"${String(r.name).replace(/"/g, '""')}"`,
+    r.country,
+    r.email,
+    r.optin,
+    `"${String(r.frameNames || '').replace(/"/g, '""')}"`,
+    String(r.lang).toUpperCase()
+  ]);
+
+  const csv = [header, ...rows].map(r => r.join(',')).join('\n');
+  const blob = new Blob(['﻿' + csv], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `mykita-registrations-${new Date().toISOString().slice(0,10)}.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+// ── EMAIL ACTIONS ──
+function showEmailActions(e, row) {
+  e.stopPropagation();
+  activeEmailRow = row;
+  activeEmailEl = e.target;
+  const menu = document.getElementById('email-actions-menu');
+  menu.style.display = 'block';
+  const rect = e.target.getBoundingClientRect();
+  menu.style.left = rect.left + 'px';
+  menu.style.top = (rect.bottom + 4 + window.scrollY) + 'px';
+}
+
+document.addEventListener('click', e => {
+  const menu = document.getElementById('email-actions-menu');
+  if (menu && !menu.contains(e.target) && e.target !== activeEmailEl) {
+    menu.style.display = 'none';
+  }
+});
+
+function copyEmailAddress() {
+  const record = adminRecords.find(r => r.row === activeEmailRow);
+  if (!record) return;
+  navigator.clipboard.writeText(record.email).then(() => {
+    document.getElementById('email-actions-menu').style.display = 'none';
+  });
+}
+
+// ── MAIL MODAL ──
+const MAIL_TEMPLATES = [
+  {
+    id: 'confirmation',
+    label: 'Warranty Registration Confirmation',
+    body: (r) => `Dear ${r.name},\n\nThank you for registering your MYKITA frame with us. Your warranty registration has been received and recorded.\n\nIf you have any questions, please feel free to contact us.\n\nBest regards,\nMYKITA JAPAN`
+  },
+  {
+    id: 'followup',
+    label: 'Promotional Follow-up',
+    body: (r) => `Dear ${r.name},\n\nThank you for your interest in MYKITA JAPAN. We'd love to keep you updated on our latest collections, exclusive offers, and news.\n\nBest regards,\nMYKITA JAPAN`
+  },
+  {
+    id: 'blank',
+    label: '(Blank)',
+    body: (r) => ''
+  }
+];
+
+let mailTargetRecord = null;
+
+function populateMailTemplates() {
+  const sel = document.getElementById('mail-template-select');
+  if (!sel) return;
+  sel.innerHTML = MAIL_TEMPLATES.map(t => `<option value="${t.id}">${escapeHtml(t.label)}</option>`).join('');
+}
+
+function composeFromEmailActions() {
+  document.getElementById('email-actions-menu').style.display = 'none';
+  const record = adminRecords.find(r => r.row === activeEmailRow);
+  if (!record) return;
+  mailTargetRecord = record;
+  document.getElementById('mail-recipient').textContent = record.email;
+  applyMailTemplate();
+  document.getElementById('mail-modal-overlay').classList.add('open');
+}
+
+function applyMailTemplate() {
+  if (!mailTargetRecord) return;
+  const sel = document.getElementById('mail-template-select');
+  const tmpl = MAIL_TEMPLATES.find(t => t.id === sel.value);
+  if (tmpl) document.getElementById('mail-textarea').value = tmpl.body(mailTargetRecord);
+}
+
+function closeMailModal() { document.getElementById('mail-modal-overlay').classList.remove('open'); }
+function closeMailModalOnOverlay(e) { if (e.target === e.currentTarget) closeMailModal(); }
+
+function copyMailText() {
+  const text = document.getElementById('mail-textarea').value;
+  const btn = document.getElementById('mail-copy-btn');
+  navigator.clipboard.writeText(text).then(() => {
+    btn.textContent = 'Copied!';
+    setTimeout(() => { btn.textContent = 'Copy'; }, 1500);
+  });
+}
+
+// ── UTILS ──
+function escapeHtml(str) {
+  return String(str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+
+// ── INIT ──
+renderFrameRowList();
+initAutocomplete();
+initEmailAutocomplete();
+checkAdminMode();
+updateSubmitState();
+initTextScale();
+</script>
+</body>
+</html>
