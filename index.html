@@ -546,6 +546,7 @@ tr:hover td { background: #111; }
       <!-- Warranty info -->
       <div class="warranty-info">
         <strong id="lbl-warranty-title">Warranty Information</strong>
+        <span style="display:block; color:var(--light); font-size:11px; margin-bottom:8px;">本保証はMYKITA JAPAN店舗でのみ有効です</span>
         <span id="lbl-warranty-body">MYKITA frames are covered by a 2-year manufacturer's warranty from the date of purchase. Please complete this registration to activate your warranty.</span>
       </div>
 
@@ -1527,8 +1528,8 @@ function formatTimestamp(ts) {
   if (!ts) return '';
   const d = new Date(ts);
   if (isNaN(d)) return ts;
-  return d.toLocaleDateString('ja-JP', { year: 'numeric', month: '2-digit', day: '2-digit' }) + ' ' +
-    d.toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit' });
+  // e.g. "Fri Jun 12 2026 18:15"
+  return d.toString().replace(/:\d{2}\s+GMT.*$/, '');
 }
 
 // ── FOLLOW-UP ──
