@@ -662,8 +662,8 @@ tr:hover td { background: #111; }
     <div class="table-wrap">
       <table>
         <thead><tr>
-          <th>#</th><th>Timestamp</th><th>Name</th><th>Country</th>
-          <th>Email</th><th>Opt-in</th><th>Follow-up</th><th>Frames</th><th>Lang</th><th></th>
+          <th>#</th><th>Timestamp</th><th>会員番号</th><th>Name</th><th>Country</th>
+          <th>Email</th><th>Opt-in</th><th>Follow-up</th><th>Purchased</th><th>Lang</th><th>Staff Notes</th><th></th>
         </tr></thead>
         <tbody id="admin-tbody"></tbody>
       </table>
@@ -908,7 +908,8 @@ function initFrameAutocomplete(id) {
 
   function renderList(query) {
     const q = query.trim().toLowerCase();
-    const filtered = q ? FRAME_NAMES.filter(n => n.toLowerCase().includes(q)) : FRAME_NAMES.slice(0, 50);
+    const base = q ? FRAME_NAMES.filter(n => n.toLowerCase().includes(q)) : FRAME_NAMES.slice(0, 200);
+    const filtered = [...base].sort((a, b) => a.localeCompare(b));
     if (filtered.length === 0) { closeDropdown(); return; }
     dropdown.innerHTML = filtered.slice(0, 100).map(n => `<div class="ac-item" data-value="${escapeHtml(n)}">${escapeHtml(n)}</div>`).join('');
     wrap.classList.add('open');
@@ -935,7 +936,11 @@ function showFormArea() {
 }
 
 function skipFrameEntry() { purchasedFrames = []; showFormArea(); }
-function continueFrameEntry() { purchasedFrames = collectFrameNames(); showFormArea(); }
+function continueFrameEntry() {
+  document.querySelectorAll('.ac-wrap').forEach(w => w.classList.remove('open'));
+  purchasedFrames = collectFrameNames();
+  showFormArea();
+}
 
 // ── COUNTRY AUTOCOMPLETE ──
 const COUNTRIES = [
@@ -1368,6 +1373,7 @@ function renderAdminTable() {
     <tr data-row="${r.row}">
       <td style="color:var(--light); font-size:10px;">${rankMap.get(r.row)}</td>
       <td style="font-size:10px; color:var(--mid);">${escapeHtml(formatTimestamp(r.timestamp))}</td>
+      <td style="font-size:10px; color:var(--mid);">${escapeHtml(r.memberNo || '')}</td>
       <td>${escapeHtml(r.name)}</td>
       <td>${escapeHtml(r.country)}</td>
       <td><span class="email-link" style="color:#185FA5; cursor:pointer;" onclick="showEmailActions(event, ${r.row})">${escapeHtml(r.email)}</span></td>
@@ -1375,6 +1381,7 @@ function renderAdminTable() {
       <td>${renderFollowupBadge(r)}</td>
       <td style="font-size:10px; color:var(--mid);">${escapeHtml(r.frameNames || '')}</td>
       <td style="text-transform:uppercase; font-size:10px; color:var(--mid);">${escapeHtml(r.lang)}</td>
+      <td style="font-size:10px; color:var(--mid); max-width:140px;">${escapeHtml(r.staffNotes || '')}</td>
       <td><button class="row-delete-btn" onclick="deleteRecord(${r.row})" title="Delete this record" aria-label="Delete this record">&times;</button></td>
     </tr>
   `).join('');
@@ -1445,16 +1452,18 @@ function downloadCSV() {
   if (filter === 'yes') records = records.filter(r => r.optin === 'Yes');
   if (filter === 'no') records = records.filter(r => r.optin !== 'Yes');
 
-  const header = ['No.', 'Timestamp', 'Name', 'Country', 'Email', 'Email Opt-in', 'Frames', 'Language'];
+  const header = ['No.', 'Timestamp', '会員番号', 'Name', 'Country', 'Email', 'Email Opt-in', 'Language', 'Purchased', 'Staff Notes'];
   const rows = records.map((r, i) => [
     i + 1,
     r.timestamp,
+    `"${String(r.memberNo || '').replace(/"/g, '""')}"`,
     `"${String(r.name).replace(/"/g, '""')}"`,
-    r.country,
+    `"${String(r.country).replace(/"/g, '""')}"`,
     r.email,
     r.optin,
+    String(r.lang).toUpperCase(),
     `"${String(r.frameNames || '').replace(/"/g, '""')}"`,
-    String(r.lang).toUpperCase()
+    `"${String(r.staffNotes || '').replace(/"/g, '""')}"`
   ]);
 
   const csv = [header, ...rows].map(r => r.join(',')).join('\n');
