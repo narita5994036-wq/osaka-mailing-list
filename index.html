@@ -546,8 +546,7 @@ tr:hover td { background: #111; }
       <!-- Warranty info -->
       <div class="warranty-info">
         <strong id="lbl-warranty-title">Warranty Information</strong>
-        <span style="display:block; color:var(--light); font-size:11px; margin-bottom:8px;">本保証はMYKITA JAPAN店舗でのみ有効です</span>
-        <span id="lbl-warranty-body">MYKITA frames are covered by a 2-year manufacturer's warranty from the date of purchase. Please complete this registration to activate your warranty.</span>
+        <div id="lbl-warranty-body"></div>
       </div>
 
       <p class="section-label" id="lbl-personal">Personal Information</p>
@@ -743,7 +742,7 @@ const i18n = {
   en: {
     subtitle: 'Frame Warranty Registration',
     warrantyTitle: 'Warranty Information',
-    warrantyBody: 'MYKITA frames are covered by a 2-year manufacturer\'s warranty from the date of purchase. Please complete this registration to activate your warranty.',
+    warrantyBody: '・This warranty is valid only at MYKITA JAPAN stores.<br>・MYKITA frames are covered by a 2-year product warranty from the date of purchase.<br>・The warranty covers product defects under normal use, excluding initial defects. (Damage from dropping or crushing, and lens damage, are not covered.)<br><br>Please complete this registration to activate your warranty.',
     personal: 'Personal Information',
     name: 'Full Name', country: 'Country / Region', email: 'Email Address',
     optinSection: 'Email Opt-in',
@@ -772,7 +771,7 @@ const i18n = {
   ja: {
     subtitle: 'フレーム保証登録',
     warrantyTitle: '保証について',
-    warrantyBody: 'MYKITAフレームには、ご購入日より2年間のメーカー保証が適用されます。保証を有効にするために、以下の登録を完了してください。',
+    warrantyBody: '・本保証はMYKITA JAPAN店舗でのみ有効です。<br>・MYKITAフレームには、ご購入日より2年間の製品保証が適用されます。<br>・保証範囲は、初期不良を除く通常使用下での製品トラブルに限ります。（落下や踏みつけによる損傷・破損、また、レンズ破損は対象外）<br><br>保証を有効にするために、以下の登録を完了してください。',
     personal: 'お客様情報',
     name: 'お名前', country: '国 / 地域', email: 'メールアドレス',
     optinSection: 'メール配信',
@@ -801,7 +800,7 @@ const i18n = {
   zh: {
     subtitle: '镜架保修登记',
     warrantyTitle: '保修信息',
-    warrantyBody: 'MYKITA镜架自购买之日起享有2年制造商保修。请完成此登记以激活您的保修。',
+    warrantyBody: '・本保修仅在MYKITA JAPAN门店有效。<br>・MYKITA镜架自购买之日起享有2年产品保修。<br>・保修范围仅限正常使用下的产品故障（初期不良除外）。（因跌落或踩踏造成的损伤、破损及镜片破损不在保修范围内。）<br><br>请完成以下登记以激活您的保修。',
     personal: '个人信息',
     name: '姓名', country: '国家 / 地区', email: '电子邮箱',
     optinSection: '邮件订阅',
@@ -830,7 +829,7 @@ const i18n = {
   ko: {
     subtitle: '프레임 보증 등록',
     warrantyTitle: '보증 안내',
-    warrantyBody: 'MYKITA 프레임은 구매일로부터 2년간 제조사 보증이 적용됩니다. 보증을 활성화하려면 아래 등록을 완료해 주세요.',
+    warrantyBody: '・본 보증은 MYKITA JAPAN 매장에서만 유효합니다.<br>・MYKITA 프레임은 구매일로부터 2년간 제품 보증이 적용됩니다.<br>・보증 범위는 초기 불량을 제외한 정상 사용 중 발생한 제품 문제에 한합니다. （낙하 또는 밟힘으로 인한 손상·파손, 렌즈 파손은 대상 외）<br><br>보증을 활성화하려면 아래 등록을 완료해 주세요.',
     personal: '개인 정보',
     name: '성명', country: '국가 / 지역', email: '이메일 주소',
     optinSection: '이메일 수신 동의',
@@ -866,7 +865,7 @@ function setLang(lang) {
   });
   document.getElementById('lbl-subtitle').textContent = t.subtitle;
   document.getElementById('lbl-warranty-title').textContent = t.warrantyTitle;
-  document.getElementById('lbl-warranty-body').textContent = t.warrantyBody;
+  document.getElementById('lbl-warranty-body').innerHTML = t.warrantyBody;
   document.getElementById('lbl-personal').textContent = t.personal;
   document.getElementById('lbl-name').textContent = t.name;
   document.getElementById('lbl-country').textContent = t.country;
@@ -1702,6 +1701,7 @@ function escapeHtml(str) {
 }
 
 // ── INIT ──
+setLang('en');
 renderFrameRowList();
 initAutocomplete();
 initEmailAutocomplete();
