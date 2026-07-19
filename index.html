@@ -946,7 +946,7 @@ function initFrameAutocomplete(id) {
 
   function renderList(query) {
     const q = query.trim().toLowerCase();
-    const base = q ? FRAME_NAMES.filter(n => n.toLowerCase().includes(q)) : FRAME_NAMES.slice(0, 200);
+    const base = q ? FRAME_NAMES.filter(n => n.toLowerCase().startsWith(q)) : FRAME_NAMES.slice(0, 200);
     const filtered = [...base].sort((a, b) => a.localeCompare(b));
     if (filtered.length === 0) { closeDropdown(); return; }
     dropdown.innerHTML = filtered.slice(0, 100).map(n => `<div class="ac-item" data-value="${escapeHtml(n)}">${escapeHtml(n)}</div>`).join('');
@@ -1141,7 +1141,6 @@ function initEmailAutocomplete() {
 // ── FORM VALIDATION ──
 function updateSubmitState() {
   const name = document.getElementById('f-name');
-  const country = document.getElementById('f-country');
   const email = document.getElementById('f-email');
   const optinYes = document.getElementById('f-optin-yes');
   const optinNo = document.getElementById('f-optin-no');
@@ -1149,7 +1148,6 @@ function updateSubmitState() {
   const btn = document.getElementById('submit-btn');
   if (!btn) return;
   const valid = name && name.value.trim() &&
-    country && country.value.trim() &&
     email && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value.trim()) &&
     (optinYes && optinYes.checked || optinNo && optinNo.checked) &&
     agree && agree.checked;
@@ -1157,21 +1155,13 @@ function updateSubmitState() {
 }
 
 function validateForm() {
-  const t = i18n[currentLang];
   let ok = true;
   const name = document.getElementById('f-name');
   const eName = document.getElementById('e-name');
-  const country = document.getElementById('f-country');
-  const countryInput = document.getElementById('f-country-input');
-  const eCountry = document.getElementById('e-country');
   const email = document.getElementById('f-email');
   const eEmail = document.getElementById('e-email');
-  const optinYes = document.getElementById('f-optin-yes');
-  const optinNo = document.getElementById('f-optin-no');
-  const agree = document.getElementById('f-agree');
 
   if (!name.value.trim()) { name.classList.add('err'); eName.style.display = 'block'; ok = false; } else { name.classList.remove('err'); eName.style.display = 'none'; }
-  if (!country.value.trim()) { countryInput.classList.add('err'); eCountry.style.display = 'block'; ok = false; } else { countryInput.classList.remove('err'); eCountry.style.display = 'none'; }
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value.trim())) { email.classList.add('err'); eEmail.style.display = 'block'; ok = false; } else { email.classList.remove('err'); eEmail.style.display = 'none'; }
 
   return ok;
@@ -1286,7 +1276,7 @@ function initThanksFrameAutocomplete(id) {
   if (!wrap || !input || !dropdown) return;
   function renderList(query) {
     const q = query.trim().toLowerCase();
-    const base = q ? FRAME_NAMES.filter(n => n.toLowerCase().includes(q)) : FRAME_NAMES.slice(0, 200);
+    const base = q ? FRAME_NAMES.filter(n => n.toLowerCase().startsWith(q)) : FRAME_NAMES.slice(0, 200);
     const filtered = [...base].sort((a, b) => a.localeCompare(b));
     if (filtered.length === 0) { closeDropdown(); return; }
     dropdown.innerHTML = filtered.slice(0, 100).map(n => `<div class="ac-item" data-value="${escapeHtml(n)}">${escapeHtml(n)}</div>`).join('');
