@@ -1073,7 +1073,8 @@ function initAutocomplete() {
 
   function renderList(query) {
     const q = query.trim().toLowerCase();
-    const filtered = q ? COUNTRIES.filter(c => c.name.toLowerCase().includes(q)) : COUNTRIES;
+    const base = q ? COUNTRIES.filter(c => c.name.toLowerCase().startsWith(q)) : COUNTRIES;
+    const filtered = q ? [...base].sort((a, b) => a.name.localeCompare(b.name)) : base;
     if (filtered.length === 0) {
       dropdown.innerHTML = '<div class="ac-empty">No results</div>';
       wrap.classList.add('open');
