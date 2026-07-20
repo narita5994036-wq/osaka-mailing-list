@@ -502,7 +502,30 @@ tr:hover td { background: #f9f9f9; }
   min-height: 160px;
   line-height: 1.6;
 }
-.mail-modal-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 16px; }
+.mail-subject-input {
+  width: 100%;
+  background: var(--bg);
+  border: 0.5px solid var(--border);
+  color: var(--light);
+  font-family: var(--font);
+  font-size: 13px;
+  padding: 8px 10px;
+  outline: none;
+  box-sizing: border-box;
+}
+.mail-subject-input:focus { border-color: #888; }
+.mail-modal-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 16px; flex-wrap: wrap; }
+.mail-open-btn {
+  background: #185FA5;
+  color: #fff;
+  border: none;
+  padding: 8px 18px;
+  font-family: var(--font);
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+}
+.mail-open-btn:hover { background: #1050a0; }
 </style>
 </head>
 <body>
@@ -701,12 +724,17 @@ tr:hover td { background: #f9f9f9; }
         <select class="mail-template-select" id="mail-template-select" onchange="applyMailTemplate()"></select>
       </div>
       <div class="mail-modal-field">
+        <label>Subject</label>
+        <input type="text" class="mail-subject-input" id="mail-subject">
+      </div>
+      <div class="mail-modal-field">
         <label>Message</label>
         <textarea class="mail-textarea" id="mail-textarea"></textarea>
       </div>
       <div class="mail-modal-actions">
         <button class="refresh-btn" onclick="closeMailModal()">Close</button>
         <button class="csv-btn" id="mail-copy-btn" onclick="copyMailText()">Copy</button>
+        <button class="mail-open-btn" onclick="openInMailClient()">Open in Mail</button>
       </div>
     </div>
   </div>
@@ -716,7 +744,7 @@ tr:hover td { background: #f9f9f9; }
 'use strict';
 
 // ── CONFIG ──
-const SHEET_WEBHOOK_URL = 'https://script.google.com/macros/s/AKfycbwAO1bnbq2oPlWumNLlLUP3_tPHYT804xOkXaYgnzguOv6HpQSdXz7PlIU05IOf8ZN_pw/exec';
+const SHEET_WEBHOOK_URL = 'https://script.google.com/macros/s/AKfycbwSW6EdiOX7xZ3dINHaKnhM1iXFEFbraVaM_DePZkbzJmAmVfsQmCAWN3NyAPJEyREh-Q/exec';
 
 // ── GLOBALS ──
 let adminPassword = '';
@@ -736,7 +764,7 @@ let purchasedFrames = [];
 
 // ── FOLLOW-UP TIMING ──
 const FOLLOWUP_WINDOW_MS = 7 * 24 * 60 * 60 * 1000;
-const FOLLOWUP_DUE_SOON_MS = 2 * 24 * 60 * 60 * 1000;
+const FOLLOWUP_DUE_SOON_MS = 3 * 24 * 60 * 60 * 1000;
 
 // ── I18N ──
 const i18n = {
@@ -1668,16 +1696,43 @@ const MAIL_TEMPLATES = [
   {
     id: 'confirmation',
     label: 'Warranty Registration Confirmation',
-    body: (r) => `Dear ${r.name},\n\nThank you for registering your MYKITA frame with us. Your warranty registration has been received and recorded.\n\nIf you have any questions, please feel free to contact us.\n\nBest regards,\nMYKITA JAPAN`
+    subject: (r) => {
+      const lang = (r.lang || 'EN').toUpperCase();
+      if (lang === 'JA') return '保証登録のご確認 - MYKITA JAPAN';
+      if (lang === 'ZH') return '保修注册确认 - MYKITA JAPAN';
+      if (lang === 'KO') return '보증 등록 확인 - MYKITA JAPAN';
+      return 'Warranty Registration Confirmation - MYKITA JAPAN';
+    },
+    body: (r) => {
+      const lang = (r.lang || 'EN').toUpperCase();
+      if (lang === 'JA') return `${r.name} 様\n\nMYKITAフレームの保証登録をいただきありがとうございます。ご登録内容を確認いたしました。\n\nご不明な点がございましたら、お気軽にお問い合わせください。\n\nMYKITA JAPAN`;
+      if (lang === 'ZH') return `尊敬的 ${r.name}，\n\n感谢您注册MYKITA镜框的保修服务。我们已收到并记录了您的注册信息。\n\n如有任何疑问，请随时与我们联系。\n\nMYKITA JAPAN`;
+      if (lang === 'KO') return `${r.name} 고객님,\n\nMYKITA 프레임 보증 등록을 해주셔서 감사합니다. 등록 내용이 확인되었습니다.\n\n궁금한 점이 있으시면 언제든지 문의해 주세요.\n\nMYKITA JAPAN`;
+      return `Dear ${r.name},\n\nThank you for registering your MYKITA frame with us. Your warranty registration has been received and recorded.\n\nIf you have any questions, please feel free to contact us.\n\nBest regards,\nMYKITA JAPAN`;
+    }
   },
   {
     id: 'followup',
     label: 'Promotional Follow-up',
-    body: (r) => `Dear ${r.name},\n\nThank you for your interest in MYKITA JAPAN. We'd love to keep you updated on our latest collections, exclusive offers, and news.\n\nBest regards,\nMYKITA JAPAN`
+    subject: (r) => {
+      const lang = (r.lang || 'EN').toUpperCase();
+      if (lang === 'JA') return 'MYKITA JAPANよりご案内';
+      if (lang === 'ZH') return 'MYKITA JAPAN 最新资讯';
+      if (lang === 'KO') return 'MYKITA JAPAN 안내드립니다';
+      return 'A message from MYKITA JAPAN';
+    },
+    body: (r) => {
+      const lang = (r.lang || 'EN').toUpperCase();
+      if (lang === 'JA') return `${r.name} 様\n\nいつもMYKITA JAPANをご愛顧いただきありがとうございます。最新コレクションや限定オファーなど、お得な情報をお届けしたいと思っております。\n\n引き続きどうぞよろしくお願いいたします。\n\nMYKITA JAPAN`;
+      if (lang === 'ZH') return `尊敬的 ${r.name}，\n\n感谢您对MYKITA JAPAN的支持。我们希望为您带来最新系列、独家优惠及品牌动态。\n\n期待继续为您服务。\n\nMYKITA JAPAN`;
+      if (lang === 'KO') return `${r.name} 고객님,\n\nMYKITA JAPAN을 이용해 주셔서 감사합니다. 최신 컬렉션과 특별 혜택 등 다양한 소식을 전해드리고 싶습니다.\n\n앞으로도 잘 부탁드립니다.\n\nMYKITA JAPAN`;
+      return `Dear ${r.name},\n\nThank you for your interest in MYKITA JAPAN. We'd love to keep you updated on our latest collections, exclusive offers, and news.\n\nBest regards,\nMYKITA JAPAN`;
+    }
   },
   {
     id: 'blank',
     label: '(Blank)',
+    subject: (r) => '',
     body: (r) => ''
   }
 ];
@@ -1704,19 +1759,32 @@ function applyMailTemplate() {
   if (!mailTargetRecord) return;
   const sel = document.getElementById('mail-template-select');
   const tmpl = MAIL_TEMPLATES.find(t => t.id === sel.value);
-  if (tmpl) document.getElementById('mail-textarea').value = tmpl.body(mailTargetRecord);
+  if (!tmpl) return;
+  document.getElementById('mail-subject').value = tmpl.subject(mailTargetRecord);
+  document.getElementById('mail-textarea').value = tmpl.body(mailTargetRecord);
 }
 
 function closeMailModal() { document.getElementById('mail-modal-overlay').classList.remove('open'); }
 function closeMailModalOnOverlay(e) { if (e.target === e.currentTarget) closeMailModal(); }
 
 function copyMailText() {
-  const text = document.getElementById('mail-textarea').value;
+  const subject = document.getElementById('mail-subject').value;
+  const body = document.getElementById('mail-textarea').value;
+  const text = subject ? `Subject: ${subject}\n\n${body}` : body;
   const btn = document.getElementById('mail-copy-btn');
   navigator.clipboard.writeText(text).then(() => {
     btn.textContent = 'Copied!';
     setTimeout(() => { btn.textContent = 'Copy'; }, 1500);
   });
+}
+
+function openInMailClient() {
+  if (!mailTargetRecord) return;
+  const to = mailTargetRecord.email;
+  const subject = document.getElementById('mail-subject').value;
+  const body = document.getElementById('mail-textarea').value;
+  const mailto = `mailto:${encodeURIComponent(to)}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+  window.location.href = mailto;
 }
 
 // ── UTILS ──
