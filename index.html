@@ -6,14 +6,14 @@
 <title>MYKITA JAPAN — Frame Warranty Registration</title>
 <style>
 :root {
-  --bg: #0e0e0e;
-  --surface: #161616;
-  --border: #2a2a2a;
-  --light: #c8c8c8;
-  --mid: #757575;
+  --bg: #ffffff;
+  --surface: #f5f5f5;
+  --border: #d0d0d0;
+  --light: #1a1a1a;
+  --mid: #666666;
   --red: #c0392b;
-  --green: #27ae60;
-  --orange: #e67e22;
+  --green: #1e7e44;
+  --orange: #b85c00;
   --blue: #185FA5;
   --font: 'Helvetica Neue', Helvetica, Arial, sans-serif;
 }
@@ -57,7 +57,7 @@ body {
   font-size: 21px;
   letter-spacing: 0.25em;
   font-weight: 300;
-  color: #fff;
+  color: #1a1a1a;
   cursor: pointer;
   user-select: none;
 }
@@ -191,8 +191,8 @@ body {
 /* ── SUBMIT BTN ── */
 .submit-btn {
   width: 100%;
-  background: var(--light);
-  color: #000;
+  background: #1a1a1a;
+  color: #ffffff;
   border: none;
   font-family: var(--font);
   font-size: 13px;
@@ -203,7 +203,7 @@ body {
   transition: background 0.15s;
   margin-top: 8px;
 }
-.submit-btn:hover { background: #fff; }
+.submit-btn:hover { background: #333333; }
 .submit-btn:disabled { background: var(--border); color: var(--mid); cursor: not-allowed; }
 
 /* ── THANKS ── */
@@ -217,8 +217,8 @@ body {
 .thanks-sub { font-size: 13px; color: var(--mid); line-height: 1.7; margin-bottom: 20px; }
 .refresh-btn {
   background: none;
-  border: 0.5px solid var(--border);
-  color: var(--light);
+  border: 0.5px solid #aaaaaa;
+  color: #1a1a1a;
   font-family: var(--font);
   font-size: 12px;
   letter-spacing: 0.12em;
@@ -226,7 +226,7 @@ body {
   cursor: pointer;
   transition: border-color 0.15s, color 0.15s;
 }
-.refresh-btn:hover { border-color: var(--light); }
+.refresh-btn:hover { border-color: #1a1a1a; }
 
 /* ── AUTOCOMPLETE ── */
 .ac-wrap { position: relative; }
@@ -249,7 +249,7 @@ body {
   position: absolute;
   top: 100%;
   left: 0; right: 0;
-  background: #1e1e1e;
+  background: #f0f0f0;
   border: 0.5px solid var(--border);
   border-top: none;
   max-height: 200px;
@@ -265,7 +265,7 @@ body {
   cursor: pointer;
   transition: background 0.1s;
 }
-.ac-item:hover, .ac-item.highlight { background: #2a2a2a; }
+.ac-item:hover, .ac-item.highlight { background: #e8e8e8; }
 .ac-empty {
   padding: 10px 14px;
   font-size: 13px;
@@ -313,8 +313,8 @@ body {
   letter-spacing: 0.06em;
 }
 .csv-btn {
-  background: var(--light);
-  color: #000;
+  background: #1a1a1a;
+  color: #ffffff;
   border: none;
   font-family: var(--font);
   font-size: 11px;
@@ -323,7 +323,7 @@ body {
   cursor: pointer;
   transition: background 0.15s;
 }
-.csv-btn:hover { background: #fff; }
+.csv-btn:hover { background: #333333; }
 .csv-filter {
   background: var(--surface);
   border: 0.5px solid var(--border);
@@ -348,13 +348,13 @@ th {
 }
 td {
   padding: 10px 10px;
-  border-bottom: 0.5px solid #1a1a1a;
+  border-bottom: 0.5px solid #e0e0e0;
   vertical-align: middle;
   font-size: 13px;
 }
-tr:hover td { background: #111; }
-.badge-yes { background: #1a3a1a; color: #4caf50; font-size: 11px; padding: 2px 8px; letter-spacing: 0.06em; }
-.badge-no  { background: #2a1a1a; color: #888; font-size: 11px; padding: 2px 8px; letter-spacing: 0.06em; }
+tr:hover td { background: #f9f9f9; }
+.badge-yes { background: #e8f5e9; color: #1e7e44; font-size: 11px; padding: 2px 8px; letter-spacing: 0.06em; }
+.badge-no  { background: #fdecea; color: #666; font-size: 11px; padding: 2px 8px; letter-spacing: 0.06em; }
 .row-delete-btn {
   background: none;
   border: none;
@@ -382,10 +382,10 @@ tr:hover td { background: #111; }
 .followup-badge:hover { opacity: 0.75; }
 .followup-na      { background: transparent; color: var(--mid); cursor: default; }
 .followup-na:hover { opacity: 1; }
-.followup-pending  { background: #1e1e1e; color: var(--mid); border: 0.5px solid var(--border); }
-.followup-due      { background: #3a2200; color: var(--orange); }
-.followup-overdue  { background: #2a0a0a; color: var(--red); }
-.followup-done     { background: #0a2a0a; color: var(--green); }
+.followup-pending  { background: #f0f0f0; color: var(--mid); border: 0.5px solid var(--border); }
+.followup-due      { background: #fff3e0; color: var(--orange); }
+.followup-overdue  { background: #fdecea; color: var(--red); }
+.followup-done     { background: #e6f4ea; color: var(--green); }
 
 /* ── ADMIN GATE ── */
 #admin-gate {
@@ -428,7 +428,7 @@ tr:hover td { background: #111; }
 .email-actions-menu {
   display: none;
   position: fixed;
-  background: #1e1e1e;
+  background: #f0f0f0;
   border: 0.5px solid var(--border);
   z-index: 200;
   min-width: 160px;
@@ -447,14 +447,14 @@ tr:hover td { background: #111; }
   cursor: pointer;
   transition: background 0.1s;
 }
-.email-action-btn:hover { background: #2a2a2a; }
+.email-action-btn:hover { background: #e8e8e8; }
 
 /* ── MAIL MODAL ── */
 .mail-modal-overlay {
   display: none;
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,0.7);
+  background: rgba(0,0,0,0.4);
   z-index: 300;
   align-items: center;
   justify-content: center;
@@ -929,14 +929,31 @@ function renderFrameRowList() {
 
 function addFrameRow() {
   if (frameRows.length >= 3) return;
+  // preserve existing input values before re-render
+  const saved = frameRows.map(r => {
+    const el = document.getElementById('frame-input-' + r.id);
+    return { id: r.id, value: el ? el.value : '' };
+  });
   frameRows.push({ id: frameRowSeq++ });
   renderFrameRowList();
+  saved.forEach(({ id, value }) => {
+    const el = document.getElementById('frame-input-' + id);
+    if (el) el.value = value;
+  });
 }
 
 function removeFrameRow(id) {
   if (frameRows.length <= 1) return;
+  const saved = frameRows.map(r => {
+    const el = document.getElementById('frame-input-' + r.id);
+    return { id: r.id, value: el ? el.value : '' };
+  });
   frameRows = frameRows.filter(r => r.id !== id);
   renderFrameRowList();
+  saved.filter(s => s.id !== id).forEach(({ id, value }) => {
+    const el = document.getElementById('frame-input-' + id);
+    if (el) el.value = value;
+  });
 }
 
 function resetFrameEntry() {
