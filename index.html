@@ -719,9 +719,10 @@ tr:hover td { background: #f9f9f9; }
     <div class="mail-modal">
       <p class="section-label" style="border:none; margin:0 0 4px;">Compose Follow-up Email</p>
       <p class="mail-modal-recipient" id="mail-recipient"></p>
+      <select class="mail-template-select" id="mail-template-select" style="display:none;"></select>
       <div class="mail-modal-field">
-        <label>Template</label>
-        <select class="mail-template-select" id="mail-template-select" onchange="applyMailTemplate()"></select>
+        <label>Staff Name</label>
+        <input type="text" class="mail-subject-input" id="mail-staff-name" placeholder="Your name" oninput="saveStaffName(); applyMailTemplate()">
       </div>
       <div class="mail-modal-field">
         <label>Subject</label>
@@ -729,7 +730,7 @@ tr:hover td { background: #f9f9f9; }
       </div>
       <div class="mail-modal-field">
         <label>Message</label>
-        <textarea class="mail-textarea" id="mail-textarea"></textarea>
+        <textarea class="mail-textarea" id="mail-textarea" style="min-height:220px;"></textarea>
       </div>
       <div class="mail-modal-actions">
         <button class="refresh-btn" onclick="closeMailModal()">Close</button>
@@ -1692,49 +1693,24 @@ function copyEmailAddress() {
 }
 
 // ── MAIL MODAL ──
+function getStaffName() {
+  return (document.getElementById('mail-staff-name') || {}).value || localStorage.getItem('mykita_staff_name') || '';
+}
+function saveStaffName() {
+  const v = (document.getElementById('mail-staff-name') || {}).value || '';
+  localStorage.setItem('mykita_staff_name', v);
+}
+
 const MAIL_TEMPLATES = [
   {
-    id: 'confirmation',
-    label: 'Warranty Registration Confirmation',
-    subject: (r) => {
-      const lang = (r.lang || 'EN').toUpperCase();
-      if (lang === 'JA') return '保証登録のご確認 - MYKITA JAPAN';
-      if (lang === 'ZH') return '保修注册确认 - MYKITA JAPAN';
-      if (lang === 'KO') return '보증 등록 확인 - MYKITA JAPAN';
-      return 'Warranty Registration Confirmation - MYKITA JAPAN';
-    },
+    id: 'thankyou',
+    label: 'Thank You (Visit)',
+    subject: (r) => 'Thank You for Visiting/MYKITA Osaka',
     body: (r) => {
-      const lang = (r.lang || 'EN').toUpperCase();
-      if (lang === 'JA') return `${r.name} 様\n\nMYKITAフレームの保証登録をいただきありがとうございます。ご登録内容を確認いたしました。\n\nご不明な点がございましたら、お気軽にお問い合わせください。\n\nMYKITA JAPAN`;
-      if (lang === 'ZH') return `尊敬的 ${r.name}，\n\n感谢您注册MYKITA镜框的保修服务。我们已收到并记录了您的注册信息。\n\n如有任何疑问，请随时与我们联系。\n\nMYKITA JAPAN`;
-      if (lang === 'KO') return `${r.name} 고객님,\n\nMYKITA 프레임 보증 등록을 해주셔서 감사합니다. 등록 내용이 확인되었습니다.\n\n궁금한 점이 있으시면 언제든지 문의해 주세요.\n\nMYKITA JAPAN`;
-      return `Dear ${r.name},\n\nThank you for registering your MYKITA frame with us. Your warranty registration has been received and recorded.\n\nIf you have any questions, please feel free to contact us.\n\nBest regards,\nMYKITA JAPAN`;
+      const staff = getStaffName();
+      return `Dear ${r.name}-san,\n\nThank you very much for visiting our store today.\nIt was a pleasure to meet you.\n\nWe hope you will enjoy your new MYKITA glasses/sunglasses.\nShould you require any maintenance or adjustments, please feel free to visit our store at any time. We would be delighted to assist you.\n\nWe look forward to welcoming you again on your next visit to Japan.\n\n\nKind regards,\n${staff}\nMYKITA Osaka\nGoogle Map Link | https://share.google/mw7yBJWFXs3xLcj1Y`;
     }
   },
-  {
-    id: 'followup',
-    label: 'Promotional Follow-up',
-    subject: (r) => {
-      const lang = (r.lang || 'EN').toUpperCase();
-      if (lang === 'JA') return 'MYKITA JAPANよりご案内';
-      if (lang === 'ZH') return 'MYKITA JAPAN 最新资讯';
-      if (lang === 'KO') return 'MYKITA JAPAN 안내드립니다';
-      return 'A message from MYKITA JAPAN';
-    },
-    body: (r) => {
-      const lang = (r.lang || 'EN').toUpperCase();
-      if (lang === 'JA') return `${r.name} 様\n\nいつもMYKITA JAPANをご愛顧いただきありがとうございます。最新コレクションや限定オファーなど、お得な情報をお届けしたいと思っております。\n\n引き続きどうぞよろしくお願いいたします。\n\nMYKITA JAPAN`;
-      if (lang === 'ZH') return `尊敬的 ${r.name}，\n\n感谢您对MYKITA JAPAN的支持。我们希望为您带来最新系列、独家优惠及品牌动态。\n\n期待继续为您服务。\n\nMYKITA JAPAN`;
-      if (lang === 'KO') return `${r.name} 고객님,\n\nMYKITA JAPAN을 이용해 주셔서 감사합니다. 최신 컬렉션과 특별 혜택 등 다양한 소식을 전해드리고 싶습니다.\n\n앞으로도 잘 부탁드립니다.\n\nMYKITA JAPAN`;
-      return `Dear ${r.name},\n\nThank you for your interest in MYKITA JAPAN. We'd love to keep you updated on our latest collections, exclusive offers, and news.\n\nBest regards,\nMYKITA JAPAN`;
-    }
-  },
-  {
-    id: 'blank',
-    label: '(Blank)',
-    subject: (r) => '',
-    body: (r) => ''
-  }
 ];
 
 let mailTargetRecord = null;
@@ -1751,6 +1727,8 @@ function composeFromEmailActions() {
   if (!record) return;
   mailTargetRecord = record;
   document.getElementById('mail-recipient').textContent = record.email;
+  const staffInput = document.getElementById('mail-staff-name');
+  if (staffInput && !staffInput.value) staffInput.value = localStorage.getItem('mykita_staff_name') || '';
   applyMailTemplate();
   document.getElementById('mail-modal-overlay').classList.add('open');
 }
