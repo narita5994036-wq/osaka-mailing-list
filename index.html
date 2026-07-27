@@ -25,9 +25,7 @@ body {
   font-family: var(--font);
   -webkit-font-smoothing: antialiased;
   min-height: 100vh;
-  transition: background-color 0.6s ease;
 }
-body.lens-selected { background-color: #eaf3fc; }
 
 /* ── LANG BAR ── */
 .lang-bar {
@@ -63,6 +61,16 @@ body.lens-selected { background-color: #eaf3fc; }
   cursor: pointer;
   user-select: none;
 }
+.logo-underline {
+  width: 60px;
+  height: 2px;
+  background: var(--blue);
+  margin: 10px auto 0;
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.6s ease;
+}
+.logo-underline.active { transform: scaleX(1); }
 .logo-sub {
   margin-top: 6px;
   font-size: 11px;
@@ -623,6 +631,7 @@ tr:hover td { background: #f9f9f9; }
   <!-- HEADER -->
   <div class="header">
     <div class="logo" id="logo-tap">MYKITA JAPAN</div>
+    <div class="logo-underline" id="logo-underline"></div>
     <div class="logo-sub" id="lbl-subtitle">Frame Warranty Registration</div>
   </div>
 
@@ -641,45 +650,6 @@ tr:hover td { background: #f9f9f9; }
         <input type="checkbox" id="f-lens" onchange="toggleLensFields()">
         <span class="lens-toggle-label" id="lbl-lens-toggle">I also purchased prescription lenses.</span>
       </label>
-      <div id="lens-fields">
-        <!-- Phone -->
-        <div class="field">
-          <label id="lbl-phone">Phone Number</label>
-          <div class="phone-row" id="phone-row-intl">
-            <select class="phone-code-select" id="f-phone-code"></select>
-            <input type="tel" id="f-phone-intl" style="flex:1;">
-          </div>
-          <input type="tel" id="f-phone-ja" style="display:none;">
-        </div>
-        <!-- Postcode -->
-        <div class="field">
-          <label id="lbl-postcode">Postcode</label>
-          <div class="postcode-row" id="postcode-row-ja" style="display:none;">
-            <input type="text" id="f-postcode-ja" placeholder="000-0000" maxlength="8" oninput="onPostcodeInput(this.value)">
-            <button type="button" class="postcode-lookup-btn" onclick="lookupPostcode()" id="lbl-postcode-lookup">Search</button>
-          </div>
-          <input type="text" id="f-postcode-intl" placeholder="Postcode / ZIP">
-        </div>
-        <!-- Address -->
-        <div class="field" id="address-ja-fields" style="display:none;">
-          <label id="lbl-address-pref">Prefecture</label>
-          <input type="text" id="f-address-pref" readonly style="background:#efefef;">
-          <label id="lbl-address-city" style="margin-top:12px;">City / Town</label>
-          <input type="text" id="f-address-city" readonly style="background:#efefef;">
-          <label id="lbl-address-line" style="margin-top:12px;">Street / Building</label>
-          <textarea id="f-address-line"></textarea>
-        </div>
-        <div class="field" id="address-intl-fields">
-          <label id="lbl-address-line1">Address Line 1</label>
-          <input type="text" id="f-address-line1" placeholder="Street number, street name">
-          <label id="lbl-address-line2" style="margin-top:12px;">Address Line 2 <span style="font-size:10px; text-transform:none; letter-spacing:0;">(optional)</span></label>
-          <input type="text" id="f-address-line2" placeholder="Building, apartment, suite">
-          <label id="lbl-address-city-intl" style="margin-top:12px;">City / Town</label>
-          <input type="text" id="f-address-city-intl">
-          <label id="lbl-address-state" style="margin-top:12px;">State / Province <span style="font-size:10px; text-transform:none; letter-spacing:0;">(optional)</span></label>
-          <input type="text" id="f-address-state">
-        </div>
-      </div>
 
       <div style="display:flex; gap:10px;">
         <button class="refresh-btn" style="flex:1; height:48px;" onclick="skipFrameEntry()" id="lbl-frame-skip">Skip</button>
@@ -724,6 +694,46 @@ tr:hover td { background: #f9f9f9; }
           <div class="ac-dropdown" id="email-dropdown"></div>
         </div>
         <div class="err-msg" id="e-email">Please enter a valid email address.</div>
+      </div>
+
+      <div id="lens-fields">
+        <!-- Phone -->
+        <div class="field">
+          <label id="lbl-phone">Phone Number</label>
+          <div class="phone-row" id="phone-row-intl">
+            <select class="phone-code-select" id="f-phone-code"></select>
+            <input type="tel" id="f-phone-intl" style="flex:1;">
+          </div>
+          <input type="tel" id="f-phone-ja" style="display:none;">
+        </div>
+        <!-- Postcode -->
+        <div class="field">
+          <label id="lbl-postcode">Postcode</label>
+          <div class="postcode-row" id="postcode-row-ja" style="display:none;">
+            <input type="text" id="f-postcode-ja" placeholder="000-0000" maxlength="8" oninput="onPostcodeInput(this.value)">
+            <button type="button" class="postcode-lookup-btn" onclick="lookupPostcode()" id="lbl-postcode-lookup">Search</button>
+          </div>
+          <input type="text" id="f-postcode-intl" placeholder="Postcode / ZIP">
+        </div>
+        <!-- Address -->
+        <div class="field" id="address-ja-fields" style="display:none;">
+          <label id="lbl-address-pref">Prefecture</label>
+          <input type="text" id="f-address-pref" readonly style="background:#efefef;">
+          <label id="lbl-address-city" style="margin-top:12px;">City / Town</label>
+          <input type="text" id="f-address-city" readonly style="background:#efefef;">
+          <label id="lbl-address-line" style="margin-top:12px;">Street / Building</label>
+          <textarea id="f-address-line"></textarea>
+        </div>
+        <div class="field" id="address-intl-fields">
+          <label id="lbl-address-line1">Address Line 1</label>
+          <input type="text" id="f-address-line1" placeholder="Street number, street name">
+          <label id="lbl-address-line2" style="margin-top:12px;">Address Line 2 <span style="font-size:10px; text-transform:none; letter-spacing:0;">(optional)</span></label>
+          <input type="text" id="f-address-line2" placeholder="Building, apartment, suite">
+          <label id="lbl-address-city-intl" style="margin-top:12px;">City / Town</label>
+          <input type="text" id="f-address-city-intl">
+          <label id="lbl-address-state" style="margin-top:12px;">State / Province <span style="font-size:10px; text-transform:none; letter-spacing:0;">(optional)</span></label>
+          <input type="text" id="f-address-state">
+        </div>
       </div>
 
       <!-- Opt-in -->
@@ -1138,7 +1148,7 @@ function updateLensFieldsForLang(lang) {
 function toggleLensFields() {
   const checked = document.getElementById('f-lens').checked;
   document.getElementById('lens-fields').classList.toggle('open', checked);
-  document.body.classList.toggle('lens-selected', checked);
+  document.getElementById('logo-underline').classList.toggle('active', checked);
 }
 
 function onPostcodeInput(val) {
