@@ -696,21 +696,6 @@ tr:hover td { background: #f9f9f9; }
         <div class="err-msg" id="e-email">Please enter a valid email address.</div>
       </div>
 
-      <!-- Opt-in -->
-      <p class="section-label" id="lbl-optin-section" style="margin-top:8px;">Email Opt-in</p>
-      <p class="optin-desc" id="lbl-optin-desc">Would you like to receive exclusive offers, news, and updates from MYKITA JAPAN?</p>
-      <div class="radio-group">
-        <label class="radio-btn">
-          <input type="radio" name="optin" id="f-optin-yes" value="yes" onchange="updateSubmitState()">
-          <span id="lbl-yes">Yes</span>
-        </label>
-        <label class="radio-btn">
-          <input type="radio" name="optin" id="f-optin-no" value="no" onchange="updateSubmitState()">
-          <span id="lbl-no">No</span>
-        </label>
-      </div>
-      <p class="optin-desc" id="lbl-optin-note" style="margin-top:-8px; font-size:11px;"></p>
-
       <div id="lens-fields">
         <!-- Phone -->
         <div class="field">
@@ -750,6 +735,21 @@ tr:hover td { background: #f9f9f9; }
           <input type="text" id="f-address-state">
         </div>
       </div>
+
+      <!-- Opt-in -->
+      <p class="section-label" id="lbl-optin-section" style="margin-top:8px;">Email Opt-in</p>
+      <p class="optin-desc" id="lbl-optin-desc">Would you like to receive exclusive offers, news, and updates from MYKITA JAPAN?</p>
+      <div class="radio-group">
+        <label class="radio-btn">
+          <input type="radio" name="optin" id="f-optin-yes" value="yes" onchange="updateSubmitState()">
+          <span id="lbl-yes">Yes</span>
+        </label>
+        <label class="radio-btn">
+          <input type="radio" name="optin" id="f-optin-no" value="no" onchange="updateSubmitState()">
+          <span id="lbl-no">No</span>
+        </label>
+      </div>
+      <p class="optin-desc" id="lbl-optin-note" style="margin-top:-8px; font-size:11px;"></p>
 
       <!-- Privacy note -->
       <div class="privacy-note" id="lbl-privacy">
