@@ -125,7 +125,7 @@ body {
   border: 0.5px solid var(--border);
   color: var(--light);
   font-family: var(--font);
-  font-size: 15px;
+  font-size: 16px;
   padding: 12px 14px;
   outline: none;
   transition: border-color 0.15s;
@@ -223,7 +223,7 @@ body {
   border: 0.5px solid var(--border);
   color: var(--light);
   font-family: var(--font);
-  font-size: 14px;
+  font-size: 16px;
   padding: 12px 14px;
   outline: none;
   resize: vertical;
@@ -239,7 +239,7 @@ body {
   border: 0.5px solid var(--border);
   color: var(--light);
   font-family: var(--font);
-  font-size: 15px;
+  font-size: 16px;
   padding: 12px 14px;
   outline: none;
   -webkit-appearance: none;
@@ -321,7 +321,7 @@ body {
   border: 0.5px solid var(--border);
   color: var(--light);
   font-family: var(--font);
-  font-size: 15px;
+  font-size: 16px;
   padding: 12px 14px;
   outline: none;
   transition: border-color 0.15s;
@@ -501,7 +501,7 @@ tr:hover td { background: #f9f9f9; }
   border: 0.5px solid var(--border);
   color: var(--light);
   font-family: var(--font);
-  font-size: 15px;
+  font-size: 16px;
   padding: 12px 14px;
   outline: none;
   transition: border-color 0.15s;
@@ -580,7 +580,7 @@ tr:hover td { background: #f9f9f9; }
   border: 0.5px solid var(--border);
   color: var(--light);
   font-family: var(--font);
-  font-size: 13px;
+  font-size: 16px;
   padding: 10px 12px;
   outline: none;
   resize: vertical;
@@ -593,7 +593,7 @@ tr:hover td { background: #f9f9f9; }
   border: 0.5px solid var(--border);
   color: var(--light);
   font-family: var(--font);
-  font-size: 13px;
+  font-size: 16px;
   padding: 8px 10px;
   outline: none;
   box-sizing: border-box;
@@ -1479,6 +1479,21 @@ function validateForm() {
   return ok;
 }
 
+// ── PHONE FORMATTING ──
+function formatIntlPhone(code, raw) {
+  const trimmed = raw.trim();
+  if (!trimmed) return '';
+  if (/^\d+$/.test(trimmed)) {
+    // plain digits, e.g. "09011111111" — drop the leading 0, then group
+    const digits = trimmed.replace(/^0/, '');
+    if (digits.length === 10) return `(${code}) ${digits.slice(0, 2)}-${digits.slice(2, 6)}-${digits.slice(6)}`;
+    if (digits.length === 9) return `(${code}) ${digits.slice(0, 1)}-${digits.slice(1, 5)}-${digits.slice(5)}`;
+    return `(${code}) ${digits}`;
+  }
+  // already has its own separators — just drop a leading 0
+  return `(${code}) ${trimmed.replace(/^0/, '')}`;
+}
+
 // ── SUBMIT ──
 async function handleSubmit() {
   if (!validateForm()) return;
@@ -1509,7 +1524,7 @@ async function handleSubmit() {
     } else {
       const code = document.getElementById('f-phone-code').value;
       const num = document.getElementById('f-phone-intl').value.trim();
-      phone = num ? code + ' ' + num : '';
+      phone = formatIntlPhone(code, num);
       postcode = document.getElementById('f-postcode-intl').value.trim();
       const line1 = document.getElementById('f-address-line1').value.trim();
       const line2 = document.getElementById('f-address-line2').value.trim();
