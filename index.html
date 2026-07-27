@@ -650,7 +650,7 @@ tr:hover td { background: #f9f9f9; }
       <p class="section-label" id="lbl-lens-section">Lens Purchase</p>
       <label class="lens-toggle-row" for="f-lens">
         <input type="checkbox" id="f-lens" onchange="toggleLensFields()">
-        <span class="lens-toggle-label" id="lbl-lens-toggle">I also purchased lenses.</span>
+        <span class="lens-toggle-label" id="lbl-lens-toggle">Customer also purchased lenses.</span>
       </label>
 
       <div style="display:flex; gap:10px;">
@@ -701,38 +701,38 @@ tr:hover td { background: #f9f9f9; }
       <div id="lens-fields">
         <!-- Phone -->
         <div class="field">
-          <label id="lbl-phone">Phone Number</label>
+          <label id="lbl-phone" class="required">Phone Number</label>
           <div class="phone-row" id="phone-row-intl">
             <select class="phone-code-select" id="f-phone-code"></select>
-            <input type="tel" id="f-phone-intl" style="flex:1;">
+            <input type="tel" id="f-phone-intl" style="flex:1;" oninput="updateSubmitState()">
           </div>
-          <input type="tel" id="f-phone-ja" style="display:none;">
+          <input type="tel" id="f-phone-ja" style="display:none;" oninput="updateSubmitState()">
         </div>
         <!-- Postcode -->
         <div class="field">
-          <label id="lbl-postcode">Postcode</label>
+          <label id="lbl-postcode" class="required">Postcode</label>
           <div class="postcode-row" id="postcode-row-ja" style="display:none;">
-            <input type="text" id="f-postcode-ja" placeholder="000-0000" maxlength="8" oninput="onPostcodeInput(this.value)">
+            <input type="text" id="f-postcode-ja" placeholder="000-0000" maxlength="8" oninput="onPostcodeInput(this.value); updateSubmitState()">
             <button type="button" class="postcode-lookup-btn" onclick="lookupPostcode()" id="lbl-postcode-lookup">Search</button>
           </div>
-          <input type="text" id="f-postcode-intl" placeholder="Postcode / ZIP">
+          <input type="text" id="f-postcode-intl" placeholder="Postcode / ZIP" oninput="updateSubmitState()">
         </div>
         <!-- Address -->
         <div class="field" id="address-ja-fields" style="display:none;">
-          <label id="lbl-address-pref">Prefecture</label>
+          <label id="lbl-address-pref" class="required">Prefecture</label>
           <input type="text" id="f-address-pref" readonly style="background:#efefef;">
-          <label id="lbl-address-city" style="margin-top:12px;">City / Town</label>
+          <label id="lbl-address-city" class="required" style="margin-top:12px;">City / Town</label>
           <input type="text" id="f-address-city" readonly style="background:#efefef;">
-          <label id="lbl-address-line" style="margin-top:12px;">Street / Building</label>
-          <textarea id="f-address-line"></textarea>
+          <label id="lbl-address-line" class="required" style="margin-top:12px;">Street / Building</label>
+          <textarea id="f-address-line" oninput="updateSubmitState()"></textarea>
         </div>
         <div class="field" id="address-intl-fields">
-          <label id="lbl-address-line1">Address Line 1</label>
-          <input type="text" id="f-address-line1" placeholder="Street number, street name">
+          <label id="lbl-address-line1" class="required">Address Line 1</label>
+          <input type="text" id="f-address-line1" placeholder="Street number, street name" oninput="updateSubmitState()">
           <label id="lbl-address-line2" style="margin-top:12px;">Address Line 2 <span style="font-size:10px; text-transform:none; letter-spacing:0;">(optional)</span></label>
           <input type="text" id="f-address-line2" placeholder="Building, apartment, suite">
-          <label id="lbl-address-city-intl" style="margin-top:12px;">City / Town</label>
-          <input type="text" id="f-address-city-intl">
+          <label id="lbl-address-city-intl" class="required" style="margin-top:12px;">City / Town</label>
+          <input type="text" id="f-address-city-intl" oninput="updateSubmitState()">
           <label id="lbl-address-state" style="margin-top:12px;">State / Province <span style="font-size:10px; text-transform:none; letter-spacing:0;">(optional)</span></label>
           <input type="text" id="f-address-state">
         </div>
@@ -934,7 +934,7 @@ const i18n = {
     lblFrameInfo: 'Purchased Frame(s)',
     lblFrameDesc: 'Please enter the name(s) of the MYKITA frame(s) you purchased. You may add multiple frames, or skip this step.',
     lblFrameAdd: '+ Add Frame', lblFrameSkip: 'Skip', lblFrameContinue: 'Continue', framePlaceholder: 'Frame name',
-    lensSection: 'Lens Purchase', lensToggle: 'I also purchased lenses.',
+    lensSection: 'Lens Purchase', lensToggle: 'Customer also purchased lenses.',
     phone: 'Phone Number', postcode: 'Postcode', postcodeLookup: 'Search',
     addressPref: 'Prefecture', addressCity: 'City / Town', addressLine: 'Street / Building', address: 'Address',
     addressLine1: 'Address Line 1', addressLine2: 'Address Line 2', addressCityIntl: 'City / Town', addressState: 'State / Province',
@@ -968,7 +968,7 @@ const i18n = {
     lblFrameInfo: 'ご購入フレーム',
     lblFrameDesc: 'ご購入されたMYKITAフレームの名前を入力してください。複数点ある場合は追加できます。スキップも可能です。',
     lblFrameAdd: '+ フレームを追加', lblFrameSkip: 'スキップ', lblFrameContinue: '次へ', framePlaceholder: 'フレーム名',
-    lensSection: 'レンズ購入', lensToggle: 'レンズも購入しました。',
+    lensSection: 'レンズ購入', lensToggle: 'お客様もレンズをご購入されました。',
     phone: '電話番号', postcode: '郵便番号', postcodeLookup: '住所検索',
     addressPref: '都道府県', addressCity: '市区町村', addressLine: '番地・建物名', address: '住所',
     addressLine1: '住所①', addressLine2: '住所②', addressCityIntl: '市区郡', addressState: '州・省',
@@ -1002,7 +1002,7 @@ const i18n = {
     lblFrameInfo: '购买的镜架',
     lblFrameDesc: '请输入您购买的MYKITA镜架名称。如有多件可点击添加，也可跳过此步骤。',
     lblFrameAdd: '+ 添加镜架', lblFrameSkip: '跳过', lblFrameContinue: '继续', framePlaceholder: '镜架名称',
-    lensSection: '镜片购买', lensToggle: '我也购买了镜片。',
+    lensSection: '镜片购买', lensToggle: '顾客也购买了镜片。',
     phone: '电话号码', postcode: '邮政编码', postcodeLookup: '查询',
     addressPref: '都道府县', addressCity: '市区町村', addressLine: '街道・楼号', address: '地址',
     addressLine1: '地址①', addressLine2: '地址②', addressCityIntl: '城市/乡镇', addressState: '州/省',
@@ -1036,7 +1036,7 @@ const i18n = {
     lblFrameInfo: '구매하신 프레임',
     lblFrameDesc: '구매하신 MYKITA 프레임의 이름을 입력해 주세요. 여러 개인 경우 추가할 수 있으며, 건너뛰기도 가능합니다.',
     lblFrameAdd: '+ 프레임 추가', lblFrameSkip: '건너뛰기', lblFrameContinue: '다음', framePlaceholder: '프레임 이름',
-    lensSection: '렌즈 구매', lensToggle: '렌즈도 구매하였습니다.',
+    lensSection: '렌즈 구매', lensToggle: '고객님도 렌즈를 구매하셨습니다.',
     phone: '전화번호', postcode: '우편번호', postcodeLookup: '검색',
     addressPref: '도도부현', addressCity: '시구정촌', addressLine: '번지・건물명', address: '주소',
     addressLine1: '주소①', addressLine2: '주소②', addressCityIntl: '시/읍/면', addressState: '주/성',
@@ -1098,6 +1098,7 @@ function setLang(lang) {
   document.getElementById('lbl-address-state').childNodes[0].textContent = t.addressState + ' ';
   // Toggle phone/postcode layout based on language
   updateLensFieldsForLang(lang);
+  updateSubmitState();
 }
 
 // ── LENS FIELDS ──
@@ -1151,6 +1152,22 @@ function toggleLensFields() {
   const checked = document.getElementById('f-lens').checked;
   document.getElementById('lens-fields').classList.toggle('open', checked);
   document.getElementById('logo-underline').classList.toggle('active', checked);
+  updateSubmitState();
+}
+
+function lensFieldsValid() {
+  if (!document.getElementById('f-lens').checked) return true;
+  if (currentLang === 'ja') {
+    return !!document.getElementById('f-phone-ja').value.trim() &&
+      !!document.getElementById('f-postcode-ja').value.trim() &&
+      !!document.getElementById('f-address-pref').value.trim() &&
+      !!document.getElementById('f-address-city').value.trim() &&
+      !!document.getElementById('f-address-line').value.trim();
+  }
+  return !!document.getElementById('f-phone-intl').value.trim() &&
+    !!document.getElementById('f-postcode-intl').value.trim() &&
+    !!document.getElementById('f-address-line1').value.trim() &&
+    !!document.getElementById('f-address-city-intl').value.trim();
 }
 
 function onPostcodeInput(val) {
@@ -1168,6 +1185,7 @@ async function lookupPostcode() {
       const r = data.results[0];
       document.getElementById('f-address-pref').value = r.address1;
       document.getElementById('f-address-city').value = r.address2 + r.address3;
+      updateSubmitState();
     }
   } catch (e) {}
 }
@@ -1464,7 +1482,8 @@ function updateSubmitState() {
   const valid = name && name.value.trim() &&
     email && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value.trim()) &&
     (optinYes && optinYes.checked || optinNo && optinNo.checked) &&
-    agree && agree.checked;
+    agree && agree.checked &&
+    lensFieldsValid();
   btn.disabled = !valid;
 }
 
