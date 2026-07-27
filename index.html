@@ -274,6 +274,9 @@ body {
 
 /* ── FRAME ENTRY SCREEN ── */
 #form-area { display: none; }
+#frame-entry-area { transition: background-color 0.6s ease; }
+#frame-entry-area.lens-selected { background-color: #eaf3fc; }
+.lens-question { margin-bottom: 24px; }
 .frame-row { display: flex; gap: 8px; margin-bottom: 12px; }
 .frame-row .ac-wrap { flex: 1; }
 .frame-remove-btn {
@@ -557,6 +560,21 @@ tr:hover td { background: #f9f9f9; }
       <p class="optin-desc" id="lbl-frame-desc" style="margin-bottom:1.5rem;">Please enter the name(s) of the MYKITA frame(s) you purchased. You may add multiple frames, or skip this step.</p>
       <div id="frame-row-list"></div>
       <button class="refresh-btn" type="button" onclick="addFrameRow()" id="lbl-frame-add" style="margin-bottom:2rem;">+ Add Frame</button>
+
+      <div class="lens-question">
+        <span class="optin-label" id="lbl-lens-question">Did you also purchase lenses?</span>
+        <div class="radio-group">
+          <label class="radio-btn">
+            <input type="radio" name="lens-purchase" id="f-lens-yes" value="yes" onchange="handleLensSelect()">
+            <span id="lbl-lens-yes">Yes</span>
+          </label>
+          <label class="radio-btn">
+            <input type="radio" name="lens-purchase" id="f-lens-no" value="no" onchange="handleLensSelect()">
+            <span id="lbl-lens-no">No</span>
+          </label>
+        </div>
+      </div>
+
       <div style="display:flex; gap:10px;">
         <button class="refresh-btn" style="flex:1; height:48px;" onclick="skipFrameEntry()" id="lbl-frame-skip">Skip</button>
         <button class="submit-btn" style="flex:1; margin-top:0;" onclick="continueFrameEntry()" id="lbl-frame-continue">Continue</button>
@@ -798,6 +816,7 @@ const i18n = {
     lblFrameInfo: 'Purchased Frame(s)',
     lblFrameDesc: 'Please enter the name(s) of the MYKITA frame(s) you purchased. You may add multiple frames, or skip this step.',
     lblFrameAdd: '+ Add Frame', lblFrameSkip: 'Skip', lblFrameContinue: 'Continue', framePlaceholder: 'Frame name',
+    lblLensQuestion: 'Did you also purchase lenses?',
   },
   ja: {
     subtitle: 'フレーム保証登録',
@@ -828,6 +847,7 @@ const i18n = {
     lblFrameInfo: 'ご購入フレーム',
     lblFrameDesc: 'ご購入されたMYKITAフレームの名前を入力してください。複数点ある場合は追加できます。スキップも可能です。',
     lblFrameAdd: '+ フレームを追加', lblFrameSkip: 'スキップ', lblFrameContinue: '次へ', framePlaceholder: 'フレーム名',
+    lblLensQuestion: 'レンズもご購入されましたか？',
   },
   zh: {
     subtitle: '镜架保修登记',
@@ -858,6 +878,7 @@ const i18n = {
     lblFrameInfo: '购买的镜架',
     lblFrameDesc: '请输入您购买的MYKITA镜架名称。如有多件可点击添加，也可跳过此步骤。',
     lblFrameAdd: '+ 添加镜架', lblFrameSkip: '跳过', lblFrameContinue: '继续', framePlaceholder: '镜架名称',
+    lblLensQuestion: '您是否也购买了镜片？',
   },
   ko: {
     subtitle: '프레임 보증 등록',
@@ -888,6 +909,7 @@ const i18n = {
     lblFrameInfo: '구매하신 프레임',
     lblFrameDesc: '구매하신 MYKITA 프레임의 이름을 입력해 주세요. 여러 개인 경우 추가할 수 있으며, 건너뛰기도 가능합니다.',
     lblFrameAdd: '+ 프레임 추가', lblFrameSkip: '건너뛰기', lblFrameContinue: '다음', framePlaceholder: '프레임 이름',
+    lblLensQuestion: '렌즈도 구매하셨나요?',
   }
 };
 
@@ -928,6 +950,9 @@ function setLang(lang) {
   document.getElementById('lbl-frame-add').textContent = t.lblFrameAdd;
   document.getElementById('lbl-frame-skip').textContent = t.lblFrameSkip;
   document.getElementById('lbl-frame-continue').textContent = t.lblFrameContinue;
+  document.getElementById('lbl-lens-question').textContent = t.lblLensQuestion;
+  document.getElementById('lbl-lens-yes').textContent = t.yes;
+  document.getElementById('lbl-lens-no').textContent = t.no;
   document.querySelectorAll('.frame-input').forEach(el => { el.placeholder = t.framePlaceholder; });
   const countryInput = document.getElementById('f-country-input');
   if (countryInput) countryInput.placeholder = '';
@@ -988,6 +1013,13 @@ function removeFrameRow(id) {
 function resetFrameEntry() {
   frameRows = [{ id: 0 }]; frameRowSeq = 1; purchasedFrames = [];
   renderFrameRowList();
+  document.getElementById('f-lens-yes').checked = false;
+  document.getElementById('f-lens-no').checked = false;
+  document.getElementById('frame-entry-area').classList.remove('lens-selected');
+}
+
+function handleLensSelect() {
+  document.getElementById('frame-entry-area').classList.add('lens-selected');
 }
 
 function initFrameAutocomplete(id) {
