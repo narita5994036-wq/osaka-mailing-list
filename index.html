@@ -1708,7 +1708,17 @@ const MAIL_TEMPLATES = [
     subject: (r) => 'Thank You for Visiting/MYKITA Osaka',
     body: (r) => {
       const staff = getStaffName();
-      return `Dear ${r.name}-san,\n\nThank you very much for visiting our store today.\nIt was a pleasure to meet you.\n\nWe hope you will enjoy your new MYKITA glasses/sunglasses.\nShould you require any maintenance or adjustments, please feel free to visit our store at any time. We would be delighted to assist you.\n\nWe look forward to welcoming you again on your next visit to Japan.\n\n\nKind regards,\n${staff}\nMYKITA Osaka\nGoogle Map Link | https://share.google/mw7yBJWFXs3xLcj1Y`;
+      let when = 'the other day';
+      if (r.timestamp) {
+        const ts = new Date(r.timestamp);
+        const now = new Date();
+        const tsDay = new Date(ts.getFullYear(), ts.getMonth(), ts.getDate()).getTime();
+        const todayDay = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+        const diff = todayDay - tsDay;
+        if (diff === 0) when = 'today';
+        else if (diff === 86400000) when = 'yesterday';
+      }
+      return `Dear ${r.name}-san,\n\nThank you very much for visiting our store ${when}.\nIt was a pleasure to meet you.\n\nWe hope you will enjoy your new MYKITA glasses/sunglasses.\nShould you require any maintenance or adjustments, please feel free to visit our store at any time. We would be delighted to assist you.\n\nWe look forward to welcoming you again on your next visit to Japan.\n\n\nKind regards,\n${staff}\nMYKITA Osaka\nGoogle Map Link | https://share.google/mw7yBJWFXs3xLcj1Y`;
     }
   },
 ];
