@@ -165,6 +165,81 @@ body.lens-selected { background-color: #eaf3fc; }
 .radio-btn input[type="radio"] { accent-color: var(--light); }
 .radio-btn:has(input:checked) { border-color: var(--light); }
 
+/* ── LENS SECTION ── */
+.lens-toggle-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+  padding: 14px;
+  border: 0.5px solid var(--border);
+  cursor: pointer;
+}
+.lens-toggle-row input[type="checkbox"] { accent-color: var(--light); flex-shrink: 0; width: 16px; height: 16px; }
+.lens-toggle-label { font-size: 13px; color: var(--light); }
+#lens-fields { display: none; margin-bottom: 8px; }
+#lens-fields.open { display: block; }
+.phone-row { display: flex; gap: 8px; }
+.phone-code-select {
+  width: 110px;
+  flex-shrink: 0;
+  background: var(--surface);
+  border: 0.5px solid var(--border);
+  color: var(--light);
+  font-family: var(--font);
+  font-size: 14px;
+  padding: 12px 8px;
+  outline: none;
+  border-radius: 0;
+  -webkit-appearance: none;
+}
+.phone-code-select:focus { border-color: var(--light); }
+.postcode-row { display: flex; gap: 8px; align-items: flex-start; }
+.postcode-row input { flex: 1; }
+.postcode-lookup-btn {
+  flex-shrink: 0;
+  background: var(--surface);
+  border: 0.5px solid var(--border);
+  color: var(--light);
+  font-family: var(--font);
+  font-size: 12px;
+  padding: 12px 14px;
+  cursor: pointer;
+  letter-spacing: 0.06em;
+  white-space: nowrap;
+}
+.postcode-lookup-btn:hover { background: var(--border); }
+.field textarea {
+  width: 100%;
+  background: var(--surface);
+  border: 0.5px solid var(--border);
+  color: var(--light);
+  font-family: var(--font);
+  font-size: 14px;
+  padding: 12px 14px;
+  outline: none;
+  resize: vertical;
+  min-height: 80px;
+  line-height: 1.5;
+  border-radius: 0;
+  box-sizing: border-box;
+}
+.field textarea:focus { border-color: var(--light); }
+.field input[type="tel"] {
+  width: 100%;
+  background: var(--surface);
+  border: 0.5px solid var(--border);
+  color: var(--light);
+  font-family: var(--font);
+  font-size: 15px;
+  padding: 12px 14px;
+  outline: none;
+  -webkit-appearance: none;
+  border-radius: 0;
+  box-sizing: border-box;
+}
+.field input[type="tel"]:focus { border-color: var(--light); }
+
 /* ── AGREE ── */
 .agree-row {
   display: flex;
@@ -276,7 +351,6 @@ body.lens-selected { background-color: #eaf3fc; }
 
 /* ── FRAME ENTRY SCREEN ── */
 #form-area { display: none; }
-.lens-question { margin-bottom: 24px; }
 .frame-row { display: flex; gap: 8px; margin-bottom: 12px; }
 .frame-row .ac-wrap { flex: 1; }
 .frame-remove-btn {
@@ -561,17 +635,49 @@ tr:hover td { background: #f9f9f9; }
       <div id="frame-row-list"></div>
       <button class="refresh-btn" type="button" onclick="addFrameRow()" id="lbl-frame-add" style="margin-bottom:2rem;">+ Add Frame</button>
 
-      <div class="lens-question">
-        <span class="optin-label" id="lbl-lens-question">Did you also purchase lenses?</span>
-        <div class="radio-group">
-          <label class="radio-btn">
-            <input type="radio" name="lens-purchase" id="f-lens-yes" value="yes" onchange="handleLensSelect()">
-            <span id="lbl-lens-yes">Yes</span>
-          </label>
-          <label class="radio-btn">
-            <input type="radio" name="lens-purchase" id="f-lens-no" value="no" onchange="handleLensSelect()">
-            <span id="lbl-lens-no">No</span>
-          </label>
+      <!-- Lens Purchase -->
+      <p class="section-label" id="lbl-lens-section">Lens Purchase</p>
+      <label class="lens-toggle-row" for="f-lens">
+        <input type="checkbox" id="f-lens" onchange="toggleLensFields()">
+        <span class="lens-toggle-label" id="lbl-lens-toggle">I also purchased prescription lenses.</span>
+      </label>
+      <div id="lens-fields">
+        <!-- Phone -->
+        <div class="field">
+          <label id="lbl-phone">Phone Number</label>
+          <div class="phone-row" id="phone-row-intl">
+            <select class="phone-code-select" id="f-phone-code"></select>
+            <input type="tel" id="f-phone-intl" style="flex:1;">
+          </div>
+          <input type="tel" id="f-phone-ja" style="display:none;">
+        </div>
+        <!-- Postcode -->
+        <div class="field">
+          <label id="lbl-postcode">Postcode</label>
+          <div class="postcode-row" id="postcode-row-ja" style="display:none;">
+            <input type="text" id="f-postcode-ja" placeholder="000-0000" maxlength="8" oninput="onPostcodeInput(this.value)">
+            <button type="button" class="postcode-lookup-btn" onclick="lookupPostcode()" id="lbl-postcode-lookup">Search</button>
+          </div>
+          <input type="text" id="f-postcode-intl" placeholder="Postcode / ZIP">
+        </div>
+        <!-- Address -->
+        <div class="field" id="address-ja-fields" style="display:none;">
+          <label id="lbl-address-pref">Prefecture</label>
+          <input type="text" id="f-address-pref" readonly style="background:#efefef;">
+          <label id="lbl-address-city" style="margin-top:12px;">City / Town</label>
+          <input type="text" id="f-address-city" readonly style="background:#efefef;">
+          <label id="lbl-address-line" style="margin-top:12px;">Street / Building</label>
+          <textarea id="f-address-line"></textarea>
+        </div>
+        <div class="field" id="address-intl-fields">
+          <label id="lbl-address-line1">Address Line 1</label>
+          <input type="text" id="f-address-line1" placeholder="Street number, street name">
+          <label id="lbl-address-line2" style="margin-top:12px;">Address Line 2 <span style="font-size:10px; text-transform:none; letter-spacing:0;">(optional)</span></label>
+          <input type="text" id="f-address-line2" placeholder="Building, apartment, suite">
+          <label id="lbl-address-city-intl" style="margin-top:12px;">City / Town</label>
+          <input type="text" id="f-address-city-intl">
+          <label id="lbl-address-state" style="margin-top:12px;">State / Province <span style="font-size:10px; text-transform:none; letter-spacing:0;">(optional)</span></label>
+          <input type="text" id="f-address-state">
         </div>
       </div>
 
@@ -816,7 +922,10 @@ const i18n = {
     lblFrameInfo: 'Purchased Frame(s)',
     lblFrameDesc: 'Please enter the name(s) of the MYKITA frame(s) you purchased. You may add multiple frames, or skip this step.',
     lblFrameAdd: '+ Add Frame', lblFrameSkip: 'Skip', lblFrameContinue: 'Continue', framePlaceholder: 'Frame name',
-    lblLensQuestion: 'Did you also purchase lenses?',
+    lensSection: 'Lens Purchase', lensToggle: 'I also purchased prescription lenses.',
+    phone: 'Phone Number', postcode: 'Postcode', postcodeLookup: 'Search',
+    addressPref: 'Prefecture', addressCity: 'City / Town', addressLine: 'Street / Building', address: 'Address',
+    addressLine1: 'Address Line 1', addressLine2: 'Address Line 2', addressCityIntl: 'City / Town', addressState: 'State / Province',
   },
   ja: {
     subtitle: 'フレーム保証登録',
@@ -847,7 +956,10 @@ const i18n = {
     lblFrameInfo: 'ご購入フレーム',
     lblFrameDesc: 'ご購入されたMYKITAフレームの名前を入力してください。複数点ある場合は追加できます。スキップも可能です。',
     lblFrameAdd: '+ フレームを追加', lblFrameSkip: 'スキップ', lblFrameContinue: '次へ', framePlaceholder: 'フレーム名',
-    lblLensQuestion: 'レンズもご購入されましたか？',
+    lensSection: 'レンズ購入', lensToggle: '度付きレンズも購入しました。',
+    phone: '電話番号', postcode: '郵便番号', postcodeLookup: '住所検索',
+    addressPref: '都道府県', addressCity: '市区町村', addressLine: '番地・建物名', address: '住所',
+    addressLine1: '住所①', addressLine2: '住所②', addressCityIntl: '市区郡', addressState: '州・省',
   },
   zh: {
     subtitle: '镜架保修登记',
@@ -878,7 +990,10 @@ const i18n = {
     lblFrameInfo: '购买的镜架',
     lblFrameDesc: '请输入您购买的MYKITA镜架名称。如有多件可点击添加，也可跳过此步骤。',
     lblFrameAdd: '+ 添加镜架', lblFrameSkip: '跳过', lblFrameContinue: '继续', framePlaceholder: '镜架名称',
-    lblLensQuestion: '您是否也购买了镜片？',
+    lensSection: '镜片购买', lensToggle: '我也购买了处方镜片。',
+    phone: '电话号码', postcode: '邮政编码', postcodeLookup: '查询',
+    addressPref: '都道府县', addressCity: '市区町村', addressLine: '街道・楼号', address: '地址',
+    addressLine1: '地址①', addressLine2: '地址②', addressCityIntl: '城市/乡镇', addressState: '州/省',
   },
   ko: {
     subtitle: '프레임 보증 등록',
@@ -909,7 +1024,10 @@ const i18n = {
     lblFrameInfo: '구매하신 프레임',
     lblFrameDesc: '구매하신 MYKITA 프레임의 이름을 입력해 주세요. 여러 개인 경우 추가할 수 있으며, 건너뛰기도 가능합니다.',
     lblFrameAdd: '+ 프레임 추가', lblFrameSkip: '건너뛰기', lblFrameContinue: '다음', framePlaceholder: '프레임 이름',
-    lblLensQuestion: '렌즈도 구매하셨나요?',
+    lensSection: '렌즈 구매', lensToggle: '처방 렌즈도 구매하였습니다.',
+    phone: '전화번호', postcode: '우편번호', postcodeLookup: '검색',
+    addressPref: '도도부현', addressCity: '시구정촌', addressLine: '번지・건물명', address: '주소',
+    addressLine1: '주소①', addressLine2: '주소②', addressCityIntl: '시/읍/면', addressState: '주/성',
   }
 };
 
@@ -950,12 +1068,96 @@ function setLang(lang) {
   document.getElementById('lbl-frame-add').textContent = t.lblFrameAdd;
   document.getElementById('lbl-frame-skip').textContent = t.lblFrameSkip;
   document.getElementById('lbl-frame-continue').textContent = t.lblFrameContinue;
-  document.getElementById('lbl-lens-question').textContent = t.lblLensQuestion;
-  document.getElementById('lbl-lens-yes').textContent = t.yes;
-  document.getElementById('lbl-lens-no').textContent = t.no;
   document.querySelectorAll('.frame-input').forEach(el => { el.placeholder = t.framePlaceholder; });
   const countryInput = document.getElementById('f-country-input');
   if (countryInput) countryInput.placeholder = '';
+  // Lens section labels
+  document.getElementById('lbl-lens-section').textContent = t.lensSection;
+  document.getElementById('lbl-lens-toggle').textContent = t.lensToggle;
+  document.getElementById('lbl-phone').textContent = t.phone;
+  document.getElementById('lbl-postcode').textContent = t.postcode;
+  document.getElementById('lbl-postcode-lookup').textContent = t.postcodeLookup;
+  document.getElementById('lbl-address-pref').textContent = t.addressPref;
+  document.getElementById('lbl-address-city').textContent = t.addressCity;
+  document.getElementById('lbl-address-line').textContent = t.addressLine;
+  document.getElementById('lbl-address-line1').textContent = t.addressLine1;
+  document.getElementById('lbl-address-line2').childNodes[0].textContent = t.addressLine2 + ' ';
+  document.getElementById('lbl-address-city-intl').textContent = t.addressCityIntl;
+  document.getElementById('lbl-address-state').childNodes[0].textContent = t.addressState + ' ';
+  // Toggle phone/postcode layout based on language
+  updateLensFieldsForLang(lang);
+}
+
+// ── LENS FIELDS ──
+const PHONE_CODES = [
+  {code:'+81',label:'🇯🇵 +81 Japan'},{code:'+82',label:'🇰🇷 +82 Korea'},
+  {code:'+86',label:'🇨🇳 +86 China'},{code:'+852',label:'🇭🇰 +852 Hong Kong'},
+  {code:'+886',label:'🇹🇼 +886 Taiwan'},{code:'+1',label:'🇺🇸 +1 US/Canada'},
+  {code:'+44',label:'🇬🇧 +44 UK'},{code:'+61',label:'🇦🇺 +61 Australia'},
+  {code:'+64',label:'🇳🇿 +64 New Zealand'},{code:'+65',label:'🇸🇬 +65 Singapore'},
+  {code:'+60',label:'🇲🇾 +60 Malaysia'},{code:'+66',label:'🇹🇭 +66 Thailand'},
+  {code:'+84',label:'🇻🇳 +84 Vietnam'},{code:'+62',label:'🇮🇩 +62 Indonesia'},
+  {code:'+63',label:'🇵🇭 +63 Philippines'},{code:'+91',label:'🇮🇳 +91 India'},
+  {code:'+33',label:'🇫🇷 +33 France'},{code:'+49',label:'🇩🇪 +49 Germany'},
+  {code:'+39',label:'🇮🇹 +39 Italy'},{code:'+34',label:'🇪🇸 +34 Spain'},
+  {code:'+31',label:'🇳🇱 +31 Netherlands'},{code:'+46',label:'🇸🇪 +46 Sweden'},
+  {code:'+47',label:'🇳🇴 +47 Norway'},{code:'+45',label:'🇩🇰 +45 Denmark'},
+  {code:'+358',label:'🇫🇮 +358 Finland'},{code:'+41',label:'🇨🇭 +41 Switzerland'},
+  {code:'+43',label:'🇦🇹 +43 Austria'},{code:'+32',label:'🇧🇪 +32 Belgium'},
+  {code:'+351',label:'🇵🇹 +351 Portugal'},{code:'+48',label:'🇵🇱 +48 Poland'},
+  {code:'+7',label:'🇷🇺 +7 Russia'},{code:'+55',label:'🇧🇷 +55 Brazil'},
+  {code:'+52',label:'🇲🇽 +52 Mexico'},{code:'+54',label:'🇦🇷 +54 Argentina'},
+  {code:'+56',label:'🇨🇱 +56 Chile'},{code:'+57',label:'🇨🇴 +57 Colombia'},
+  {code:'+27',label:'🇿🇦 +27 South Africa'},{code:'+971',label:'🇦🇪 +971 UAE'},
+  {code:'+966',label:'🇸🇦 +966 Saudi Arabia'},{code:'+90',label:'🇹🇷 +90 Turkey'},
+  {code:'+30',label:'🇬🇷 +30 Greece'},{code:'+420',label:'🇨🇿 +420 Czech Republic'},
+  {code:'+36',label:'🇭🇺 +36 Hungary'},{code:'+40',label:'🇷🇴 +40 Romania'},
+  {code:'+380',label:'🇺🇦 +380 Ukraine'},{code:'+972',label:'🇮🇱 +972 Israel'},
+  {code:'+20',label:'🇪🇬 +20 Egypt'},{code:'+92',label:'🇵🇰 +92 Pakistan'},
+  {code:'+880',label:'🇧🇩 +880 Bangladesh'},{code:'+94',label:'🇱🇰 +94 Sri Lanka'},
+  {code:'+977',label:'🇳🇵 +977 Nepal'},{code:'+95',label:'🇲🇲 +95 Myanmar'},
+  {code:'+855',label:'🇰🇭 +855 Cambodia'},{code:'+856',label:'🇱🇦 +856 Laos'},
+  {code:'+976',label:'🇲🇳 +976 Mongolia'},{code:'+853',label:'🇲🇴 +853 Macau'},
+];
+
+function initPhoneCodeSelect() {
+  const sel = document.getElementById('f-phone-code');
+  sel.innerHTML = PHONE_CODES.map(p => `<option value="${p.code}">${p.label}</option>`).join('');
+}
+
+function updateLensFieldsForLang(lang) {
+  const isJa = lang === 'ja';
+  document.getElementById('phone-row-intl').style.display = isJa ? 'none' : 'flex';
+  document.getElementById('f-phone-ja').style.display = isJa ? 'block' : 'none';
+  document.getElementById('postcode-row-ja').style.display = isJa ? 'flex' : 'none';
+  document.getElementById('f-postcode-intl').style.display = isJa ? 'none' : 'block';
+  document.getElementById('address-ja-fields').style.display = isJa ? 'block' : 'none';
+  document.getElementById('address-intl-fields').style.display = isJa ? 'none' : 'block';
+}
+
+function toggleLensFields() {
+  const checked = document.getElementById('f-lens').checked;
+  document.getElementById('lens-fields').classList.toggle('open', checked);
+  document.body.classList.toggle('lens-selected', checked);
+}
+
+function onPostcodeInput(val) {
+  const digits = val.replace(/\D/g, '');
+  if (digits.length === 7) lookupPostcode();
+}
+
+async function lookupPostcode() {
+  const raw = document.getElementById('f-postcode-ja').value.replace(/\D/g, '');
+  if (raw.length !== 7) return;
+  try {
+    const res = await fetch(`https://zipcloud.ibsnet.co.jp/api/search?zipcode=${raw}`);
+    const data = await res.json();
+    if (data.results && data.results[0]) {
+      const r = data.results[0];
+      document.getElementById('f-address-pref').value = r.address1;
+      document.getElementById('f-address-city').value = r.address2 + r.address3;
+    }
+  } catch (e) {}
 }
 
 // ── FRAME NAME ENTRY ──
@@ -1013,13 +1215,19 @@ function removeFrameRow(id) {
 function resetFrameEntry() {
   frameRows = [{ id: 0 }]; frameRowSeq = 1; purchasedFrames = [];
   renderFrameRowList();
-  document.getElementById('f-lens-yes').checked = false;
-  document.getElementById('f-lens-no').checked = false;
-  document.body.classList.remove('lens-selected');
-}
-
-function handleLensSelect() {
-  document.body.classList.add('lens-selected');
+  document.getElementById('f-lens').checked = false;
+  document.getElementById('f-phone-intl').value = '';
+  document.getElementById('f-phone-ja').value = '';
+  document.getElementById('f-postcode-intl').value = '';
+  document.getElementById('f-postcode-ja').value = '';
+  document.getElementById('f-address-pref').value = '';
+  document.getElementById('f-address-city').value = '';
+  document.getElementById('f-address-line').value = '';
+  document.getElementById('f-address-line1').value = '';
+  document.getElementById('f-address-line2').value = '';
+  document.getElementById('f-address-city-intl').value = '';
+  document.getElementById('f-address-state').value = '';
+  toggleLensFields();
 }
 
 function initFrameAutocomplete(id) {
@@ -1066,64 +1274,64 @@ function continueFrameEntry() {
 
 // ── COUNTRY AUTOCOMPLETE ──
 const COUNTRIES = [
-  { name: 'Japan', code: 'JP' },
-  { name: 'United States', code: 'US' },
-  { name: 'China', code: 'CN' },
-  { name: 'South Korea', code: 'KR' },
-  { name: 'Taiwan', code: 'TW' },
-  { name: 'Hong Kong', code: 'HK' },
-  { name: 'Singapore', code: 'SG' },
-  { name: 'Australia', code: 'AU' },
-  { name: 'United Kingdom', code: 'GB' },
-  { name: 'Germany', code: 'DE' },
-  { name: 'France', code: 'FR' },
-  { name: 'Italy', code: 'IT' },
-  { name: 'Spain', code: 'ES' },
-  { name: 'Netherlands', code: 'NL' },
-  { name: 'Switzerland', code: 'CH' },
-  { name: 'Canada', code: 'CA' },
-  { name: 'Brazil', code: 'BR' },
-  { name: 'India', code: 'IN' },
-  { name: 'Thailand', code: 'TH' },
-  { name: 'Vietnam', code: 'VN' },
-  { name: 'Indonesia', code: 'ID' },
-  { name: 'Malaysia', code: 'MY' },
-  { name: 'Philippines', code: 'PH' },
-  { name: 'New Zealand', code: 'NZ' },
-  { name: 'Sweden', code: 'SE' },
-  { name: 'Norway', code: 'NO' },
-  { name: 'Denmark', code: 'DK' },
-  { name: 'Finland', code: 'FI' },
-  { name: 'Belgium', code: 'BE' },
-  { name: 'Austria', code: 'AT' },
-  { name: 'Portugal', code: 'PT' },
-  { name: 'Poland', code: 'PL' },
-  { name: 'Russia', code: 'RU' },
-  { name: 'Mexico', code: 'MX' },
-  { name: 'Argentina', code: 'AR' },
-  { name: 'Chile', code: 'CL' },
-  { name: 'Colombia', code: 'CO' },
-  { name: 'South Africa', code: 'ZA' },
-  { name: 'UAE', code: 'AE' },
-  { name: 'Saudi Arabia', code: 'SA' },
-  { name: 'Turkey', code: 'TR' },
-  { name: 'Greece', code: 'GR' },
-  { name: 'Czech Republic', code: 'CZ' },
-  { name: 'Hungary', code: 'HU' },
-  { name: 'Romania', code: 'RO' },
-  { name: 'Ukraine', code: 'UA' },
-  { name: 'Israel', code: 'IL' },
-  { name: 'Egypt', code: 'EG' },
-  { name: 'Pakistan', code: 'PK' },
-  { name: 'Bangladesh', code: 'BD' },
-  { name: 'Sri Lanka', code: 'LK' },
-  { name: 'Nepal', code: 'NP' },
-  { name: 'Myanmar', code: 'MM' },
-  { name: 'Cambodia', code: 'KH' },
-  { name: 'Laos', code: 'LA' },
-  { name: 'Mongolia', code: 'MN' },
-  { name: 'Macau', code: 'MO' },
-  { name: 'Other', code: '' }
+  { name: 'Japan', code: 'JP', phoneCode: '+81' },
+  { name: 'United States', code: 'US', phoneCode: '+1' },
+  { name: 'China', code: 'CN', phoneCode: '+86' },
+  { name: 'South Korea', code: 'KR', phoneCode: '+82' },
+  { name: 'Taiwan', code: 'TW', phoneCode: '+886' },
+  { name: 'Hong Kong', code: 'HK', phoneCode: '+852' },
+  { name: 'Singapore', code: 'SG', phoneCode: '+65' },
+  { name: 'Australia', code: 'AU', phoneCode: '+61' },
+  { name: 'United Kingdom', code: 'GB', phoneCode: '+44' },
+  { name: 'Germany', code: 'DE', phoneCode: '+49' },
+  { name: 'France', code: 'FR', phoneCode: '+33' },
+  { name: 'Italy', code: 'IT', phoneCode: '+39' },
+  { name: 'Spain', code: 'ES', phoneCode: '+34' },
+  { name: 'Netherlands', code: 'NL', phoneCode: '+31' },
+  { name: 'Switzerland', code: 'CH', phoneCode: '+41' },
+  { name: 'Canada', code: 'CA', phoneCode: '+1' },
+  { name: 'Brazil', code: 'BR', phoneCode: '+55' },
+  { name: 'India', code: 'IN', phoneCode: '+91' },
+  { name: 'Thailand', code: 'TH', phoneCode: '+66' },
+  { name: 'Vietnam', code: 'VN', phoneCode: '+84' },
+  { name: 'Indonesia', code: 'ID', phoneCode: '+62' },
+  { name: 'Malaysia', code: 'MY', phoneCode: '+60' },
+  { name: 'Philippines', code: 'PH', phoneCode: '+63' },
+  { name: 'New Zealand', code: 'NZ', phoneCode: '+64' },
+  { name: 'Sweden', code: 'SE', phoneCode: '+46' },
+  { name: 'Norway', code: 'NO', phoneCode: '+47' },
+  { name: 'Denmark', code: 'DK', phoneCode: '+45' },
+  { name: 'Finland', code: 'FI', phoneCode: '+358' },
+  { name: 'Belgium', code: 'BE', phoneCode: '+32' },
+  { name: 'Austria', code: 'AT', phoneCode: '+43' },
+  { name: 'Portugal', code: 'PT', phoneCode: '+351' },
+  { name: 'Poland', code: 'PL', phoneCode: '+48' },
+  { name: 'Russia', code: 'RU', phoneCode: '+7' },
+  { name: 'Mexico', code: 'MX', phoneCode: '+52' },
+  { name: 'Argentina', code: 'AR', phoneCode: '+54' },
+  { name: 'Chile', code: 'CL', phoneCode: '+56' },
+  { name: 'Colombia', code: 'CO', phoneCode: '+57' },
+  { name: 'South Africa', code: 'ZA', phoneCode: '+27' },
+  { name: 'UAE', code: 'AE', phoneCode: '+971' },
+  { name: 'Saudi Arabia', code: 'SA', phoneCode: '+966' },
+  { name: 'Turkey', code: 'TR', phoneCode: '+90' },
+  { name: 'Greece', code: 'GR', phoneCode: '+30' },
+  { name: 'Czech Republic', code: 'CZ', phoneCode: '+420' },
+  { name: 'Hungary', code: 'HU', phoneCode: '+36' },
+  { name: 'Romania', code: 'RO', phoneCode: '+40' },
+  { name: 'Ukraine', code: 'UA', phoneCode: '+380' },
+  { name: 'Israel', code: 'IL', phoneCode: '+972' },
+  { name: 'Egypt', code: 'EG', phoneCode: '+20' },
+  { name: 'Pakistan', code: 'PK', phoneCode: '+92' },
+  { name: 'Bangladesh', code: 'BD', phoneCode: '+880' },
+  { name: 'Sri Lanka', code: 'LK', phoneCode: '+94' },
+  { name: 'Nepal', code: 'NP', phoneCode: '+977' },
+  { name: 'Myanmar', code: 'MM', phoneCode: '+95' },
+  { name: 'Cambodia', code: 'KH', phoneCode: '+855' },
+  { name: 'Laos', code: 'LA', phoneCode: '+856' },
+  { name: 'Mongolia', code: 'MN', phoneCode: '+976' },
+  { name: 'Macau', code: 'MO', phoneCode: '+853' },
+  { name: 'Other', code: '', phoneCode: '' }
 ];
 
 function initAutocomplete() {
@@ -1141,7 +1349,7 @@ function initAutocomplete() {
       wrap.classList.add('open');
       return;
     }
-    dropdown.innerHTML = filtered.map((c, i) => `<div class="ac-item${i === acHighlight ? ' highlight' : ''}" data-name="${escapeHtml(c.name)}" data-code="${escapeHtml(c.code)}">${escapeHtml(c.name)}</div>`).join('');
+    dropdown.innerHTML = filtered.map((c, i) => `<div class="ac-item${i === acHighlight ? ' highlight' : ''}" data-name="${escapeHtml(c.name)}" data-code="${escapeHtml(c.code)}" data-phone="${escapeHtml(c.phoneCode||'')}">${escapeHtml(c.name)}</div>`).join('');
     wrap.classList.add('open');
     dropdown.querySelectorAll('.ac-item').forEach(item => {
       item.addEventListener('mousedown', e => {
@@ -1153,6 +1361,15 @@ function initAutocomplete() {
         dropdown.innerHTML = '';
         acHighlight = -1;
         updateSubmitState();
+        // Sync phone country code selector
+        const phoneCode = item.dataset.phone;
+        if (phoneCode) {
+          const sel = document.getElementById('f-phone-code');
+          if (sel) {
+            const opt = [...sel.options].find(o => o.value === phoneCode);
+            if (opt) sel.value = phoneCode;
+          }
+        }
       });
     });
   }
@@ -1268,6 +1485,30 @@ async function handleSubmit() {
   const countryCode = (countryWrap && countryWrap.dataset.countryCode) || '';
   const ts = new Date().toISOString();
 
+  // Lens fields
+  const lensChecked = document.getElementById('f-lens').checked;
+  let phone = '', postcode = '', address = '';
+  if (lensChecked) {
+    if (currentLang === 'ja') {
+      phone = document.getElementById('f-phone-ja').value.trim();
+      postcode = document.getElementById('f-postcode-ja').value.trim();
+      const pref = document.getElementById('f-address-pref').value.trim();
+      const city = document.getElementById('f-address-city').value.trim();
+      const line = document.getElementById('f-address-line').value.trim();
+      address = [pref, city, line].filter(Boolean).join(' ');
+    } else {
+      const code = document.getElementById('f-phone-code').value;
+      const num = document.getElementById('f-phone-intl').value.trim();
+      phone = num ? code + ' ' + num : '';
+      postcode = document.getElementById('f-postcode-intl').value.trim();
+      const line1 = document.getElementById('f-address-line1').value.trim();
+      const line2 = document.getElementById('f-address-line2').value.trim();
+      const cityIntl = document.getElementById('f-address-city-intl').value.trim();
+      const state = document.getElementById('f-address-state').value.trim();
+      address = [line1, line2, cityIntl, state].filter(Boolean).join(', ');
+    }
+  }
+
   const record = {
     timestamp: ts,
     name: name.value.trim(),
@@ -1277,7 +1518,11 @@ async function handleSubmit() {
     countryCode: countryCode,
     lang: currentLang,
     memberNo: '',
-    frameNames: purchasedFrames.join(', ')
+    frameNames: purchasedFrames.join(', '),
+    lensOrder: lensChecked,
+    phone: phone,
+    postcode: postcode,
+    address: address
   };
 
   try {
@@ -1817,6 +2062,7 @@ setLang('en');
 renderFrameRowList();
 initAutocomplete();
 initEmailAutocomplete();
+initPhoneCodeSelect();
 checkAdminMode();
 updateSubmitState();
 initTextScale();
