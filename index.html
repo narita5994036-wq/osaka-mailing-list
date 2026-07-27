@@ -118,6 +118,8 @@ body {
   color: var(--mid);
   margin-bottom: 8px;
 }
+.required::after { content: " *"; color: var(--red); }
+.required-before::before { content: "* "; color: var(--red); }
 .field input[type="text"],
 .field input[type="email"] {
   width: 100%;
@@ -648,7 +650,7 @@ tr:hover td { background: #f9f9f9; }
       <p class="section-label" id="lbl-lens-section">Lens Purchase</p>
       <label class="lens-toggle-row" for="f-lens">
         <input type="checkbox" id="f-lens" onchange="toggleLensFields()">
-        <span class="lens-toggle-label" id="lbl-lens-toggle">I also purchased prescription lenses.</span>
+        <span class="lens-toggle-label" id="lbl-lens-toggle">I also purchased lenses.</span>
       </label>
 
       <div style="display:flex; gap:10px;">
@@ -670,7 +672,7 @@ tr:hover td { background: #f9f9f9; }
 
       <!-- Name -->
       <div class="field">
-        <label id="lbl-name">Full Name</label>
+        <label id="lbl-name" class="required">Full Name</label>
         <input type="text" id="f-name" autocomplete="name" oninput="updateSubmitState()">
         <div class="err-msg" id="e-name">Please enter your name.</div>
       </div>
@@ -688,7 +690,7 @@ tr:hover td { background: #f9f9f9; }
 
       <!-- Email -->
       <div class="field">
-        <label id="lbl-email">Email Address</label>
+        <label id="lbl-email" class="required">Email Address</label>
         <div class="ac-wrap" id="email-ac-wrap">
           <input type="email" class="ac-input" id="f-email" autocomplete="email" oninput="updateSubmitState()">
           <div class="ac-dropdown" id="email-dropdown"></div>
@@ -737,7 +739,7 @@ tr:hover td { background: #f9f9f9; }
       </div>
 
       <!-- Opt-in -->
-      <p class="section-label" id="lbl-optin-section" style="margin-top:8px;">Email Opt-in</p>
+      <p class="section-label required" id="lbl-optin-section" style="margin-top:8px;">Email Opt-in</p>
       <p class="optin-desc" id="lbl-optin-desc">Would you like to receive exclusive offers, news, and updates from MYKITA JAPAN?</p>
       <div class="radio-group">
         <label class="radio-btn">
@@ -759,7 +761,7 @@ tr:hover td { background: #f9f9f9; }
       <!-- Agree -->
       <div class="agree-row">
         <input type="checkbox" id="f-agree" onchange="updateSubmitState()">
-        <span class="agree-text" id="lbl-agree">I agree to the <a href="#" onclick="return false;">Privacy Policy</a> and consent to the processing of my personal data for warranty registration purposes.</span>
+        <span class="agree-text required-before" id="lbl-agree">I agree to the <a href="#" onclick="return false;">Privacy Policy</a> and consent to the processing of my personal data for warranty registration purposes.</span>
       </div>
 
       <button class="submit-btn" id="submit-btn" onclick="handleSubmit()" disabled id="lbl-submit">Register</button>
@@ -932,7 +934,7 @@ const i18n = {
     lblFrameInfo: 'Purchased Frame(s)',
     lblFrameDesc: 'Please enter the name(s) of the MYKITA frame(s) you purchased. You may add multiple frames, or skip this step.',
     lblFrameAdd: '+ Add Frame', lblFrameSkip: 'Skip', lblFrameContinue: 'Continue', framePlaceholder: 'Frame name',
-    lensSection: 'Lens Purchase', lensToggle: 'I also purchased prescription lenses.',
+    lensSection: 'Lens Purchase', lensToggle: 'I also purchased lenses.',
     phone: 'Phone Number', postcode: 'Postcode', postcodeLookup: 'Search',
     addressPref: 'Prefecture', addressCity: 'City / Town', addressLine: 'Street / Building', address: 'Address',
     addressLine1: 'Address Line 1', addressLine2: 'Address Line 2', addressCityIntl: 'City / Town', addressState: 'State / Province',
@@ -966,7 +968,7 @@ const i18n = {
     lblFrameInfo: 'ご購入フレーム',
     lblFrameDesc: 'ご購入されたMYKITAフレームの名前を入力してください。複数点ある場合は追加できます。スキップも可能です。',
     lblFrameAdd: '+ フレームを追加', lblFrameSkip: 'スキップ', lblFrameContinue: '次へ', framePlaceholder: 'フレーム名',
-    lensSection: 'レンズ購入', lensToggle: '度付きレンズも購入しました。',
+    lensSection: 'レンズ購入', lensToggle: 'レンズも購入しました。',
     phone: '電話番号', postcode: '郵便番号', postcodeLookup: '住所検索',
     addressPref: '都道府県', addressCity: '市区町村', addressLine: '番地・建物名', address: '住所',
     addressLine1: '住所①', addressLine2: '住所②', addressCityIntl: '市区郡', addressState: '州・省',
@@ -1000,7 +1002,7 @@ const i18n = {
     lblFrameInfo: '购买的镜架',
     lblFrameDesc: '请输入您购买的MYKITA镜架名称。如有多件可点击添加，也可跳过此步骤。',
     lblFrameAdd: '+ 添加镜架', lblFrameSkip: '跳过', lblFrameContinue: '继续', framePlaceholder: '镜架名称',
-    lensSection: '镜片购买', lensToggle: '我也购买了处方镜片。',
+    lensSection: '镜片购买', lensToggle: '我也购买了镜片。',
     phone: '电话号码', postcode: '邮政编码', postcodeLookup: '查询',
     addressPref: '都道府县', addressCity: '市区町村', addressLine: '街道・楼号', address: '地址',
     addressLine1: '地址①', addressLine2: '地址②', addressCityIntl: '城市/乡镇', addressState: '州/省',
@@ -1034,7 +1036,7 @@ const i18n = {
     lblFrameInfo: '구매하신 프레임',
     lblFrameDesc: '구매하신 MYKITA 프레임의 이름을 입력해 주세요. 여러 개인 경우 추가할 수 있으며, 건너뛰기도 가능합니다.',
     lblFrameAdd: '+ 프레임 추가', lblFrameSkip: '건너뛰기', lblFrameContinue: '다음', framePlaceholder: '프레임 이름',
-    lensSection: '렌즈 구매', lensToggle: '처방 렌즈도 구매하였습니다.',
+    lensSection: '렌즈 구매', lensToggle: '렌즈도 구매하였습니다.',
     phone: '전화번호', postcode: '우편번호', postcodeLookup: '검색',
     addressPref: '도도부현', addressCity: '시구정촌', addressLine: '번지・건물명', address: '주소',
     addressLine1: '주소①', addressLine2: '주소②', addressCityIntl: '시/읍/면', addressState: '주/성',
