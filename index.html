@@ -1483,14 +1483,14 @@ function validateForm() {
 function formatIntlPhone(code, raw) {
   const trimmed = raw.trim();
   if (!trimmed) return '';
-  if (code === '+81' && /^\d+$/.test(trimmed)) {
+  if (/^\d+$/.test(trimmed)) {
     // plain digits, e.g. "09011111111" — drop the leading 0, then group
     const digits = trimmed.replace(/^0/, '');
     if (digits.length === 10) return `(${code}) ${digits.slice(0, 2)}-${digits.slice(2, 6)}-${digits.slice(6)}`;
     if (digits.length === 9) return `(${code}) ${digits.slice(0, 1)}-${digits.slice(1, 5)}-${digits.slice(5)}`;
     return `(${code}) ${digits}`;
   }
-  // already has its own separators (or a non-JP number) — just drop a leading 0
+  // already has its own separators — just drop a leading 0
   return `(${code}) ${trimmed.replace(/^0/, '')}`;
 }
 
