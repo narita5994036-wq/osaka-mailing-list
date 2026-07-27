@@ -25,7 +25,9 @@ body {
   font-family: var(--font);
   -webkit-font-smoothing: antialiased;
   min-height: 100vh;
+  transition: background-color 0.6s ease;
 }
+body.lens-selected { background-color: #eaf3fc; }
 
 /* ── LANG BAR ── */
 .lang-bar {
@@ -274,8 +276,6 @@ body {
 
 /* ── FRAME ENTRY SCREEN ── */
 #form-area { display: none; }
-#frame-entry-area { transition: background-color 0.6s ease; }
-#frame-entry-area.lens-selected { background-color: #eaf3fc; }
 .lens-question { margin-bottom: 24px; }
 .frame-row { display: flex; gap: 8px; margin-bottom: 12px; }
 .frame-row .ac-wrap { flex: 1; }
@@ -1015,11 +1015,11 @@ function resetFrameEntry() {
   renderFrameRowList();
   document.getElementById('f-lens-yes').checked = false;
   document.getElementById('f-lens-no').checked = false;
-  document.getElementById('frame-entry-area').classList.remove('lens-selected');
+  document.body.classList.remove('lens-selected');
 }
 
 function handleLensSelect() {
-  document.getElementById('frame-entry-area').classList.add('lens-selected');
+  document.body.classList.add('lens-selected');
 }
 
 function initFrameAutocomplete(id) {
