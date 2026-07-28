@@ -1058,7 +1058,6 @@ function setLang(lang) {
     btn.classList.toggle('active', btn.textContent === lang.toUpperCase());
   });
   document.getElementById('lbl-subtitle').textContent = t.subtitle;
-  alignSubtitleWidth();
   document.getElementById('lbl-warranty-title').textContent = t.warrantyTitle;
   document.getElementById('lbl-warranty-body').innerHTML = t.warrantyBody;
   document.getElementById('lbl-warranty-footer').textContent = t.warrantyFooter;
@@ -1811,38 +1810,6 @@ function initTextScale() {
   }
 }
 window.addEventListener('resize', initTextScale);
-
-// ── SUBTITLE WIDTH MATCH ──
-function measureRenderedWidth(text, refEl) {
-  const style = getComputedStyle(refEl);
-  const span = document.createElement('span');
-  span.style.position = 'absolute';
-  span.style.visibility = 'hidden';
-  span.style.whiteSpace = 'nowrap';
-  span.style.fontFamily = style.fontFamily;
-  span.style.fontSize = style.fontSize;
-  span.style.fontWeight = style.fontWeight;
-  span.style.letterSpacing = style.letterSpacing;
-  span.textContent = text;
-  document.body.appendChild(span);
-  const width = span.getBoundingClientRect().width;
-  document.body.removeChild(span);
-  return width;
-}
-
-function alignSubtitleWidth() {
-  const logo = document.getElementById('logo-tap');
-  const sub = document.getElementById('lbl-subtitle');
-  if (!logo || !sub) return;
-  const targetWidth = measureRenderedWidth(logo.textContent, logo);
-  sub.style.letterSpacing = '0px';
-  const charCount = sub.textContent.length;
-  if (charCount <= 1) return;
-  const naturalWidth = measureRenderedWidth(sub.textContent, sub);
-  const extra = (targetWidth - naturalWidth) / charCount;
-  sub.style.letterSpacing = Math.max(extra, 0) + 'px';
-}
-window.addEventListener('resize', alignSubtitleWidth);
 
 // ── LOGO TAP (admin access) ──
 function initLogoTap() {
