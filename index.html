@@ -678,7 +678,7 @@ tr:hover td { background: #f9f9f9; }
       </div>
 
       <!-- Country -->
-      <div class="field">
+      <div class="field" id="country-field">
         <label id="lbl-country">Country / Region</label>
         <div class="ac-wrap" id="country-ac-wrap">
           <input type="text" class="ac-input" id="f-country-input" autocomplete="off" oninput="updateSubmitState()">
@@ -712,7 +712,7 @@ tr:hover td { background: #f9f9f9; }
         <div class="field">
           <label id="lbl-postcode" class="required">Postcode</label>
           <div class="postcode-row" id="postcode-row-ja" style="display:none;">
-            <input type="text" id="f-postcode-ja" placeholder="000-0000" maxlength="8" oninput="onPostcodeInput(this.value); updateSubmitState()">
+            <input type="text" id="f-postcode-ja" inputmode="numeric" placeholder="000-0000" maxlength="8" oninput="onPostcodeInput(this.value); updateSubmitState()">
             <button type="button" class="postcode-lookup-btn" onclick="lookupPostcode()" id="lbl-postcode-lookup">Search</button>
           </div>
           <input type="text" id="f-postcode-intl" placeholder="Postcode / ZIP" oninput="updateSubmitState()">
@@ -720,9 +720,9 @@ tr:hover td { background: #f9f9f9; }
         <!-- Address -->
         <div class="field" id="address-ja-fields" style="display:none;">
           <label id="lbl-address-pref" class="required">Prefecture</label>
-          <input type="text" id="f-address-pref" readonly style="background:#efefef;">
+          <input type="text" id="f-address-pref" oninput="updateSubmitState()">
           <label id="lbl-address-city" class="required" style="margin-top:12px;">City / Town</label>
-          <input type="text" id="f-address-city" readonly style="background:#efefef;">
+          <input type="text" id="f-address-city" oninput="updateSubmitState()">
           <label id="lbl-address-line" class="required" style="margin-top:12px;">Street / Building</label>
           <textarea id="f-address-line" oninput="updateSubmitState()"></textarea>
         </div>
@@ -944,7 +944,7 @@ const i18n = {
     warrantyTitle: '保証について',
     warrantyBody: '・本保証はMYKITA JAPAN店舗でのみ有効です。<br>・MYKITAフレームには、ご購入日より2年間の製品保証が適用されます。<br>・保証範囲は、初期不良を除く通常使用下での製品トラブルに限ります。（落下や踏みつけによる損傷・破損、また、レンズ破損は対象外）<br><br>保証を有効にするために、以下の登録を完了してください。',
     personal: 'お客様情報',
-    name: 'お名前', country: '国 / 地域', email: 'メールアドレス',
+    name: 'お名前', country: '都道府県', email: 'メールアドレス',
     optinSection: 'メール配信',
     optinDesc: 'MYKITA JAPANからの最新情報・限定オファーをお受け取りになりますか？',
     optinNote: '＊Noを選択した場合でもご登録確認を兼ねたサンキューメールをお送りさせていただきます。',
@@ -961,7 +961,7 @@ const i18n = {
     thanksFrameCancel: 'キャンセル',
     thanksFrameSubmit: '保存',
     errName: 'お名前を入力してください。',
-    errCountry: '国を選択してください。',
+    errCountry: '都道府県を選択してください。',
     errEmail: '有効なメールアドレスを入力してください。',
     errOptin: '選択してください。',
     errAgree: 'プライバシーポリシーに同意してください。',
@@ -1098,6 +1098,7 @@ function setLang(lang) {
   document.getElementById('lbl-address-state').childNodes[0].textContent = t.addressState + ' ';
   // Toggle phone/postcode layout based on language
   updateLensFieldsForLang(lang);
+  updateCountryFieldVisibility();
   updateSubmitState();
 }
 
@@ -1152,7 +1153,14 @@ function toggleLensFields() {
   const checked = document.getElementById('f-lens').checked;
   document.getElementById('lens-fields').classList.toggle('open', checked);
   document.getElementById('logo-underline').classList.toggle('active', checked);
+  updateCountryFieldVisibility();
   updateSubmitState();
+}
+
+function updateCountryFieldVisibility() {
+  const lensChecked = document.getElementById('f-lens').checked;
+  // JA address fields already collect the prefecture, so skip asking twice.
+  document.getElementById('country-field').style.display = (currentLang === 'ja' && lensChecked) ? 'none' : '';
 }
 
 function lensFieldsValid() {
@@ -1302,6 +1310,15 @@ function continueFrameEntry() {
   showFormArea();
 }
 
+// ── PREFECTURE AUTOCOMPLETE (JA) ──
+const JAPAN_PREFECTURES = [
+  '北海道','青森県','岩手県','宮城県','秋田県','山形県','福島県','茨城県','栃木県','群馬県',
+  '埼玉県','千葉県','東京都','神奈川県','新潟県','富山県','石川県','福井県','山梨県','長野県',
+  '岐阜県','静岡県','愛知県','三重県','滋賀県','京都府','大阪府','兵庫県','奈良県','和歌山県',
+  '鳥取県','島根県','岡山県','広島県','山口県','徳島県','香川県','愛媛県','高知県','福岡県',
+  '佐賀県','長崎県','熊本県','大分県','宮崎県','鹿児島県','沖縄県'
+].map(name => ({ name, code: 'JP', phoneCode: '+81' }));
+
 // ── COUNTRY AUTOCOMPLETE ──
 const COUNTRIES = [
   { name: 'Japan', code: 'JP', phoneCode: '+81' },
@@ -1371,8 +1388,9 @@ function initAutocomplete() {
   const dropdown = document.getElementById('country-dropdown');
 
   function renderList(query) {
+    const source = currentLang === 'ja' ? JAPAN_PREFECTURES : COUNTRIES;
     const q = query.trim().toLowerCase();
-    const base = q ? COUNTRIES.filter(c => c.name.toLowerCase().startsWith(q)) : COUNTRIES;
+    const base = q ? source.filter(c => c.name.toLowerCase().startsWith(q)) : source;
     const filtered = q ? [...base].sort((a, b) => a.name.localeCompare(b.name)) : base;
     if (filtered.length === 0) {
       dropdown.innerHTML = '<div class="ac-empty">No results</div>';
