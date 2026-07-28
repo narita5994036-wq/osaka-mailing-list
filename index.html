@@ -712,7 +712,7 @@ tr:hover td { background: #f9f9f9; }
         <div class="field">
           <label id="lbl-postcode" class="required">Postcode</label>
           <div class="postcode-row" id="postcode-row-ja" style="display:none;">
-            <input type="text" id="f-postcode-ja" placeholder="000-0000" maxlength="8" oninput="onPostcodeInput(this.value); updateSubmitState()">
+            <input type="text" id="f-postcode-ja" inputmode="numeric" placeholder="000-0000" maxlength="8" oninput="onPostcodeInput(this.value); updateSubmitState()">
             <button type="button" class="postcode-lookup-btn" onclick="lookupPostcode()" id="lbl-postcode-lookup">Search</button>
           </div>
           <input type="text" id="f-postcode-intl" placeholder="Postcode / ZIP" oninput="updateSubmitState()">
@@ -720,9 +720,9 @@ tr:hover td { background: #f9f9f9; }
         <!-- Address -->
         <div class="field" id="address-ja-fields" style="display:none;">
           <label id="lbl-address-pref" class="required">Prefecture</label>
-          <input type="text" id="f-address-pref" readonly style="background:#efefef;">
+          <input type="text" id="f-address-pref" oninput="updateSubmitState()">
           <label id="lbl-address-city" class="required" style="margin-top:12px;">City / Town</label>
-          <input type="text" id="f-address-city" readonly style="background:#efefef;">
+          <input type="text" id="f-address-city" oninput="updateSubmitState()">
           <label id="lbl-address-line" class="required" style="margin-top:12px;">Street / Building</label>
           <textarea id="f-address-line" oninput="updateSubmitState()"></textarea>
         </div>
