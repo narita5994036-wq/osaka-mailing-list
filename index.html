@@ -719,19 +719,22 @@ tr:hover td { background: #f9f9f9; }
         </div>
         <!-- Address -->
         <div class="field" id="address-ja-fields" style="display:none;">
-          <label id="lbl-address-pref" class="required">Prefecture</label>
-          <input type="text" id="f-address-pref" oninput="updateSubmitState()">
-          <label id="lbl-address-city" class="required" style="margin-top:12px;">City / Town</label>
+          <label id="lbl-address-pref">Prefecture</label>
+          <div class="ac-wrap" id="address-pref-ac-wrap">
+            <input type="text" class="ac-input" id="f-address-pref" autocomplete="off">
+            <div class="ac-dropdown" id="address-pref-dropdown"></div>
+          </div>
+          <label id="lbl-address-city" style="margin-top:12px;">City / Town</label>
           <input type="text" id="f-address-city" oninput="updateSubmitState()">
-          <label id="lbl-address-line" class="required" style="margin-top:12px;">Street / Building</label>
+          <label id="lbl-address-line" style="margin-top:12px;">Street / Building</label>
           <textarea id="f-address-line" oninput="updateSubmitState()"></textarea>
         </div>
         <div class="field" id="address-intl-fields">
-          <label id="lbl-address-line1" class="required">Address Line 1</label>
+          <label id="lbl-address-line1">Address Line 1</label>
           <input type="text" id="f-address-line1" placeholder="Street number, street name" oninput="updateSubmitState()">
           <label id="lbl-address-line2" style="margin-top:12px;">Address Line 2 <span style="font-size:10px; text-transform:none; letter-spacing:0;">(optional)</span></label>
           <input type="text" id="f-address-line2" placeholder="Building, apartment, suite">
-          <label id="lbl-address-city-intl" class="required" style="margin-top:12px;">City / Town</label>
+          <label id="lbl-address-city-intl" style="margin-top:12px;">City / Town</label>
           <input type="text" id="f-address-city-intl" oninput="updateSubmitState()">
           <label id="lbl-address-state" style="margin-top:12px;">State / Province <span style="font-size:10px; text-transform:none; letter-spacing:0;">(optional)</span></label>
           <input type="text" id="f-address-state">
@@ -1167,15 +1170,10 @@ function lensFieldsValid() {
   if (!document.getElementById('f-lens').checked) return true;
   if (currentLang === 'ja') {
     return !!document.getElementById('f-phone-ja').value.trim() &&
-      !!document.getElementById('f-postcode-ja').value.trim() &&
-      !!document.getElementById('f-address-pref').value.trim() &&
-      !!document.getElementById('f-address-city').value.trim() &&
-      !!document.getElementById('f-address-line').value.trim();
+      !!document.getElementById('f-postcode-ja').value.trim();
   }
   return !!document.getElementById('f-phone-intl').value.trim() &&
-    !!document.getElementById('f-postcode-intl').value.trim() &&
-    !!document.getElementById('f-address-line1').value.trim() &&
-    !!document.getElementById('f-address-city-intl').value.trim();
+    !!document.getElementById('f-postcode-intl').value.trim();
 }
 
 function onPostcodeInput(val) {
@@ -1443,6 +1441,36 @@ function initAutocomplete() {
     else if (e.key === 'Escape') closeDropdown();
   });
 
+  document.addEventListener('click', e => { if (!wrap.contains(e.target)) closeDropdown(); });
+}
+
+// ── PREFECTURE AUTOCOMPLETE (lens address block) ──
+function initAddressPrefAutocomplete() {
+  const wrap = document.getElementById('address-pref-ac-wrap');
+  const input = document.getElementById('f-address-pref');
+  const dropdown = document.getElementById('address-pref-dropdown');
+  if (!wrap || !input || !dropdown) return;
+
+  function renderList(query) {
+    const q = query.trim();
+    const base = q ? JAPAN_PREFECTURES.filter(p => p.name.startsWith(q)) : JAPAN_PREFECTURES;
+    if (base.length === 0) { closeDropdown(); return; }
+    dropdown.innerHTML = base.map(p => `<div class="ac-item" data-value="${escapeHtml(p.name)}">${escapeHtml(p.name)}</div>`).join('');
+    wrap.classList.add('open');
+    dropdown.querySelectorAll('.ac-item').forEach(item => {
+      item.addEventListener('mousedown', e => {
+        e.preventDefault();
+        input.value = item.dataset.value;
+        closeDropdown();
+        updateSubmitState();
+      });
+    });
+  }
+  function closeDropdown() { wrap.classList.remove('open'); dropdown.innerHTML = ''; }
+
+  input.addEventListener('input', () => { renderList(input.value); updateSubmitState(); });
+  input.addEventListener('focus', () => renderList(input.value));
+  input.addEventListener('keydown', e => { if (e.key === 'Escape') { closeDropdown(); input.blur(); } });
   document.addEventListener('click', e => { if (!wrap.contains(e.target)) closeDropdown(); });
 }
 
@@ -2125,6 +2153,7 @@ function escapeHtml(str) {
 setLang('en');
 renderFrameRowList();
 initAutocomplete();
+initAddressPrefAutocomplete();
 initEmailAutocomplete();
 initPhoneCodeSelect();
 checkAdminMode();
