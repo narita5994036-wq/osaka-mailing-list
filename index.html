@@ -710,7 +710,7 @@ tr:hover td { background: #f9f9f9; }
         </div>
         <!-- Postcode -->
         <div class="field">
-          <label id="lbl-postcode" class="required">Postcode</label>
+          <label id="lbl-postcode">Postcode</label>
           <div class="postcode-row" id="postcode-row-ja" style="display:none;">
             <input type="text" id="f-postcode-ja" inputmode="numeric" placeholder="000-0000" maxlength="8" oninput="onPostcodeInput(this.value); updateSubmitState()">
             <button type="button" class="postcode-lookup-btn" onclick="lookupPostcode()" id="lbl-postcode-lookup">Search</button>
@@ -1169,11 +1169,9 @@ function updateCountryFieldVisibility() {
 function lensFieldsValid() {
   if (!document.getElementById('f-lens').checked) return true;
   if (currentLang === 'ja') {
-    return !!document.getElementById('f-phone-ja').value.trim() &&
-      !!document.getElementById('f-postcode-ja').value.trim();
+    return !!document.getElementById('f-phone-ja').value.trim();
   }
-  return !!document.getElementById('f-phone-intl').value.trim() &&
-    !!document.getElementById('f-postcode-intl').value.trim();
+  return !!document.getElementById('f-phone-intl').value.trim();
 }
 
 function onPostcodeInput(val) {
