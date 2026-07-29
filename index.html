@@ -61,16 +61,20 @@ body {
   cursor: pointer;
   user-select: none;
 }
-.logo-underline {
-  width: 60px;
-  height: 2px;
-  background: var(--blue);
-  margin: 10px auto 0;
-  transform: scaleX(0);
-  transform-origin: left;
-  transition: transform 0.6s ease;
+.logo.shine {
+  background-image: linear-gradient(120deg, #1a1a1a 40%, #ffffff 50%, #1a1a1a 60%);
+  background-size: 200% 100%;
+  background-position: 200% 0;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+  animation: logoShine 1.2s ease;
 }
-.logo-underline.active { transform: scaleX(1); }
+@keyframes logoShine {
+  0% { background-position: 200% 0; }
+  100% { background-position: -100% 0; }
+}
 .logo-sub {
   margin-top: 2px;
   font-size: 11px;
@@ -633,7 +637,6 @@ tr:hover td { background: #f9f9f9; }
   <!-- HEADER -->
   <div class="header">
     <div class="logo" id="logo-tap">MYKITA JAPAN</div>
-    <div class="logo-underline" id="logo-underline"></div>
     <div class="logo-sub" id="lbl-subtitle">Frame Warranty Registration</div>
   </div>
 
@@ -1161,9 +1164,17 @@ function updateLensFieldsForLang(lang) {
 function toggleLensFields() {
   const checked = document.getElementById('f-lens').checked;
   document.getElementById('lens-fields').classList.toggle('open', checked);
-  document.getElementById('logo-underline').classList.toggle('active', checked);
   updateCountryFieldVisibility();
   updateSubmitState();
+  if (checked) triggerLogoShine();
+}
+
+function triggerLogoShine() {
+  const logo = document.getElementById('logo-tap');
+  logo.classList.remove('shine');
+  void logo.offsetWidth;
+  logo.classList.add('shine');
+  logo.addEventListener('animationend', () => logo.classList.remove('shine'), { once: true });
 }
 
 function updateCountryFieldVisibility() {
