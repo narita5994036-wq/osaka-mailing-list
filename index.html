@@ -642,6 +642,7 @@ tr:hover td { background: #f9f9f9; }
     <button class="lang-btn" onclick="setLang('ja')">JA</button>
     <button class="lang-btn" onclick="setLang('zh')">ZH</button>
     <button class="lang-btn" onclick="setLang('ko')">KO</button>
+    <button class="lang-btn top-btn" id="back-to-top-btn" style="display:none; margin-left:auto;" onclick="goToTopScreen()">TOP</button>
   </div>
 
   <!-- HEADER -->
@@ -953,6 +954,7 @@ const i18n = {
     lblFrameDesc: 'Please enter the name(s) of the MYKITA frame(s) the customer purchased. You may add multiple frames, or skip this step.',
     lblFrameAdd: '+ Add Frame', lblFrameSkip: 'Skip', lblFrameContinue: 'Continue', framePlaceholder: 'Frame name',
     lensSection: 'Lens Purchase', lensToggle: 'Customer also purchased lenses.',
+    topBtn: 'Top',
     phone: 'Phone Number', postcode: 'Postcode', postcodeLookup: 'Search',
     addressPref: 'Prefecture', addressCity: 'City / Town', addressLine: 'Street / Building', address: 'Address',
     addressLine1: 'Address Line 1', addressLine2: 'Address Line 2', addressCityIntl: 'City / Town', addressState: 'State / Province',
@@ -988,6 +990,7 @@ const i18n = {
     lblFrameDesc: 'お客様がご購入されたMYKITAフレームの名前を入力してください。複数点ある場合は追加できます。スキップも可能です。',
     lblFrameAdd: '+ フレームを追加', lblFrameSkip: 'スキップ', lblFrameContinue: '次へ', framePlaceholder: 'フレーム名',
     lensSection: 'レンズ購入', lensToggle: 'レンズ購入あり',
+    topBtn: 'トップへ',
     phone: '電話番号', postcode: '郵便番号', postcodeLookup: '住所検索',
     addressPref: '都道府県', addressCity: '市区町村', addressLine: '番地・建物名', address: '住所',
     addressLine1: '住所①', addressLine2: '住所②', addressCityIntl: '市区郡', addressState: '州・省',
@@ -1023,6 +1026,7 @@ const i18n = {
     lblFrameDesc: '请输入顾客购买的MYKITA镜架名称。如有多件可点击添加，也可跳过此步骤。',
     lblFrameAdd: '+ 添加镜架', lblFrameSkip: '跳过', lblFrameContinue: '继续', framePlaceholder: '镜架名称',
     lensSection: '镜片购买', lensToggle: '顾客也购买了镜片。',
+    topBtn: '返回顶部',
     phone: '电话号码', postcode: '邮政编码', postcodeLookup: '查询',
     addressPref: '都道府县', addressCity: '市区町村', addressLine: '街道・楼号', address: '地址',
     addressLine1: '地址①', addressLine2: '地址②', addressCityIntl: '城市/乡镇', addressState: '州/省',
@@ -1058,6 +1062,7 @@ const i18n = {
     lblFrameDesc: '고객님이 구매하신 MYKITA 프레임의 이름을 입력해 주세요. 여러 개인 경우 추가할 수 있으며, 건너뛰기도 가능합니다.',
     lblFrameAdd: '+ 프레임 추가', lblFrameSkip: '건너뛰기', lblFrameContinue: '다음', framePlaceholder: '프레임 이름',
     lensSection: '렌즈 구매', lensToggle: '고객님도 렌즈를 구매하셨습니다.',
+    topBtn: '처음으로',
     phone: '전화번호', postcode: '우편번호', postcodeLookup: '검색',
     addressPref: '도도부현', addressCity: '시구정촌', addressLine: '번지・건물명', address: '주소',
     addressLine1: '주소①', addressLine2: '주소②', addressCityIntl: '시/읍/면', addressState: '주/성',
@@ -1106,6 +1111,7 @@ function setLang(lang) {
   const countryInput = document.getElementById('f-country-input');
   if (countryInput) countryInput.placeholder = '';
   // Lens section labels
+  document.getElementById('back-to-top-btn').textContent = t.topBtn;
   document.getElementById('lbl-lens-section').textContent = t.lensSection;
   document.getElementById('lbl-lens-toggle').textContent = t.lensToggle;
   document.getElementById('lbl-phone').textContent = t.phone;
@@ -1323,6 +1329,15 @@ function collectFrameNames() {
 function showFormArea() {
   document.getElementById('frame-entry-area').style.display = 'none';
   document.getElementById('form-area').style.display = 'block';
+  document.getElementById('back-to-top-btn').style.display = '';
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function goToTopScreen() {
+  document.querySelectorAll('.ac-wrap').forEach(w => w.classList.remove('open'));
+  document.getElementById('form-area').style.display = 'none';
+  document.getElementById('frame-entry-area').style.display = 'block';
+  document.getElementById('back-to-top-btn').style.display = 'none';
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
@@ -1664,6 +1679,7 @@ function showThanks() {
   const ta = document.getElementById('thanks-area');
   fa.style.display = 'none';
   ta.style.display = 'block';
+  document.getElementById('back-to-top-btn').style.display = 'none';
   document.getElementById('thanks-add-frame-wrap').style.display =
     purchasedFrames.length === 0 ? 'block' : 'none';
   document.getElementById('thanks-frame-entry').style.display = 'none';
