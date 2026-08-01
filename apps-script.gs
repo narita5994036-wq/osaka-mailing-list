@@ -16,6 +16,10 @@ function doPost(e) {
     sheet.appendRow(headers);
   }
 
+  // Keep the Timestamp column as plain text so "yyyy/mm/dd hh:mm:ss" isn't
+  // reinterpreted as a Date and reformatted per the sheet's locale.
+  sheet.getRange('A2:A').setNumberFormat('@');
+
   var country = data.country || '';
   if (data.countryCode) {
     country += ' (' + data.countryCode + ')';
