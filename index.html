@@ -580,6 +580,11 @@ tr:hover td { background: #f9f9f9; }
   color: var(--mid);
   margin-bottom: 6px;
 }
+.mail-banner-img {
+  display: block;
+  width: 100%;
+  border: 0.5px solid var(--border);
+}
 .mail-template-select {
   width: 100%;
   background: var(--bg);
@@ -885,6 +890,11 @@ tr:hover td { background: #f9f9f9; }
       <div class="mail-modal-field">
         <label>Message</label>
         <textarea class="mail-textarea" id="mail-textarea" style="min-height:220px;"></textarea>
+      </div>
+      <div class="mail-modal-field">
+        <label>Signature Image</label>
+        <img src="assets/mail-banner.gif" alt="MYKITA signature banner" class="mail-banner-img" id="mail-banner-img">
+        <button type="button" class="refresh-btn" style="margin-top:10px; width:100%;" id="mail-image-copy-btn" onclick="copyMailImage()">Copy Image</button>
       </div>
       <div class="mail-modal-actions">
         <button class="refresh-btn" onclick="closeMailModal()">Close</button>
@@ -2174,6 +2184,31 @@ function copyMailText() {
     btn.textContent = 'Copied!';
     setTimeout(() => { btn.textContent = 'Copy'; }, 1500);
   });
+}
+
+async function copyMailImage() {
+  const btn = document.getElementById('mail-image-copy-btn');
+  const originalLabel = btn.textContent;
+  try {
+    const img = document.getElementById('mail-banner-img');
+    const resp = await fetch(img.src);
+    const blob = await resp.blob();
+    // Draw to canvas and export as PNG — the clipboard image type most mail
+    // clients (and Safari) reliably accept; also flattens an animated GIF to
+    // its first frame, which is what pasting into an email needs anyway.
+    const bitmap = await createImageBitmap(blob);
+    const canvas = document.createElement('canvas');
+    canvas.width = bitmap.width;
+    canvas.height = bitmap.height;
+    canvas.getContext('2d').drawImage(bitmap, 0, 0);
+    const pngBlob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
+    await navigator.clipboard.write([new ClipboardItem({ 'image/png': pngBlob })]);
+    btn.textContent = 'Copied!';
+  } catch (e) {
+    btn.textContent = 'Copy failed';
+  } finally {
+    setTimeout(() => { btn.textContent = originalLabel; }, 1500);
+  }
 }
 
 function openInMailClient() {
