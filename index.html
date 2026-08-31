@@ -1908,25 +1908,24 @@ async function handleSubmit() {
 
   // Lens fields
   const lensChecked = document.getElementById('f-lens').checked;
-  let phone = '', postcode = '', address = '';
+  let phone = '', postcode = '', addressStreet = '', addressBuilding = '', addressCity = '', addressState = '';
   if (lensChecked) {
     if (currentLang === 'ja') {
       phone = document.getElementById('f-phone-ja').value.trim();
       postcode = document.getElementById('f-postcode-ja').value.trim();
-      const pref = document.getElementById('f-address-pref').value.trim();
-      const city = document.getElementById('f-address-city').value.trim();
-      const line = document.getElementById('f-address-line').value.trim();
-      address = [pref, city, line].filter(Boolean).join(' ');
+      // The JA form doesn't split street/building, so it all goes into "Street".
+      addressStreet = document.getElementById('f-address-line').value.trim();
+      addressCity = document.getElementById('f-address-city').value.trim();
+      addressState = document.getElementById('f-address-pref').value.trim();
     } else {
       const code = document.getElementById('f-phone-code').value;
       const num = document.getElementById('f-phone-intl').value.trim();
       phone = formatIntlPhone(code, num);
       postcode = document.getElementById('f-postcode-intl').value.trim();
-      const line1 = document.getElementById('f-address-line1').value.trim();
-      const line2 = document.getElementById('f-address-line2').value.trim();
-      const cityIntl = document.getElementById('f-address-city-intl').value.trim();
-      const state = document.getElementById('f-address-state').value.trim();
-      address = [line1, line2, cityIntl, state].filter(Boolean).join(', ');
+      addressStreet = document.getElementById('f-address-line1').value.trim();
+      addressBuilding = document.getElementById('f-address-line2').value.trim();
+      addressCity = document.getElementById('f-address-city-intl').value.trim();
+      addressState = document.getElementById('f-address-state').value.trim();
     }
   }
 
@@ -1944,7 +1943,10 @@ async function handleSubmit() {
     lensOrder: lensChecked,
     phone: phone,
     postcode: postcode,
-    address: address,
+    addressStreet: addressStreet,
+    addressBuilding: addressBuilding,
+    addressCity: addressCity,
+    addressState: addressState,
     customerType: customerType,
     prospectFrames: isProspect ? collectProspectFrames() : [],
     prospectPhone: isProspect ? document.getElementById('f-prospect-phone').value.trim() : '',
