@@ -456,6 +456,11 @@ td {
 tr:hover td { background: #f9f9f9; }
 .badge-yes { background: #e8f5e9; color: #1e7e44; font-size: 11px; padding: 2px 8px; letter-spacing: 0.06em; }
 .badge-no  { background: #fdecea; color: #666; font-size: 11px; padding: 2px 8px; letter-spacing: 0.06em; }
+.lens-blind-dots { color: var(--mid); font-size: 11px; letter-spacing: 0.15em; user-select: none; }
+#lens-blind-toggle.active { border-color: #1a1a1a; color: #1a1a1a; background: #f0f0f0; }
+.admin-settings-row { margin-bottom: 16px; }
+.admin-setting-toggle { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--mid); cursor: pointer; }
+.admin-setting-toggle input[type="checkbox"] { accent-color: var(--light); width: 14px; height: 14px; flex-shrink: 0; }
 .row-delete-btn {
   background: none;
   border: none;
@@ -666,11 +671,13 @@ tr:hover td { background: #f9f9f9; }
       <button class="refresh-btn" type="button" onclick="addFrameRow()" id="lbl-frame-add" style="margin-bottom:2rem;">+ Add Frame</button>
 
       <!-- Lens Purchase -->
-      <p class="section-label" id="lbl-lens-section">Lens Purchase</p>
-      <label class="lens-toggle-row" for="f-lens">
-        <input type="checkbox" id="f-lens" onchange="toggleLensFields()">
-        <span class="lens-toggle-label" id="lbl-lens-toggle">Customer also purchased lenses.</span>
-      </label>
+      <div id="lens-purchase-block">
+        <p class="section-label" id="lbl-lens-section">Lens Purchase</p>
+        <label class="lens-toggle-row" for="f-lens">
+          <input type="checkbox" id="f-lens" onchange="toggleLensFields()">
+          <span class="lens-toggle-label" id="lbl-lens-toggle">Customer also purchased lenses.</span>
+        </label>
+      </div>
 
       <div style="display:flex; gap:10px;">
         <button class="refresh-btn" style="flex:1; height:48px;" onclick="skipFrameEntry()" id="lbl-frame-skip">Skip</button>
@@ -839,6 +846,12 @@ tr:hover td { background: #f9f9f9; }
     <div class="logo-sub">Admin — Warranty Registrations</div>
   </div>
   <div class="main" style="max-width:none; padding:24px 20px 60px;">
+    <div class="admin-settings-row">
+      <label class="admin-setting-toggle" for="setting-hide-lens">
+        <input type="checkbox" id="setting-hide-lens" onchange="updateHideLensSetting()">
+        <span>Hide "Lens Purchase" section on registration form</span>
+      </label>
+    </div>
     <div class="admin-header-row">
       <div>
         <p class="section-label" style="border:none; margin:0 0 4px;">Registration List</p>
@@ -847,6 +860,7 @@ tr:hover td { background: #f9f9f9; }
       <div class="admin-controls">
         <button class="refresh-btn" id="refresh-btn" onclick="refreshRecords()">&#8635; Refresh</button>
         <button class="refresh-btn" id="sort-btn" onclick="toggleSortOrder()">Newest First &#8595;</button>
+        <button class="refresh-btn" id="lens-blind-toggle" onclick="toggleLensBlind()">&#128584; Lens</button>
         <select class="csv-filter" id="csv-filter" onchange="renderAdminTable()">
           <option value="all">All Opt-ins</option>
           <option value="yes">Yes Only</option>
@@ -859,7 +873,7 @@ tr:hover td { background: #f9f9f9; }
       <table>
         <thead><tr>
           <th>#</th><th>Timestamp</th><th>会員番号</th><th>Name</th><th>Country</th>
-          <th>Email</th><th>Opt-in</th><th>Follow-up</th><th>Purchased</th><th>Lang</th><th>Staff Notes</th><th></th>
+          <th>Email</th><th>Opt-in</th><th>Follow-up</th><th>Purchased</th><th>Lens</th><th>Lang</th><th>Staff Notes</th><th></th>
         </tr></thead>
         <tbody id="admin-tbody"></tbody>
       </table>
@@ -914,6 +928,8 @@ const SHEET_WEBHOOK_URL = 'https://script.google.com/macros/s/AKfycbxgRf0LNCXFAT
 // ── GLOBALS ──
 let adminPassword = '';
 let adminRecords = [];
+let lensBlinded = true;
+let hideLensSection = false;
 let currentLang = 'en';
 let isAdmin = false;
 const LOGO_TAP_COUNT = 5;
@@ -1907,6 +1923,7 @@ async function checkPw() {
       isAdmin = true;
       populateMailTemplates();
       renderAdminTable();
+      loadLensSectionSetting();
     } else {
       eMsg.style.visibility = 'visible';
     }
@@ -1934,6 +1951,50 @@ async function adminRequest(params) {
   return res.json();
 }
 
+// ── LENS SECTION VISIBILITY SETTING ──
+function applyLensSectionVisibility() {
+  const block = document.getElementById('lens-purchase-block');
+  if (block) block.style.display = hideLensSection ? 'none' : '';
+  if (hideLensSection) {
+    const cb = document.getElementById('f-lens');
+    if (cb && cb.checked) { cb.checked = false; toggleLensFields(); }
+  }
+}
+
+async function loadLensSectionSetting() {
+  try {
+    const res = await fetch(`${SHEET_WEBHOOK_URL}?action=settings`);
+    const json = await res.json();
+    if (json.ok) {
+      hideLensSection = !!json.hideLensSection;
+      applyLensSectionVisibility();
+      const cb = document.getElementById('setting-hide-lens');
+      if (cb) cb.checked = hideLensSection;
+    }
+  } catch (err) { /* keep section visible by default on failure */ }
+}
+
+async function updateHideLensSetting() {
+  const cb = document.getElementById('setting-hide-lens');
+  const value = cb.checked;
+  cb.disabled = true;
+  try {
+    const json = await adminRequest({ op: 'setting', key: 'hideLensSection', value: String(value) });
+    if (json.ok) {
+      hideLensSection = value;
+      applyLensSectionVisibility();
+    } else {
+      cb.checked = !value;
+      alert('Failed to update setting: ' + (json.error || 'unknown error'));
+    }
+  } catch (err) {
+    cb.checked = !value;
+    alert('Connection error.');
+  } finally {
+    cb.disabled = false;
+  }
+}
+
 async function refreshRecords() {
   const btn = document.getElementById('refresh-btn');
   btn.textContent = '…';
@@ -1951,6 +2012,21 @@ function toggleSortOrder() {
   const btn = document.getElementById('sort-btn');
   btn.textContent = sortNewest ? 'Newest First ↓' : 'Oldest First ↑';
   renderAdminTable();
+}
+
+// ── LENS COLUMN BLIND ──
+function toggleLensBlind() {
+  lensBlinded = !lensBlinded;
+  const btn = document.getElementById('lens-blind-toggle');
+  btn.innerHTML = lensBlinded ? '&#128584; Lens' : '&#128065; Lens';
+  btn.classList.toggle('active', !lensBlinded);
+  renderAdminTable();
+}
+
+function renderLensCell(r) {
+  if (lensBlinded) return '<span class="lens-blind-dots" title="Click the Lens toggle above to reveal">&bull;&bull;&bull;</span>';
+  const isYes = r.lensOrder === 'Yes';
+  return `<span class="${isYes ? 'badge-yes' : 'badge-no'}">${escapeHtml(r.lensOrder || 'No')}</span>`;
 }
 
 function renderAdminTable() {
@@ -1989,6 +2065,7 @@ function renderAdminTable() {
       <td><span class="${r.optin === 'Yes' ? 'badge-yes' : 'badge-no'}">${escapeHtml(r.optin)}</span></td>
       <td>${renderFollowupBadge(r)}</td>
       <td style="font-size:11px; color:var(--mid);">${escapeHtml(r.frameNames || '')}</td>
+      <td>${renderLensCell(r)}</td>
       <td style="text-transform:uppercase; font-size:11px; color:var(--mid);">${escapeHtml(r.lang)}</td>
       <td style="font-size:11px; color:var(--mid); max-width:140px;">${escapeHtml(r.staffNotes || '')}</td>
       <td><button class="row-delete-btn" onclick="deleteRecord(${r.row})" title="Delete this record" aria-label="Delete this record">&times;</button></td>
@@ -2235,6 +2312,7 @@ initPhoneCodeSelect();
 checkAdminMode();
 updateSubmitState();
 initTextScale();
+loadLensSectionSetting();
 </script>
 </body>
 </html>

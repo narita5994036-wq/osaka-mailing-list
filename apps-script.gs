@@ -60,6 +60,8 @@ function doGet(e) {
     out = handleAdminRequest(params);
   } else if (params.action === 'addframes') {
     out = handleAddFrames(params);
+  } else if (params.action === 'settings') {
+    out = handleGetSettings();
   } else {
     out = { ok: false, error: 'unknown action' };
   }
@@ -132,7 +134,29 @@ function handleAdminRequest(params) {
     return { ok: true };
   }
 
+  if (op === 'setting') {
+    var settingKeys = { hideLensSection: 'HIDE_LENS_SECTION' };
+    var propKey = settingKeys[params.key];
+    if (!propKey) {
+      return { ok: false, error: 'unknown setting key' };
+    }
+    PropertiesService.getScriptProperties().setProperty(propKey, params.value === 'true' ? 'true' : 'false');
+    return { ok: true };
+  }
+
   return { ok: true, records: readRecords(sheet) };
+}
+
+/**
+ * Public settings that affect the customer-facing registration form.
+ * Readable without a password since the form itself needs them.
+ */
+function handleGetSettings() {
+  var props = PropertiesService.getScriptProperties();
+  return {
+    ok: true,
+    hideLensSection: props.getProperty('HIDE_LENS_SECTION') === 'true'
+  };
 }
 
 function readRecords(sheet) {
