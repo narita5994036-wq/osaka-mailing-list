@@ -13,9 +13,19 @@
  * highlighted with a light blue background for quick visual identification.
  * The considering frame model and color number are combined into a single
  * cell (column R) formatted as "Frame Name/C###", e.g. "Kelly Sun/C301".
+ * Timestamp (column A) is stored as a real date and displayed in Japan
+ * time as yyyy/mm/dd hh:mm:ss; run fixExistingTimestamps() once to apply
+ * the same formatting to rows submitted before this was added.
  */
+var SPREADSHEET_TIMEZONE = 'Asia/Tokyo';
+var TIMESTAMP_DISPLAY_FORMAT = 'yyyy/mm/dd hh:mm:ss';
+
 function doPost(e) {
-  var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  if (ss.getSpreadsheetTimeZone() !== SPREADSHEET_TIMEZONE) {
+    ss.setSpreadsheetTimeZone(SPREADSHEET_TIMEZONE);
+  }
+  var sheet = ss.getActiveSheet();
   var data = JSON.parse(e.postData.contents);
 
   var headers = ['Timestamp', '会員番号', 'Name', 'Email', 'Opt-in', 'Country', 'Language', 'Follow-up Sent', 'Purchased', 'Staff Notes', 'Lens Order', 'Phone', 'Postcode', 'Address', 'Customer Type', '', '', 'Considering Frame/Color'];
@@ -41,8 +51,13 @@ function doPost(e) {
     considerFrameColor = 'C' + considerColor;
   }
 
+  // Store a real Date (not a string) so the sheet can render it in Japan
+  // time via the cell number format below, while readRecords() can still
+  // recover the exact instant with row[0].toISOString().
+  var timestampValue = data.timestamp ? new Date(data.timestamp) : '';
+
   sheet.appendRow([
-    data.timestamp || '',   // A: Timestamp
+    timestampValue,          // A: Timestamp
     data.memberNo || '',    // B: 会員番号
     data.name || '',        // C: Name
     data.email || '',       // D: Email
@@ -62,13 +77,46 @@ function doPost(e) {
     considerFrameColor                     // R: Considering Frame/Color
   ]);
 
+  var newRow = sheet.getLastRow();
+  if (timestampValue) {
+    sheet.getRange(newRow, 1).setNumberFormat(TIMESTAMP_DISPLAY_FORMAT);
+  }
+
   if (isProspect) {
-    var newRow = sheet.getLastRow();
     sheet.getRange(newRow, 1, 1, headers.length).setBackground('#dbe9fb');
   }
 
   return ContentService.createTextOutput(JSON.stringify({ result: 'success' }))
     .setMimeType(ContentService.MimeType.JSON);
+}
+
+/**
+ * One-time utility: open this script in the Apps Script editor, select
+ * "fixExistingTimestamps" in the function dropdown next to Run, and click
+ * Run. It converts every existing Timestamp cell (column A) into a real
+ * date shown in Japan time as yyyy/mm/dd hh:mm:ss, matching new
+ * submissions. Safe to re-run.
+ */
+function fixExistingTimestamps() {
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  ss.setSpreadsheetTimeZone(SPREADSHEET_TIMEZONE);
+  var sheet = ss.getActiveSheet();
+  var lastRow = sheet.getLastRow();
+  if (lastRow < 2) { return; }
+
+  var range = sheet.getRange(2, 1, lastRow - 1, 1);
+  var values = range.getValues();
+  for (var i = 0; i < values.length; i++) {
+    var v = values[i][0];
+    if (v && !(v instanceof Date)) {
+      var d = new Date(v);
+      if (!isNaN(d.getTime())) {
+        values[i][0] = d;
+      }
+    }
+  }
+  range.setValues(values);
+  range.setNumberFormat(TIMESTAMP_DISPLAY_FORMAT);
 }
 
 /**
