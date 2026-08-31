@@ -753,9 +753,12 @@ tr:hover td { background: #f9f9f9; }
       <!-- Frame of interest (prospect only) -->
       <div class="field" id="prospect-frame-block" style="display:none;">
         <label id="lbl-prospect-frame-model">Frame Model of Interest <span style="font-size:10px; text-transform:none; letter-spacing:0;">(optional)</span></label>
-        <input type="text" id="f-prospect-frame-model" placeholder="e.g. Kelly Sun">
+        <div class="ac-wrap" id="prospect-frame-ac-wrap">
+          <input type="text" class="ac-input" id="f-prospect-frame-model" autocomplete="off" placeholder="e.g. Kelly Sun">
+          <div class="ac-dropdown" id="prospect-frame-dropdown"></div>
+        </div>
         <label id="lbl-prospect-frame-color" style="margin-top:12px;">Color Number <span style="font-size:10px; text-transform:none; letter-spacing:0;">(optional)</span></label>
-        <input type="text" id="f-prospect-frame-color" placeholder="e.g. 301">
+        <input type="text" id="f-prospect-frame-color" inputmode="numeric" pattern="[0-9]*" placeholder="e.g. 301" oninput="this.value = this.value.replace(/\D/g, '')">
       </div>
 
       <div id="lens-fields">
@@ -1418,6 +1421,30 @@ function initFrameAutocomplete(id) {
   document.addEventListener('click', e => { if (!wrap.contains(e.target)) closeDropdown(); });
 }
 
+function initProspectFrameAutocomplete() {
+  const wrap = document.getElementById('prospect-frame-ac-wrap');
+  const input = document.getElementById('f-prospect-frame-model');
+  const dropdown = document.getElementById('prospect-frame-dropdown');
+  if (!wrap || !input || !dropdown) return;
+
+  function renderList(query) {
+    const q = query.trim().toLowerCase();
+    const base = q ? FRAME_NAMES.filter(n => n.toLowerCase().startsWith(q)) : FRAME_NAMES.slice(0, 200);
+    const filtered = [...base].sort((a, b) => a.localeCompare(b));
+    if (filtered.length === 0) { closeDropdown(); return; }
+    dropdown.innerHTML = filtered.slice(0, 100).map(n => `<div class="ac-item" data-value="${escapeHtml(n)}">${escapeHtml(n)}</div>`).join('');
+    wrap.classList.add('open');
+    dropdown.querySelectorAll('.ac-item').forEach(item => {
+      item.addEventListener('mousedown', e => { e.preventDefault(); input.value = item.dataset.value; closeDropdown(); });
+    });
+  }
+  function closeDropdown() { wrap.classList.remove('open'); dropdown.innerHTML = ''; }
+  input.addEventListener('input', () => renderList(input.value));
+  input.addEventListener('focus', () => { if (input.value) renderList(input.value); });
+  input.addEventListener('keydown', e => { if (e.key === 'Escape') { closeDropdown(); input.blur(); } });
+  document.addEventListener('click', e => { if (!wrap.contains(e.target)) closeDropdown(); });
+}
+
 function collectFrameNames() {
   return frameRows.map(row => document.getElementById('frame-input-' + row.id))
     .filter(input => input && input.value.trim()).map(input => input.value.trim());
@@ -1437,6 +1464,8 @@ function goToTopScreen() {
   document.getElementById('customer-type-area').style.display = 'none';
   document.getElementById('frame-entry-area').style.display = 'block';
   document.getElementById('back-to-top-btn').style.display = 'none';
+  customerType = 'purchaser';
+  applyCustomerTypeToForm();
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
@@ -1486,6 +1515,7 @@ function continueCustomerType() {
 function applyCustomerTypeToForm() {
   const isProspect = customerType === 'prospect';
 
+  document.getElementById('lbl-subtitle').style.display = isProspect ? 'none' : '';
   document.getElementById('warranty-block').style.display = isProspect ? 'none' : '';
   document.getElementById('lens-purchase-block').style.display = isProspect ? 'none' : '';
   document.getElementById('optin-block').style.display = isProspect ? 'none' : '';
@@ -2451,6 +2481,7 @@ renderFrameRowList();
 initAutocomplete();
 initAddressPrefAutocomplete();
 initEmailAutocomplete();
+initProspectFrameAutocomplete();
 initPhoneCodeSelect();
 checkAdminMode();
 updateSubmitState();
