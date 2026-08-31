@@ -3,10 +3,10 @@
  * Deploy as Web App (Execute as: Me / Access: Anyone) and paste the
  * resulting /exec URL into SHEET_WEBHOOK_URL in index.html.
  *
- * Spreadsheet column order (A→R):
+ * Spreadsheet column order (A→S):
  * Timestamp | 会員番号 | Name | Email | Opt-in | Country | Language | Follow-up Sent | Purchased |
  * Staff Notes | Lens Order | Phone | Postcode | Address | Customer Type | (P, Q reserved —
- * lens purchaser address details, filled manually) | Considering Frame/Color
+ * lens purchaser address details, filled manually) | Considering Frame/Color | SMS Opt-in
  * (会員番号 and Staff Notes are filled in manually in the sheet; P and Q are also
  * filled in manually and are not written by this script.)
  * Rows submitted by a prospective customer (Customer Type = "Prospect") are
@@ -14,6 +14,11 @@
  * Up to 3 considering frames (model + color number) are combined into a
  * single cell (column R), each formatted as "Frame Name/C###" and joined
  * with ", ", e.g. "Kelly Sun/C301, Aiko/C204".
+ * A prospect's optional phone number reuses column L (Phone) — the same
+ * column a purchaser's lens-shipping phone number uses — since a single
+ * registration is always one or the other, never both. Whether a prospect
+ * wants SMS notifications is stored as Yes/No in column S (blank for
+ * purchasers, since it doesn't apply to them).
  * Timestamp (column A) is stored as a real date and displayed in Japan
  * time as yyyy/mm/dd hh:mm:ss; run fixExistingTimestamps() once to apply
  * the same formatting to rows submitted before this was added.
@@ -29,7 +34,7 @@ function doPost(e) {
   var sheet = ss.getActiveSheet();
   var data = JSON.parse(e.postData.contents);
 
-  var headers = ['Timestamp', '会員番号', 'Name', 'Email', 'Opt-in', 'Country', 'Language', 'Follow-up Sent', 'Purchased', 'Staff Notes', 'Lens Order', 'Phone', 'Postcode', 'Address', 'Customer Type', '', '', 'Considering Frame/Color'];
+  var headers = ['Timestamp', '会員番号', 'Name', 'Email', 'Opt-in', 'Country', 'Language', 'Follow-up Sent', 'Purchased', 'Staff Notes', 'Lens Order', 'Phone', 'Postcode', 'Address', 'Customer Type', '', '', 'Considering Frame/Color', 'SMS Opt-in'];
   if (sheet.getLastRow() === 0) {
     sheet.appendRow(headers);
   }
@@ -70,13 +75,14 @@ function doPost(e) {
     data.frameNames || '',                 // I: Purchased
     '',                                    // J: Staff Notes
     data.lensOrder ? 'Yes' : 'No',        // K: Lens Order
-    data.phone || '',                      // L: Phone
+    isProspect ? (data.prospectPhone || '') : (data.phone || ''), // L: Phone
     data.postcode || '',                   // M: Postcode
     data.address || '',                    // N: Address
     isProspect ? 'Prospect' : 'Purchaser', // O: Customer Type
     '',                                    // P: reserved (filled manually)
     '',                                    // Q: reserved (filled manually)
-    considerFrameColor                     // R: Considering Frame/Color
+    considerFrameColor,                    // R: Considering Frame/Color
+    isProspect ? (data.prospectSmsOptIn ? 'Yes' : 'No') : '' // S: SMS Opt-in
   ]);
 
   var newRow = sheet.getLastRow();
@@ -242,7 +248,7 @@ function readRecords(sheet) {
   var lastRow = sheet.getLastRow();
   if (lastRow < 2) { return []; }
 
-  var values = sheet.getRange(2, 1, lastRow - 1, 18).getValues();
+  var values = sheet.getRange(2, 1, lastRow - 1, 19).getValues();
   var records = [];
   for (var i = 0; i < values.length; i++) {
     var row = values[i];
@@ -263,7 +269,8 @@ function readRecords(sheet) {
       postcode:    row[12] || '', // M
       address:     row[13] || '', // N
       customerType:      row[14] || 'Purchaser', // O
-      considerFrameColor: row[17] || ''           // R
+      considerFrameColor: row[17] || '',          // R
+      smsOptIn:          row[18] || ''            // S
     });
   }
   return records;

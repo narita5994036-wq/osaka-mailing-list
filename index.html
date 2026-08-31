@@ -760,6 +760,18 @@ tr:hover td { background: #f9f9f9; }
         <button class="refresh-btn" type="button" onclick="addProspectFrameRow()" id="lbl-prospect-frame-add" style="margin-bottom:1rem;">+ Add Frame</button>
       </div>
 
+      <!-- Phone + SMS opt-in (prospect only) -->
+      <div id="prospect-contact-block" style="display:none;">
+        <div class="field">
+          <label id="lbl-prospect-phone">Phone Number <span style="font-size:10px; text-transform:none; letter-spacing:0;">(optional)</span></label>
+          <input type="tel" id="f-prospect-phone">
+        </div>
+        <label class="lens-toggle-row" for="f-prospect-sms">
+          <input type="checkbox" id="f-prospect-sms">
+          <span class="lens-toggle-label" id="lbl-prospect-sms">I would like to receive SMS notifications.</span>
+        </label>
+      </div>
+
       <div id="lens-fields">
         <!-- Phone -->
         <div class="field">
@@ -1029,6 +1041,7 @@ const i18n = {
     customerTypePurchaser: 'Purchaser', customerTypeProspect: 'Considering',
     customerTypeBack: 'Back', customerTypeContinue: 'Continue',
     prospectFrameModel: 'Frame Model of Interest', prospectFrameColor: 'Color', prospectFrameAdd: '+ Add Frame',
+    prospectPhone: 'Phone Number', prospectSms: 'I would like to receive SMS notifications.',
   },
   ja: {
     subtitle: 'フレーム保証登録',
@@ -1073,6 +1086,7 @@ const i18n = {
     customerTypePurchaser: '購入者', customerTypeProspect: '検討中',
     customerTypeBack: '戻る', customerTypeContinue: '次へ',
     prospectFrameModel: '検討中のフレームモデル名', prospectFrameColor: 'カラー番号', prospectFrameAdd: '+ フレームを追加',
+    prospectPhone: '電話番号', prospectSms: 'SMSでの通知を希望する',
   },
   zh: {
     subtitle: '镜架保修登记',
@@ -1117,6 +1131,7 @@ const i18n = {
     customerTypePurchaser: '购买者', customerTypeProspect: '意向顾客（考虑中）',
     customerTypeBack: '返回', customerTypeContinue: '继续',
     prospectFrameModel: '意向镜架型号', prospectFrameColor: '颜色编号', prospectFrameAdd: '+ 添加镜架',
+    prospectPhone: '电话号码', prospectSms: '希望接收短信通知',
   },
   ko: {
     subtitle: '프레임 보증 등록',
@@ -1161,6 +1176,7 @@ const i18n = {
     customerTypePurchaser: '구매자', customerTypeProspect: '검토 중（잠재 고객）',
     customerTypeBack: '뒤로', customerTypeContinue: '다음',
     prospectFrameModel: '검토 중인 프레임 모델명', prospectFrameColor: '컬러 번호', prospectFrameAdd: '+ 프레임 추가',
+    prospectPhone: '전화번호', prospectSms: 'SMS 알림을 받고 싶습니다.',
   }
 };
 
@@ -1227,6 +1243,8 @@ function setLang(lang) {
   document.getElementById('lbl-prospect-frame-model').childNodes[0].textContent = t.prospectFrameModel + ' ';
   document.getElementById('lbl-prospect-frame-color').textContent = t.prospectFrameColor;
   document.getElementById('lbl-prospect-frame-add').textContent = t.prospectFrameAdd;
+  document.getElementById('lbl-prospect-phone').childNodes[0].textContent = t.prospectPhone + ' ';
+  document.getElementById('lbl-prospect-sms').textContent = t.prospectSms;
   // Toggle phone/postcode layout based on language
   updateLensFieldsForLang(lang);
   applyCustomerTypeToForm();
@@ -1402,6 +1420,8 @@ function resetFrameEntry() {
   document.getElementById('f-customer-type-prospect').checked = false;
   document.getElementById('customer-type-continue-btn').disabled = true;
   resetProspectFrameEntry();
+  document.getElementById('f-prospect-phone').value = '';
+  document.getElementById('f-prospect-sms').checked = false;
   customerType = 'purchaser';
   applyCustomerTypeToForm();
   toggleLensFields();
@@ -1600,6 +1620,7 @@ function applyCustomerTypeToForm() {
   document.getElementById('lens-purchase-block').style.display = hideLens ? 'none' : '';
   document.getElementById('optin-block').style.display = isProspect ? 'none' : '';
   document.getElementById('prospect-frame-block').style.display = isProspect ? 'block' : 'none';
+  document.getElementById('prospect-contact-block').style.display = isProspect ? 'block' : 'none';
 
   if (hideLens) {
     const lensCheckbox = document.getElementById('f-lens');
@@ -1925,7 +1946,9 @@ async function handleSubmit() {
     postcode: postcode,
     address: address,
     customerType: customerType,
-    prospectFrames: isProspect ? collectProspectFrames() : []
+    prospectFrames: isProspect ? collectProspectFrames() : [],
+    prospectPhone: isProspect ? document.getElementById('f-prospect-phone').value.trim() : '',
+    prospectSmsOptIn: isProspect ? document.getElementById('f-prospect-sms').checked : false
   };
 
   try {
