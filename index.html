@@ -712,6 +712,16 @@ tr:hover td { background: #f9f9f9; }
     <!-- FORM AREA -->
     <div id="form-area">
 
+      <!-- Frame(s) of interest (prospect only, up to 3; staff enters this) -->
+      <div class="field" id="prospect-frame-block" style="display:none;">
+        <div style="display:flex; gap:8px; margin-bottom:10px;">
+          <label id="lbl-prospect-frame-model" style="flex:1; margin:0;">Frame Model of Interest <span style="font-size:10px; text-transform:none; letter-spacing:0;">(optional)</span></label>
+          <label id="lbl-prospect-frame-color" style="width:90px; flex-shrink:0; margin:0;">Color</label>
+        </div>
+        <div id="prospect-frame-row-list"></div>
+        <button class="refresh-btn" type="button" onclick="addProspectFrameRow()" id="lbl-prospect-frame-add" style="margin-bottom:1rem;">+ Add Frame</button>
+      </div>
+
       <!-- Warranty info -->
       <div id="warranty-block">
         <div class="warranty-info">
@@ -741,6 +751,8 @@ tr:hover td { background: #f9f9f9; }
         <div class="err-msg" id="e-country">Please select your country.</div>
       </div>
 
+      <p class="optin-desc" id="lbl-email-or-phone-note" style="display:none;">Please provide either an email address or phone number below.</p>
+
       <!-- Email -->
       <div class="field">
         <label id="lbl-email" class="required">Email Address</label>
@@ -751,19 +763,8 @@ tr:hover td { background: #f9f9f9; }
         <div class="err-msg" id="e-email">Please enter a valid email address.</div>
       </div>
 
-      <!-- Frame(s) of interest (prospect only, up to 3) -->
-      <div class="field" id="prospect-frame-block" style="display:none;">
-        <div style="display:flex; gap:8px; margin-bottom:10px;">
-          <label id="lbl-prospect-frame-model" style="flex:1; margin:0;">Frame Model of Interest <span style="font-size:10px; text-transform:none; letter-spacing:0;">(optional)</span></label>
-          <label id="lbl-prospect-frame-color" style="width:90px; flex-shrink:0; margin:0;">Color</label>
-        </div>
-        <div id="prospect-frame-row-list"></div>
-        <button class="refresh-btn" type="button" onclick="addProspectFrameRow()" id="lbl-prospect-frame-add" style="margin-bottom:1rem;">+ Add Frame</button>
-      </div>
-
       <!-- Phone + SMS opt-in (prospect only) -->
       <div id="prospect-contact-block" style="display:none;">
-        <p class="optin-desc" id="lbl-email-or-phone-note" style="margin-top:-8px;">Please provide either your email address above or a phone number below.</p>
         <div class="field">
           <label id="lbl-prospect-phone">Phone Number</label>
           <input type="tel" id="f-prospect-phone" oninput="updateProspectSmsAvailability(); updateSubmitState();">
@@ -1050,7 +1051,7 @@ const i18n = {
     customerTypeBack: 'Back', customerTypeContinue: 'Continue',
     prospectFrameModel: 'Frame Model of Interest', prospectFrameColor: 'Color', prospectFrameAdd: '+ Add Frame',
     prospectPhone: 'Phone Number', prospectSms: 'I would like to receive SMS notifications.',
-    emailOrPhoneNote: 'Please provide either your email address above or a phone number below.',
+    emailOrPhoneNote: 'Please provide either an email address or phone number below.',
     errEmailOrPhone: 'Please enter a valid email address, or a phone number.',
   },
   ja: {
@@ -1100,7 +1101,7 @@ const i18n = {
     customerTypeBack: '戻る', customerTypeContinue: '次へ',
     prospectFrameModel: '検討中のフレームモデル名', prospectFrameColor: 'カラー番号', prospectFrameAdd: '+ フレームを追加',
     prospectPhone: '電話番号', prospectSms: 'SMSでの通知を希望する',
-    emailOrPhoneNote: '上記のメールアドレス、または下記の電話番号のいずれかをご入力ください。',
+    emailOrPhoneNote: '下記のメールアドレス、または電話番号のいずれかをご入力ください。',
     errEmailOrPhone: '有効なメールアドレス、または電話番号を入力してください。',
   },
   zh: {
@@ -1150,7 +1151,7 @@ const i18n = {
     customerTypeBack: '返回', customerTypeContinue: '继续',
     prospectFrameModel: '意向镜架型号', prospectFrameColor: '颜色编号', prospectFrameAdd: '+ 添加镜架',
     prospectPhone: '电话号码', prospectSms: '希望接收短信通知',
-    emailOrPhoneNote: '请填写上方的电子邮箱，或下方的电话号码，二者任填其一即可。',
+    emailOrPhoneNote: '请填写下方的电子邮箱或电话号码，二者任填其一即可。',
     errEmailOrPhone: '请输入有效的电子邮箱地址或电话号码。',
   },
   ko: {
@@ -1200,7 +1201,7 @@ const i18n = {
     customerTypeBack: '뒤로', customerTypeContinue: '다음',
     prospectFrameModel: '검토 중인 프레임 모델명', prospectFrameColor: '컬러 번호', prospectFrameAdd: '+ 프레임 추가',
     prospectPhone: '전화번호', prospectSms: 'SMS 알림을 받고 싶습니다.',
-    emailOrPhoneNote: '위의 이메일 주소 또는 아래의 전화번호 중 하나를 입력해 주세요.',
+    emailOrPhoneNote: '아래의 이메일 주소 또는 전화번호 중 하나를 입력해 주세요.',
     errEmailOrPhone: '유효한 이메일 주소 또는 전화번호를 입력해 주세요.',
   }
 };
@@ -1646,6 +1647,7 @@ function applyCustomerTypeToForm() {
   document.getElementById('optin-block').style.display = isProspect ? 'none' : '';
   document.getElementById('prospect-frame-block').style.display = isProspect ? 'block' : 'none';
   document.getElementById('prospect-contact-block').style.display = isProspect ? 'block' : 'none';
+  document.getElementById('lbl-email-or-phone-note').style.display = isProspect ? 'block' : 'none';
   updateProspectSmsAvailability();
 
   const t = i18n[currentLang];
