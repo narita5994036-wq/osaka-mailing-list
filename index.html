@@ -1011,6 +1011,8 @@ const i18n = {
     yes: 'Yes', no: 'No',
     privacy: 'Your personal information will be used solely for warranty registration and, if you opted in, to send you relevant communications from MYKITA JAPAN. We will never share your data with third parties.',
     agree: 'I agree to the Privacy Policy and consent to the processing of my personal data for warranty registration purposes.',
+    privacyProspect: 'Your personal information will be used solely to follow up on your inquiry. We will never share your data with third parties.',
+    agreeProspect: 'I agree to the Privacy Policy and consent to the processing of my personal data for this inquiry.',
     submit: 'Register',
     thanksTitle: 'Registration Complete',
     thanksSub: 'Thank you for registering your MYKITA frame. Your warranty is now active.',
@@ -1056,6 +1058,8 @@ const i18n = {
     yes: 'はい', no: 'いいえ',
     privacy: 'ご提供いただいた個人情報は、保証登録および（同意された場合）MYKITA JAPANからのご案内送付のみに使用します。第三者への提供は一切行いません。',
     agree: 'プライバシーポリシーに同意し、保証登録のための個人情報の取り扱いに同意します。',
+    privacyProspect: 'ご提供いただいた個人情報は、お問い合わせへの対応のみに使用します。第三者への提供は一切行いません。',
+    agreeProspect: 'プライバシーポリシーに同意し、本お問い合わせのための個人情報の取り扱いに同意します。',
     submit: '登録する',
     thanksTitle: '登録完了',
     thanksSub: 'MYKITAフレームをご登録いただきありがとうございます。保証が有効になりました。',
@@ -1101,6 +1105,8 @@ const i18n = {
     yes: '是', no: '否',
     privacy: '您的个人信息仅用于保修登记，以及（如您同意）向您发送MYKITA JAPAN的相关通讯。我们绝不会将您的数据分享给第三方。',
     agree: '我同意隐私政策，并同意为保修登记目的处理我的个人数据。',
+    privacyProspect: '您的个人信息仅用于跟进您的咨询。我们绝不会将您的数据分享给第三方。',
+    agreeProspect: '我同意隐私政策，并同意为本次咨询处理我的个人数据。',
     submit: '登记',
     thanksTitle: '登记完成',
     thanksSub: '感谢您登记您的MYKITA镜架。您的保修现已生效。',
@@ -1146,6 +1152,8 @@ const i18n = {
     yes: '예', no: '아니요',
     privacy: '제공하신 개인 정보는 보증 등록 및 (동의하신 경우) MYKITA JAPAN의 관련 통신 발송에만 사용됩니다. 제3자에게 데이터를 공유하지 않습니다.',
     agree: '개인정보 처리방침에 동의하며, 보증 등록 목적으로 개인 정보 처리에 동의합니다.',
+    privacyProspect: '제공하신 개인 정보는 문의 대응 목적으로만 사용됩니다. 제3자에게 데이터를 공유하지 않습니다.',
+    agreeProspect: '개인정보 처리방침에 동의하며, 본 문의 목적으로 개인 정보 처리에 동의합니다.',
     submit: '등록하기',
     thanksTitle: '등록 완료',
     thanksSub: 'MYKITA 프레임을 등록해 주셔서 감사합니다. 보증이 활성화되었습니다.',
@@ -1199,8 +1207,6 @@ function setLang(lang) {
   document.getElementById('lbl-optin-note').textContent = t.optinNote;
   document.getElementById('lbl-yes').textContent = t.yes;
   document.getElementById('lbl-no').textContent = t.no;
-  document.getElementById('lbl-privacy').textContent = t.privacy;
-  document.getElementById('lbl-agree').innerHTML = t.agree;
   document.getElementById('submit-btn').textContent = t.submit;
   updateThanksLabels();
   document.getElementById('lbl-add-frame-btn').textContent = t.addFrameBtn;
@@ -1621,6 +1627,10 @@ function applyCustomerTypeToForm() {
   document.getElementById('optin-block').style.display = isProspect ? 'none' : '';
   document.getElementById('prospect-frame-block').style.display = isProspect ? 'block' : 'none';
   document.getElementById('prospect-contact-block').style.display = isProspect ? 'block' : 'none';
+
+  const t = i18n[currentLang];
+  document.getElementById('lbl-privacy').textContent = isProspect ? t.privacyProspect : t.privacy;
+  document.getElementById('lbl-agree').innerHTML = isProspect ? t.agreeProspect : t.agree;
 
   if (hideLens) {
     const lensCheckbox = document.getElementById('f-lens');
