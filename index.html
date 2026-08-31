@@ -1000,6 +1000,9 @@ const i18n = {
     submit: 'Register',
     thanksTitle: 'Registration Complete',
     thanksSub: 'Thank you for registering your MYKITA frame. Your warranty is now active.',
+    prospectThanksTitle: 'Thank You',
+    prospectThanksSub: "Thank you for your interest in MYKITA. We'll be happy to follow up with more information about the frame you're considering.",
+    prospectRegisterAnother: 'New Registration',
     registerAnother: 'Register Another Frame',
     addFrameBtn: '+ Add Frame Name(s)',
     thanksFrameInfo: 'Purchased Frame(s)',
@@ -1041,6 +1044,9 @@ const i18n = {
     submit: '登録する',
     thanksTitle: '登録完了',
     thanksSub: 'MYKITAフレームをご登録いただきありがとうございます。保証が有効になりました。',
+    prospectThanksTitle: 'ご登録ありがとうございます',
+    prospectThanksSub: 'MYKITAへのご関心をお寄せいただきありがとうございます。検討中のフレームについて、改めてご案内させていただきます。',
+    prospectRegisterAnother: '新規登録へ戻る',
     registerAnother: '別のフレームを登録する',
     addFrameBtn: '+ フレーム名を追加する',
     thanksFrameInfo: 'ご購入フレーム',
@@ -1082,6 +1088,9 @@ const i18n = {
     submit: '登记',
     thanksTitle: '登记完成',
     thanksSub: '感谢您登记您的MYKITA镜架。您的保修现已生效。',
+    prospectThanksTitle: '感谢您的登记',
+    prospectThanksSub: '感谢您对MYKITA的关注。我们会就您意向的镜架为您提供进一步信息。',
+    prospectRegisterAnother: '新登记',
     registerAnother: '登记另一副镜架',
     addFrameBtn: '+ 添加镜架名称',
     thanksFrameInfo: '购买的镜架',
@@ -1123,6 +1132,9 @@ const i18n = {
     submit: '등록하기',
     thanksTitle: '등록 완료',
     thanksSub: 'MYKITA 프레임을 등록해 주셔서 감사합니다. 보증이 활성화되었습니다.',
+    prospectThanksTitle: '등록해 주셔서 감사합니다',
+    prospectThanksSub: 'MYKITA에 관심을 가져주셔서 감사합니다. 검토 중이신 프레임에 대해 추후 안내해 드리겠습니다.',
+    prospectRegisterAnother: '새 등록 시작',
     registerAnother: '다른 프레임 등록',
     addFrameBtn: '+ 프레임 이름 추가',
     thanksFrameInfo: '구매하신 프레임',
@@ -1172,9 +1184,7 @@ function setLang(lang) {
   document.getElementById('lbl-privacy').textContent = t.privacy;
   document.getElementById('lbl-agree').innerHTML = t.agree;
   document.getElementById('submit-btn').textContent = t.submit;
-  document.getElementById('lbl-thanks-title').textContent = t.thanksTitle;
-  document.getElementById('lbl-thanks-sub').textContent = t.thanksSub;
-  document.getElementById('lbl-register-another').textContent = t.registerAnother;
+  updateThanksLabels();
   document.getElementById('lbl-add-frame-btn').textContent = t.addFrameBtn;
   document.getElementById('lbl-thanks-frame-info').textContent = t.thanksFrameInfo;
   document.getElementById('lbl-thanks-frame-add').textContent = t.thanksFrameAdd;
@@ -1859,14 +1869,24 @@ async function handleSubmit() {
   }
 }
 
+function updateThanksLabels() {
+  const t = i18n[currentLang];
+  const isProspect = customerType === 'prospect';
+  document.getElementById('lbl-thanks-title').textContent = isProspect ? t.prospectThanksTitle : t.thanksTitle;
+  document.getElementById('lbl-thanks-sub').textContent = isProspect ? t.prospectThanksSub : t.thanksSub;
+  document.getElementById('lbl-register-another').textContent = isProspect ? t.prospectRegisterAnother : t.registerAnother;
+}
+
 function showThanks() {
   const fa = document.getElementById('form-area');
   const ta = document.getElementById('thanks-area');
   fa.style.display = 'none';
   ta.style.display = 'block';
   document.getElementById('back-to-top-btn').style.display = 'none';
+  updateThanksLabels();
+  const isProspect = customerType === 'prospect';
   document.getElementById('thanks-add-frame-wrap').style.display =
-    purchasedFrames.length === 0 ? 'block' : 'none';
+    (!isProspect && purchasedFrames.length === 0) ? 'block' : 'none';
   document.getElementById('thanks-frame-entry').style.display = 'none';
   document.getElementById('thanks-frame-status').textContent = '';
   window.scrollTo({ top: 0, behavior: 'smooth' });
