@@ -456,6 +456,8 @@ td {
 tr:hover td { background: #f9f9f9; }
 .badge-yes { background: #e8f5e9; color: #1e7e44; font-size: 11px; padding: 2px 8px; letter-spacing: 0.06em; }
 .badge-no  { background: #fdecea; color: #666; font-size: 11px; padding: 2px 8px; letter-spacing: 0.06em; }
+.lens-blind-dots { color: var(--mid); font-size: 11px; letter-spacing: 0.15em; user-select: none; }
+#lens-blind-toggle.active { border-color: #1a1a1a; color: #1a1a1a; background: #f0f0f0; }
 .row-delete-btn {
   background: none;
   border: none;
@@ -847,6 +849,7 @@ tr:hover td { background: #f9f9f9; }
       <div class="admin-controls">
         <button class="refresh-btn" id="refresh-btn" onclick="refreshRecords()">&#8635; Refresh</button>
         <button class="refresh-btn" id="sort-btn" onclick="toggleSortOrder()">Newest First &#8595;</button>
+        <button class="refresh-btn" id="lens-blind-toggle" onclick="toggleLensBlind()">&#128584; Lens</button>
         <select class="csv-filter" id="csv-filter" onchange="renderAdminTable()">
           <option value="all">All Opt-ins</option>
           <option value="yes">Yes Only</option>
@@ -859,7 +862,7 @@ tr:hover td { background: #f9f9f9; }
       <table>
         <thead><tr>
           <th>#</th><th>Timestamp</th><th>会員番号</th><th>Name</th><th>Country</th>
-          <th>Email</th><th>Opt-in</th><th>Follow-up</th><th>Purchased</th><th>Lang</th><th>Staff Notes</th><th></th>
+          <th>Email</th><th>Opt-in</th><th>Follow-up</th><th>Purchased</th><th>Lens</th><th>Lang</th><th>Staff Notes</th><th></th>
         </tr></thead>
         <tbody id="admin-tbody"></tbody>
       </table>
@@ -914,6 +917,7 @@ const SHEET_WEBHOOK_URL = 'https://script.google.com/macros/s/AKfycbxgRf0LNCXFAT
 // ── GLOBALS ──
 let adminPassword = '';
 let adminRecords = [];
+let lensBlinded = true;
 let currentLang = 'en';
 let isAdmin = false;
 const LOGO_TAP_COUNT = 5;
@@ -1953,6 +1957,21 @@ function toggleSortOrder() {
   renderAdminTable();
 }
 
+// ── LENS COLUMN BLIND ──
+function toggleLensBlind() {
+  lensBlinded = !lensBlinded;
+  const btn = document.getElementById('lens-blind-toggle');
+  btn.innerHTML = lensBlinded ? '&#128584; Lens' : '&#128065; Lens';
+  btn.classList.toggle('active', !lensBlinded);
+  renderAdminTable();
+}
+
+function renderLensCell(r) {
+  if (lensBlinded) return '<span class="lens-blind-dots" title="Click the Lens toggle above to reveal">&bull;&bull;&bull;</span>';
+  const isYes = r.lensOrder === 'Yes';
+  return `<span class="${isYes ? 'badge-yes' : 'badge-no'}">${escapeHtml(r.lensOrder || 'No')}</span>`;
+}
+
 function renderAdminTable() {
   const filter = document.getElementById('csv-filter').value;
   let records = [...adminRecords];
@@ -1989,6 +2008,7 @@ function renderAdminTable() {
       <td><span class="${r.optin === 'Yes' ? 'badge-yes' : 'badge-no'}">${escapeHtml(r.optin)}</span></td>
       <td>${renderFollowupBadge(r)}</td>
       <td style="font-size:11px; color:var(--mid);">${escapeHtml(r.frameNames || '')}</td>
+      <td>${renderLensCell(r)}</td>
       <td style="text-transform:uppercase; font-size:11px; color:var(--mid);">${escapeHtml(r.lang)}</td>
       <td style="font-size:11px; color:var(--mid); max-width:140px;">${escapeHtml(r.staffNotes || '')}</td>
       <td><button class="row-delete-btn" onclick="deleteRecord(${r.row})" title="Delete this record" aria-label="Delete this record">&times;</button></td>
