@@ -200,6 +200,7 @@ body {
   cursor: pointer;
 }
 .lens-toggle-row input[type="checkbox"] { accent-color: var(--light); flex-shrink: 0; width: 16px; height: 16px; }
+.lens-toggle-row:has(input:disabled) { cursor: not-allowed; opacity: 0.5; }
 .lens-toggle-label { font-size: 13px; color: var(--light); }
 #lens-fields { display: none; margin-bottom: 12px; }
 #lens-fields.open { display: block; }
@@ -762,9 +763,10 @@ tr:hover td { background: #f9f9f9; }
 
       <!-- Phone + SMS opt-in (prospect only) -->
       <div id="prospect-contact-block" style="display:none;">
+        <p class="optin-desc" id="lbl-email-or-phone-note" style="margin-top:-8px;">Please provide either your email address above or a phone number below.</p>
         <div class="field">
-          <label id="lbl-prospect-phone">Phone Number <span style="font-size:10px; text-transform:none; letter-spacing:0;">(optional)</span></label>
-          <input type="tel" id="f-prospect-phone">
+          <label id="lbl-prospect-phone">Phone Number</label>
+          <input type="tel" id="f-prospect-phone" oninput="updateProspectSmsAvailability(); updateSubmitState();">
         </div>
         <label class="lens-toggle-row" for="f-prospect-sms">
           <input type="checkbox" id="f-prospect-sms">
@@ -1048,6 +1050,8 @@ const i18n = {
     customerTypeBack: 'Back', customerTypeContinue: 'Continue',
     prospectFrameModel: 'Frame Model of Interest', prospectFrameColor: 'Color', prospectFrameAdd: '+ Add Frame',
     prospectPhone: 'Phone Number', prospectSms: 'I would like to receive SMS notifications.',
+    emailOrPhoneNote: 'Please provide either your email address above or a phone number below.',
+    errEmailOrPhone: 'Please enter a valid email address, or a phone number.',
   },
   ja: {
     subtitle: 'フレーム保証登録',
@@ -1096,6 +1100,8 @@ const i18n = {
     customerTypeBack: '戻る', customerTypeContinue: '次へ',
     prospectFrameModel: '検討中のフレームモデル名', prospectFrameColor: 'カラー番号', prospectFrameAdd: '+ フレームを追加',
     prospectPhone: '電話番号', prospectSms: 'SMSでの通知を希望する',
+    emailOrPhoneNote: '上記のメールアドレス、または下記の電話番号のいずれかをご入力ください。',
+    errEmailOrPhone: '有効なメールアドレス、または電話番号を入力してください。',
   },
   zh: {
     subtitle: '镜架保修登记',
@@ -1144,6 +1150,8 @@ const i18n = {
     customerTypeBack: '返回', customerTypeContinue: '继续',
     prospectFrameModel: '意向镜架型号', prospectFrameColor: '颜色编号', prospectFrameAdd: '+ 添加镜架',
     prospectPhone: '电话号码', prospectSms: '希望接收短信通知',
+    emailOrPhoneNote: '请填写上方的电子邮箱，或下方的电话号码，二者任填其一即可。',
+    errEmailOrPhone: '请输入有效的电子邮箱地址或电话号码。',
   },
   ko: {
     subtitle: '프레임 보증 등록',
@@ -1192,6 +1200,8 @@ const i18n = {
     customerTypeBack: '뒤로', customerTypeContinue: '다음',
     prospectFrameModel: '검토 중인 프레임 모델명', prospectFrameColor: '컬러 번호', prospectFrameAdd: '+ 프레임 추가',
     prospectPhone: '전화번호', prospectSms: 'SMS 알림을 받고 싶습니다.',
+    emailOrPhoneNote: '위의 이메일 주소 또는 아래의 전화번호 중 하나를 입력해 주세요.',
+    errEmailOrPhone: '유효한 이메일 주소 또는 전화번호를 입력해 주세요.',
   }
 };
 
@@ -1256,7 +1266,8 @@ function setLang(lang) {
   document.getElementById('lbl-prospect-frame-model').childNodes[0].textContent = t.prospectFrameModel + ' ';
   document.getElementById('lbl-prospect-frame-color').textContent = t.prospectFrameColor;
   document.getElementById('lbl-prospect-frame-add').textContent = t.prospectFrameAdd;
-  document.getElementById('lbl-prospect-phone').childNodes[0].textContent = t.prospectPhone + ' ';
+  document.getElementById('lbl-prospect-phone').textContent = t.prospectPhone;
+  document.getElementById('lbl-email-or-phone-note').textContent = t.emailOrPhoneNote;
   document.getElementById('lbl-prospect-sms').textContent = t.prospectSms;
   // Toggle phone/postcode layout based on language
   updateLensFieldsForLang(lang);
@@ -1435,6 +1446,7 @@ function resetFrameEntry() {
   resetProspectFrameEntry();
   document.getElementById('f-prospect-phone').value = '';
   document.getElementById('f-prospect-sms').checked = false;
+  updateProspectSmsAvailability();
   customerType = 'purchaser';
   applyCustomerTypeToForm();
   toggleLensFields();
@@ -1634,10 +1646,13 @@ function applyCustomerTypeToForm() {
   document.getElementById('optin-block').style.display = isProspect ? 'none' : '';
   document.getElementById('prospect-frame-block').style.display = isProspect ? 'block' : 'none';
   document.getElementById('prospect-contact-block').style.display = isProspect ? 'block' : 'none';
+  updateProspectSmsAvailability();
 
   const t = i18n[currentLang];
   document.getElementById('lbl-privacy').textContent = isProspect ? t.privacyProspect : t.privacy;
   document.getElementById('lbl-agree').innerHTML = isProspect ? t.agreeProspect : t.agree;
+  document.getElementById('lbl-email').classList.toggle('required', !isProspect);
+  document.getElementById('e-email').textContent = isProspect ? t.errEmailOrPhone : t.errEmail;
 
   if (hideLens) {
     const lensCheckbox = document.getElementById('f-lens');
@@ -1862,9 +1877,29 @@ function initEmailAutocomplete() {
 }
 
 // ── FORM VALIDATION ──
+function isProspectPhoneValid() {
+  const phone = document.getElementById('f-prospect-phone').value;
+  return phone.replace(/\D/g, '').length >= 10;
+}
+
+function updateProspectSmsAvailability() {
+  const cb = document.getElementById('f-prospect-sms');
+  const valid = isProspectPhoneValid();
+  cb.disabled = !valid;
+  if (!valid) { cb.checked = false; }
+}
+
+function emailOrPhoneValid() {
+  const emailVal = document.getElementById('f-email').value.trim();
+  if (customerType !== 'prospect') {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailVal);
+  }
+  if (emailVal) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailVal); }
+  return isProspectPhoneValid();
+}
+
 function updateSubmitState() {
   const name = document.getElementById('f-name');
-  const email = document.getElementById('f-email');
   const optinYes = document.getElementById('f-optin-yes');
   const optinNo = document.getElementById('f-optin-no');
   const agree = document.getElementById('f-agree');
@@ -1872,7 +1907,7 @@ function updateSubmitState() {
   if (!btn) return;
   const isProspect = customerType === 'prospect';
   const valid = name && name.value.trim() &&
-    email && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value.trim()) &&
+    emailOrPhoneValid() &&
     (isProspect || (optinYes && optinYes.checked || optinNo && optinNo.checked)) &&
     agree && agree.checked &&
     lensFieldsValid();
@@ -1887,7 +1922,7 @@ function validateForm() {
   const eEmail = document.getElementById('e-email');
 
   if (!name.value.trim()) { name.classList.add('err'); eName.style.display = 'block'; ok = false; } else { name.classList.remove('err'); eName.style.display = 'none'; }
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value.trim())) { email.classList.add('err'); eEmail.style.display = 'block'; ok = false; } else { email.classList.remove('err'); eEmail.style.display = 'none'; }
+  if (!emailOrPhoneValid()) { email.classList.add('err'); eEmail.style.display = 'block'; ok = false; } else { email.classList.remove('err'); eEmail.style.display = 'none'; }
 
   return ok;
 }
