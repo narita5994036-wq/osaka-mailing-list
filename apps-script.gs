@@ -11,8 +11,9 @@
  * filled in manually and are not written by this script.)
  * Rows submitted by a prospective customer (Customer Type = "Prospect") are
  * highlighted with a light blue background for quick visual identification.
- * The considering frame model and color number are combined into a single
- * cell (column R) formatted as "Frame Name/C###", e.g. "Kelly Sun/C301".
+ * Up to 3 considering frames (model + color number) are combined into a
+ * single cell (column R), each formatted as "Frame Name/C###" and joined
+ * with ", ", e.g. "Kelly Sun/C301, Aiko/C204".
  * Timestamp (column A) is stored as a real date and displayed in Japan
  * time as yyyy/mm/dd hh:mm:ss; run fixExistingTimestamps() once to apply
  * the same formatting to rows submitted before this was added.
@@ -40,16 +41,17 @@ function doPost(e) {
 
   var isProspect = data.customerType === 'prospect';
 
-  var considerFrameColor = '';
-  var considerModel = data.prospectFrameModel || '';
-  var considerColor = data.prospectFrameColor || '';
-  if (considerModel && considerColor) {
-    considerFrameColor = considerModel + '/C' + considerColor;
-  } else if (considerModel) {
-    considerFrameColor = considerModel;
-  } else if (considerColor) {
-    considerFrameColor = 'C' + considerColor;
-  }
+  // Up to 3 candidate frames, each combined into "Model/C###" and joined
+  // with ", " into the single Considering Frame/Color cell (column R).
+  var prospectFrames = Array.isArray(data.prospectFrames) ? data.prospectFrames.slice(0, 3) : [];
+  var considerFrameColor = prospectFrames.map(function(f) {
+    var model = (f && f.model) || '';
+    var color = (f && f.color) || '';
+    if (model && color) { return model + '/C' + color; }
+    if (model) { return model; }
+    if (color) { return 'C' + color; }
+    return '';
+  }).filter(function(s) { return s; }).join(', ');
 
   // Store a real Date (not a string) so the sheet can render it in Japan
   // time via the cell number format below, while readRecords() can still
