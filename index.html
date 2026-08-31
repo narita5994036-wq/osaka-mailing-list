@@ -459,8 +459,6 @@ tr:hover td { background: #f9f9f9; }
 .badge-prospect { background: #dbe9fb; color: #1a5fa8; font-size: 11px; padding: 2px 8px; letter-spacing: 0.06em; }
 .row-prospect td { background: #eef5fd; }
 .row-prospect:hover td { background: #e0edfa; }
-.lens-blind-dots { color: var(--mid); font-size: 11px; letter-spacing: 0.15em; user-select: none; }
-#lens-blind-toggle.active { border-color: #1a1a1a; color: #1a1a1a; background: #f0f0f0; }
 .admin-settings-row { margin-bottom: 16px; }
 .admin-setting-toggle { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--mid); cursor: pointer; }
 .admin-setting-toggle input[type="checkbox"] { accent-color: var(--light); width: 14px; height: 14px; flex-shrink: 0; }
@@ -898,7 +896,6 @@ tr:hover td { background: #f9f9f9; }
       <div class="admin-controls">
         <button class="refresh-btn" id="refresh-btn" onclick="refreshRecords()">&#8635; Refresh</button>
         <button class="refresh-btn" id="sort-btn" onclick="toggleSortOrder()">Newest First &#8595;</button>
-        <button class="refresh-btn" id="lens-blind-toggle" onclick="toggleLensBlind()">&#128584; Lens</button>
         <select class="csv-filter" id="csv-filter" onchange="renderAdminTable()">
           <option value="all">All Opt-ins</option>
           <option value="yes">Yes Only</option>
@@ -966,7 +963,6 @@ const SHEET_WEBHOOK_URL = 'https://script.google.com/macros/s/AKfycbxgRf0LNCXFAT
 // ── GLOBALS ──
 let adminPassword = '';
 let adminRecords = [];
-let lensBlinded = true;
 let hideLensSection = false;
 let currentLang = 'en';
 let isAdmin = false;
@@ -2177,17 +2173,7 @@ function toggleSortOrder() {
   renderAdminTable();
 }
 
-// ── LENS COLUMN BLIND ──
-function toggleLensBlind() {
-  lensBlinded = !lensBlinded;
-  const btn = document.getElementById('lens-blind-toggle');
-  btn.innerHTML = lensBlinded ? '&#128584; Lens' : '&#128065; Lens';
-  btn.classList.toggle('active', !lensBlinded);
-  renderAdminTable();
-}
-
 function renderLensCell(r) {
-  if (lensBlinded) return '<span class="lens-blind-dots" title="Click the Lens toggle above to reveal">&bull;&bull;&bull;</span>';
   const isYes = r.lensOrder === 'Yes';
   return `<span class="${isYes ? 'badge-yes' : 'badge-no'}">${escapeHtml(r.lensOrder || 'No')}</span>`;
 }
