@@ -3,22 +3,27 @@
  * Deploy as Web App (Execute as: Me / Access: Anyone) and paste the
  * resulting /exec URL into SHEET_WEBHOOK_URL in index.html.
  *
- * Spreadsheet column order (A→S):
- * Timestamp | 会員番号 | Name | Email | Opt-in | Country | Language | Follow-up Sent | Purchased |
- * Staff Notes | Lens Order | Phone | Postcode | Address | Customer Type | (P, Q reserved —
- * lens purchaser address details, filled manually) | Considering Frame/Color | SMS Opt-in
- * (会員番号 and Staff Notes are filled in manually in the sheet; P and Q are also
- * filled in manually and are not written by this script.)
+ * Spreadsheet column order (A→T), matching the live sheet's actual headers:
+ * A Timestamp | B 会員番号 | C Name | D Email | E Opt-in | F Country | G Language |
+ * H Follow-up Sent | I Purchased (Frame) | J Staff Notes | K Purchased (Lenses) |
+ * L Phone Number | M Postcode | N Address(Street) | O Address(Building) |
+ * P City/Town | Q State/Province | R considerFrame/Color | S SMS Opt-in | T Customer Type
+ * (B and J are filled in manually in the sheet.)
+ *
+ * A prospect's optional phone number reuses column L (Phone Number) — the
+ * same column a purchaser's lens-shipping phone uses — since a single
+ * registration is always one or the other, never both. N-Q hold a
+ * purchaser's lens-shipping address, split the same way the intl address
+ * form splits it (street / building / city / state-province); the JA
+ * address form doesn't separate street and building, so both go into N.
+ * SMS Opt-in (S) and Customer Type (T) are blank/"Purchaser" for a normal
+ * purchaser registration, since they only apply to prospects.
+ *
  * Rows submitted by a prospective customer (Customer Type = "Prospect") are
  * highlighted with a light blue background for quick visual identification.
  * Up to 3 considering frames (model + color number) are combined into a
  * single cell (column R), each formatted as "Frame Name/C###" and joined
  * with ", ", e.g. "Kelly Sun/C301, Aiko/C204".
- * A prospect's optional phone number reuses column L (Phone) — the same
- * column a purchaser's lens-shipping phone number uses — since a single
- * registration is always one or the other, never both. Whether a prospect
- * wants SMS notifications is stored as Yes/No in column S (blank for
- * purchasers, since it doesn't apply to them).
  * Timestamp (column A) is stored as a real date and displayed in Japan
  * time as yyyy/mm/dd hh:mm:ss; run fixExistingTimestamps() once to apply
  * the same formatting to rows submitted before this was added.
@@ -34,7 +39,7 @@ function doPost(e) {
   var sheet = ss.getActiveSheet();
   var data = JSON.parse(e.postData.contents);
 
-  var headers = ['Timestamp', '会員番号', 'Name', 'Email', 'Opt-in', 'Country', 'Language', 'Follow-up Sent', 'Purchased', 'Staff Notes', 'Lens Order', 'Phone', 'Postcode', 'Address', 'Customer Type', '', '', 'Considering Frame/Color', 'SMS Opt-in'];
+  var headers = ['Timestamp', '会員番号', 'Name', 'Email', 'Opt-in', 'Country', 'Language', 'Follow-up Sent', 'Purchased (Frame)', 'Staff Notes', 'Purchased (Lenses)', 'Phone Number', 'Postcode', 'Address(Street)', 'Address(Building)', 'City/Town', 'State/Province', 'considerFrame/Color', 'SMS Opt-in', 'Customer Type'];
   if (sheet.getLastRow() === 0) {
     sheet.appendRow(headers);
   }
@@ -47,7 +52,7 @@ function doPost(e) {
   var isProspect = data.customerType === 'prospect';
 
   // Up to 3 candidate frames, each combined into "Model/C###" and joined
-  // with ", " into the single Considering Frame/Color cell (column R).
+  // with ", " into the single considerFrame/Color cell (column R).
   var prospectFrames = Array.isArray(data.prospectFrames) ? data.prospectFrames.slice(0, 3) : [];
   var considerFrameColor = prospectFrames.map(function(f) {
     var model = (f && f.model) || '';
@@ -72,17 +77,18 @@ function doPost(e) {
     country,                // F: Country
     (data.lang || '').toUpperCase(), // G: Language
     '',                                    // H: Follow-up Sent (always blank)
-    data.frameNames || '',                 // I: Purchased
+    data.frameNames || '',                 // I: Purchased (Frame)
     '',                                    // J: Staff Notes
-    data.lensOrder ? 'Yes' : 'No',        // K: Lens Order
-    isProspect ? (data.prospectPhone || '') : (data.phone || ''), // L: Phone
+    data.lensOrder ? 'Yes' : 'No',        // K: Purchased (Lenses)
+    isProspect ? (data.prospectPhone || '') : (data.phone || ''), // L: Phone Number
     data.postcode || '',                   // M: Postcode
-    data.address || '',                    // N: Address
-    isProspect ? 'Prospect' : 'Purchaser', // O: Customer Type
-    '',                                    // P: reserved (filled manually)
-    '',                                    // Q: reserved (filled manually)
-    considerFrameColor,                    // R: Considering Frame/Color
-    isProspect ? (data.prospectSmsOptIn ? 'Yes' : 'No') : '' // S: SMS Opt-in
+    data.addressStreet || '',              // N: Address(Street)
+    data.addressBuilding || '',            // O: Address(Building)
+    data.addressCity || '',                // P: City/Town
+    data.addressState || '',               // Q: State/Province
+    considerFrameColor,                    // R: considerFrame/Color
+    isProspect ? (data.prospectSmsOptIn ? 'Yes' : 'No') : '', // S: SMS Opt-in
+    isProspect ? 'Prospect' : 'Purchaser'  // T: Customer Type
   ]);
 
   var newRow = sheet.getLastRow();
@@ -248,7 +254,7 @@ function readRecords(sheet) {
   var lastRow = sheet.getLastRow();
   if (lastRow < 2) { return []; }
 
-  var values = sheet.getRange(2, 1, lastRow - 1, 19).getValues();
+  var values = sheet.getRange(2, 1, lastRow - 1, 20).getValues();
   var records = [];
   for (var i = 0; i < values.length; i++) {
     var row = values[i];
@@ -267,10 +273,13 @@ function readRecords(sheet) {
       lensOrder:   row[10] || '', // K
       phone:       row[11] || '', // L
       postcode:    row[12] || '', // M
-      address:     row[13] || '', // N
-      customerType:      row[14] || 'Purchaser', // O
+      addressStreet:   row[13] || '', // N
+      addressBuilding: row[14] || '', // O
+      addressCity:     row[15] || '', // P
+      addressState:    row[16] || '', // Q
       considerFrameColor: row[17] || '',          // R
-      smsOptIn:          row[18] || ''            // S
+      smsOptIn:          row[18] || '',           // S
+      customerType:      row[19] || 'Purchaser'   // T
     });
   }
   return records;
