@@ -1520,18 +1520,22 @@ function continueCustomerType() {
 
 function applyCustomerTypeToForm() {
   const isProspect = customerType === 'prospect';
+  const hideLens = isProspect || hideLensSection;
 
   document.getElementById('lbl-subtitle').style.display = isProspect ? 'none' : '';
   document.getElementById('warranty-block').style.display = isProspect ? 'none' : '';
-  document.getElementById('lens-purchase-block').style.display = isProspect ? 'none' : '';
+  document.getElementById('lens-purchase-block').style.display = hideLens ? 'none' : '';
   document.getElementById('optin-block').style.display = isProspect ? 'none' : '';
   document.getElementById('prospect-frame-block').style.display = isProspect ? 'block' : 'none';
 
-  if (isProspect) {
-    document.getElementById('country-field').style.display = 'none';
+  if (hideLens) {
     const lensCheckbox = document.getElementById('f-lens');
     if (lensCheckbox.checked) { lensCheckbox.checked = false; }
     document.getElementById('lens-fields').classList.remove('open');
+  }
+
+  if (isProspect) {
+    document.getElementById('country-field').style.display = 'none';
   } else {
     updateCountryFieldVisibility();
   }
@@ -2131,22 +2135,13 @@ async function adminRequest(params) {
 }
 
 // ── LENS SECTION VISIBILITY SETTING ──
-function applyLensSectionVisibility() {
-  const block = document.getElementById('lens-purchase-block');
-  if (block) block.style.display = hideLensSection ? 'none' : '';
-  if (hideLensSection) {
-    const cb = document.getElementById('f-lens');
-    if (cb && cb.checked) { cb.checked = false; toggleLensFields(); }
-  }
-}
-
 async function loadLensSectionSetting() {
   try {
     const res = await fetch(`${SHEET_WEBHOOK_URL}?action=settings`);
     const json = await res.json();
     if (json.ok) {
       hideLensSection = !!json.hideLensSection;
-      applyLensSectionVisibility();
+      applyCustomerTypeToForm();
       const cb = document.getElementById('setting-hide-lens');
       if (cb) cb.checked = hideLensSection;
     }
@@ -2161,7 +2156,7 @@ async function updateHideLensSetting() {
     const json = await adminRequest({ op: 'setting', key: 'hideLensSection', value: String(value) });
     if (json.ok) {
       hideLensSection = value;
-      applyLensSectionVisibility();
+      applyCustomerTypeToForm();
     } else {
       cb.checked = !value;
       alert('Failed to update setting: ' + (json.error || 'unknown error'));
