@@ -864,6 +864,9 @@ tr:hover td { background: #f9f9f9; }
         </div>
         <div id="thanks-frame-status" style="font-size:12px; color:var(--mid); margin-top:10px; text-align:center;"></div>
       </div>
+      <div id="thanks-sms-wrap" style="display:none; margin-bottom:20px;">
+        <button class="submit-btn" style="width:100%; margin-top:0;" onclick="openProspectSms()" id="lbl-thanks-sms">Send SMS</button>
+      </div>
       <button class="refresh-btn" onclick="resetForm()" id="lbl-register-another">Register Another Frame</button>
     </div>
 
@@ -1019,6 +1022,7 @@ const i18n = {
     prospectThanksTitle: 'Thank You',
     prospectThanksSub: "Thank you for your interest in MYKITA. We'll be happy to follow up with more information about the frame you're considering.",
     prospectRegisterAnother: 'New Registration',
+    thanksSms: 'Send SMS',
     registerAnother: 'Register Another Frame',
     addFrameBtn: '+ Add Frame Name(s)',
     thanksFrameInfo: 'Purchased Frame(s)',
@@ -1066,6 +1070,7 @@ const i18n = {
     prospectThanksTitle: 'ご登録ありがとうございます',
     prospectThanksSub: 'MYKITAへのご関心をお寄せいただきありがとうございます。検討中のフレームについて、改めてご案内させていただきます。',
     prospectRegisterAnother: '新規登録へ戻る',
+    thanksSms: 'SMSを送る',
     registerAnother: '別のフレームを登録する',
     addFrameBtn: '+ フレーム名を追加する',
     thanksFrameInfo: 'ご購入フレーム',
@@ -1113,6 +1118,7 @@ const i18n = {
     prospectThanksTitle: '感谢您的登记',
     prospectThanksSub: '感谢您对MYKITA的关注。我们会就您意向的镜架为您提供进一步信息。',
     prospectRegisterAnother: '新登记',
+    thanksSms: '发送短信',
     registerAnother: '登记另一副镜架',
     addFrameBtn: '+ 添加镜架名称',
     thanksFrameInfo: '购买的镜架',
@@ -1160,6 +1166,7 @@ const i18n = {
     prospectThanksTitle: '등록해 주셔서 감사합니다',
     prospectThanksSub: 'MYKITA에 관심을 가져주셔서 감사합니다. 검토 중이신 프레임에 대해 추후 안내해 드리겠습니다.',
     prospectRegisterAnother: '새 등록 시작',
+    thanksSms: 'SMS 보내기',
     registerAnother: '다른 프레임 등록',
     addFrameBtn: '+ 프레임 이름 추가',
     thanksFrameInfo: '구매하신 프레임',
@@ -1986,6 +1993,7 @@ function updateThanksLabels() {
   document.getElementById('lbl-thanks-title').textContent = isProspect ? t.prospectThanksTitle : t.thanksTitle;
   document.getElementById('lbl-thanks-sub').textContent = isProspect ? t.prospectThanksSub : t.thanksSub;
   document.getElementById('lbl-register-another').textContent = isProspect ? t.prospectRegisterAnother : t.registerAnother;
+  document.getElementById('lbl-thanks-sms').textContent = t.thanksSms;
 }
 
 function showThanks() {
@@ -2000,7 +2008,39 @@ function showThanks() {
     (!isProspect && purchasedFrames.length === 0) ? 'block' : 'none';
   document.getElementById('thanks-frame-entry').style.display = 'none';
   document.getElementById('thanks-frame-status').textContent = '';
+  const smsPhone = isProspect ? document.getElementById('f-prospect-phone').value.trim() : '';
+  const smsWanted = isProspect && document.getElementById('f-prospect-sms').checked;
+  document.getElementById('thanks-sms-wrap').style.display = (smsWanted && smsPhone) ? 'block' : 'none';
   window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// ── PROSPECT SMS ──
+function buildProspectSmsBody() {
+  const name = document.getElementById('f-name').value.trim();
+  const frameLines = collectProspectFrames().map(f => {
+    if (f.model && f.color) { return '・' + f.model + '/C' + f.color; }
+    if (f.model) { return '・' + f.model; }
+    if (f.color) { return '・C' + f.color; }
+    return '';
+  }).filter(Boolean).join('\n');
+
+  return name + ' 様\n\n'
+    + 'この度はMYKITA Osakaへご来店いただき誠にありがとうございます。\n\n'
+    + '今回ご検討いただいたフレーム名とカラー番号は以下の通りです。\n\n'
+    + frameLines + '\n\n'
+    + 'ご検討いただいたフレームの在庫のお問い合わせも随時承っております。\n'
+    + 'また、お取り置きも可能となっておりますので、お気軽にお問い合わせください。\n\n'
+    + '※お取り置きは原則２週間までとさせていただいております。予めご了承ください。\n\n'
+    + 'MYKITA Osaka';
+}
+
+function openProspectSms() {
+  const phone = document.getElementById('f-prospect-phone').value.trim();
+  if (!phone) return;
+  const body = buildProspectSmsBody();
+  const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+  const separator = isIOS ? '&' : '?';
+  window.location.href = 'sms:' + phone + separator + 'body=' + encodeURIComponent(body);
 }
 
 // ── THANKS-SCREEN FRAME ENTRY ──
