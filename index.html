@@ -2225,7 +2225,7 @@ function renderAdminTable() {
 
 function renderFrameCell(r) {
   if (r.customerType === 'Prospect') {
-    const combined = [r.considerFrame, r.considerColor].filter(Boolean).join(' / ');
+    const combined = r.considerFrameColor || '';
     return combined ? `<span style="font-style:italic;">${escapeHtml('Considering: ' + combined)}</span>` : '';
   }
   return escapeHtml(r.frameNames || '');
@@ -2307,7 +2307,7 @@ function downloadCSV() {
     r.optin,
     String(r.lang).toUpperCase(),
     r.customerType || 'Purchaser',
-    `"${String(r.customerType === 'Prospect' ? [r.considerFrame, r.considerColor].filter(Boolean).join(' / ') : (r.frameNames || '')).replace(/"/g, '""')}"`,
+    `"${String(r.customerType === 'Prospect' ? (r.considerFrameColor || '') : (r.frameNames || '')).replace(/"/g, '""')}"`,
     `"${String(r.staffNotes || '').replace(/"/g, '""')}"`
   ]);
 

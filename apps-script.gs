@@ -3,18 +3,22 @@
  * Deploy as Web App (Execute as: Me / Access: Anyone) and paste the
  * resulting /exec URL into SHEET_WEBHOOK_URL in index.html.
  *
- * Spreadsheet column order (A→Q):
+ * Spreadsheet column order (A→R):
  * Timestamp | 会員番号 | Name | Email | Opt-in | Country | Language | Follow-up Sent | Purchased |
- * Staff Notes | Lens Order | Phone | Postcode | Address | Customer Type | Considering Frame | Considering Color
- * (会員番号 and Staff Notes are filled in manually in the sheet.)
+ * Staff Notes | Lens Order | Phone | Postcode | Address | Customer Type | (P, Q reserved —
+ * lens purchaser address details, filled manually) | Considering Frame/Color
+ * (会員番号 and Staff Notes are filled in manually in the sheet; P and Q are also
+ * filled in manually and are not written by this script.)
  * Rows submitted by a prospective customer (Customer Type = "Prospect") are
  * highlighted with a light blue background for quick visual identification.
+ * The considering frame model and color number are combined into a single
+ * cell (column R) formatted as "Frame Name/C###", e.g. "Kelly Sun/C301".
  */
 function doPost(e) {
   var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
   var data = JSON.parse(e.postData.contents);
 
-  var headers = ['Timestamp', '会員番号', 'Name', 'Email', 'Opt-in', 'Country', 'Language', 'Follow-up Sent', 'Purchased', 'Staff Notes', 'Lens Order', 'Phone', 'Postcode', 'Address', 'Customer Type', 'Considering Frame', 'Considering Color'];
+  var headers = ['Timestamp', '会員番号', 'Name', 'Email', 'Opt-in', 'Country', 'Language', 'Follow-up Sent', 'Purchased', 'Staff Notes', 'Lens Order', 'Phone', 'Postcode', 'Address', 'Customer Type', '', '', 'Considering Frame/Color'];
   if (sheet.getLastRow() === 0) {
     sheet.appendRow(headers);
   }
@@ -25,6 +29,17 @@ function doPost(e) {
   }
 
   var isProspect = data.customerType === 'prospect';
+
+  var considerFrameColor = '';
+  var considerModel = data.prospectFrameModel || '';
+  var considerColor = data.prospectFrameColor || '';
+  if (considerModel && considerColor) {
+    considerFrameColor = considerModel + '/C' + considerColor;
+  } else if (considerModel) {
+    considerFrameColor = considerModel;
+  } else if (considerColor) {
+    considerFrameColor = 'C' + considerColor;
+  }
 
   sheet.appendRow([
     data.timestamp || '',   // A: Timestamp
@@ -42,8 +57,9 @@ function doPost(e) {
     data.postcode || '',                   // M: Postcode
     data.address || '',                    // N: Address
     isProspect ? 'Prospect' : 'Purchaser', // O: Customer Type
-    data.prospectFrameModel || '',         // P: Considering Frame
-    data.prospectFrameColor || ''          // Q: Considering Color
+    '',                                    // P: reserved (filled manually)
+    '',                                    // Q: reserved (filled manually)
+    considerFrameColor                     // R: Considering Frame/Color
   ]);
 
   if (isProspect) {
@@ -176,7 +192,7 @@ function readRecords(sheet) {
   var lastRow = sheet.getLastRow();
   if (lastRow < 2) { return []; }
 
-  var values = sheet.getRange(2, 1, lastRow - 1, 17).getValues();
+  var values = sheet.getRange(2, 1, lastRow - 1, 18).getValues();
   var records = [];
   for (var i = 0; i < values.length; i++) {
     var row = values[i];
@@ -196,9 +212,8 @@ function readRecords(sheet) {
       phone:       row[11] || '', // L
       postcode:    row[12] || '', // M
       address:     row[13] || '', // N
-      customerType:   row[14] || 'Purchaser', // O
-      considerFrame:  row[15] || '', // P
-      considerColor:  row[16] || ''  // Q
+      customerType:      row[14] || 'Purchaser', // O
+      considerFrameColor: row[17] || ''           // R
     });
   }
   return records;
