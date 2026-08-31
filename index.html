@@ -384,6 +384,8 @@ body {
   transition: color 0.15s, border-color 0.15s;
 }
 .frame-remove-btn:hover { color: var(--red); border-color: var(--red); }
+.prospect-frame-row { display: flex; gap: 8px; margin-bottom: 16px; }
+.prospect-frame-row .ac-wrap { flex: 1; }
 
 /* ── ADMIN PANEL ── */
 #admin-panel { display: none; }
@@ -748,15 +750,14 @@ tr:hover td { background: #f9f9f9; }
         <div class="err-msg" id="e-email">Please enter a valid email address.</div>
       </div>
 
-      <!-- Frame of interest (prospect only) -->
+      <!-- Frame(s) of interest (prospect only, up to 3) -->
       <div class="field" id="prospect-frame-block" style="display:none;">
-        <label id="lbl-prospect-frame-model">Frame Model of Interest <span style="font-size:10px; text-transform:none; letter-spacing:0;">(optional)</span></label>
-        <div class="ac-wrap" id="prospect-frame-ac-wrap">
-          <input type="text" class="ac-input" id="f-prospect-frame-model" autocomplete="off">
-          <div class="ac-dropdown" id="prospect-frame-dropdown"></div>
+        <div style="display:flex; gap:8px; margin-bottom:10px;">
+          <label id="lbl-prospect-frame-model" style="flex:1; margin:0;">Frame Model of Interest <span style="font-size:10px; text-transform:none; letter-spacing:0;">(optional)</span></label>
+          <label id="lbl-prospect-frame-color" style="width:90px; flex-shrink:0; margin:0;">Color</label>
         </div>
-        <label id="lbl-prospect-frame-color" style="margin-top:12px;">Color Number <span style="font-size:10px; text-transform:none; letter-spacing:0;">(optional)</span></label>
-        <input type="text" id="f-prospect-frame-color" inputmode="numeric" pattern="[0-9]*" oninput="this.value = this.value.replace(/\D/g, '')">
+        <div id="prospect-frame-row-list"></div>
+        <button class="refresh-btn" type="button" onclick="addProspectFrameRow()" id="lbl-prospect-frame-add" style="margin-bottom:1rem;">+ Add Frame</button>
       </div>
 
       <div id="lens-fields">
@@ -1027,7 +1028,7 @@ const i18n = {
     customerTypeDesc: 'No frame name was entered. Please select the registration type for this customer.',
     customerTypePurchaser: 'Purchaser', customerTypeProspect: 'Considering',
     customerTypeBack: 'Back', customerTypeContinue: 'Continue',
-    prospectFrameModel: 'Frame Model of Interest', prospectFrameColor: 'Color Number',
+    prospectFrameModel: 'Frame Model of Interest', prospectFrameColor: 'Color', prospectFrameAdd: '+ Add Frame',
   },
   ja: {
     subtitle: 'フレーム保証登録',
@@ -1071,7 +1072,7 @@ const i18n = {
     customerTypeDesc: 'フレーム名が入力されていません。このお客様の登録タイプを選択してください。',
     customerTypePurchaser: '購入者', customerTypeProspect: '検討中（見込み客）',
     customerTypeBack: '戻る', customerTypeContinue: '次へ',
-    prospectFrameModel: '検討中のフレームモデル名', prospectFrameColor: 'カラー番号',
+    prospectFrameModel: '検討中のフレームモデル名', prospectFrameColor: 'カラー番号', prospectFrameAdd: '+ フレームを追加',
   },
   zh: {
     subtitle: '镜架保修登记',
@@ -1115,7 +1116,7 @@ const i18n = {
     customerTypeDesc: '未输入镜架名称。请为该顾客选择登记类型。',
     customerTypePurchaser: '购买者', customerTypeProspect: '意向顾客（考虑中）',
     customerTypeBack: '返回', customerTypeContinue: '继续',
-    prospectFrameModel: '意向镜架型号', prospectFrameColor: '颜色编号',
+    prospectFrameModel: '意向镜架型号', prospectFrameColor: '颜色编号', prospectFrameAdd: '+ 添加镜架',
   },
   ko: {
     subtitle: '프레임 보증 등록',
@@ -1159,7 +1160,7 @@ const i18n = {
     customerTypeDesc: '프레임 이름이 입력되지 않았습니다. 이 고객의 등록 유형을 선택해 주세요.',
     customerTypePurchaser: '구매자', customerTypeProspect: '검토 중（잠재 고객）',
     customerTypeBack: '뒤로', customerTypeContinue: '다음',
-    prospectFrameModel: '검토 중인 프레임 모델명', prospectFrameColor: '컬러 번호',
+    prospectFrameModel: '검토 중인 프레임 모델명', prospectFrameColor: '컬러 번호', prospectFrameAdd: '+ 프레임 추가',
   }
 };
 
@@ -1224,7 +1225,8 @@ function setLang(lang) {
   document.getElementById('lbl-customer-type-back').textContent = t.customerTypeBack;
   document.getElementById('customer-type-continue-btn').textContent = t.customerTypeContinue;
   document.getElementById('lbl-prospect-frame-model').childNodes[0].textContent = t.prospectFrameModel + ' ';
-  document.getElementById('lbl-prospect-frame-color').childNodes[0].textContent = t.prospectFrameColor + ' ';
+  document.getElementById('lbl-prospect-frame-color').textContent = t.prospectFrameColor;
+  document.getElementById('lbl-prospect-frame-add').textContent = t.prospectFrameAdd;
   // Toggle phone/postcode layout based on language
   updateLensFieldsForLang(lang);
   applyCustomerTypeToForm();
@@ -1334,6 +1336,8 @@ const FRAME_NAMES = [
 
 let frameRows = [{ id: 0 }];
 let frameRowSeq = 1;
+let prospectFrameRows = [{ id: 0 }];
+let prospectFrameRowSeq = 1;
 
 function renderFrameRowList() {
   const list = document.getElementById('frame-row-list');
@@ -1397,8 +1401,7 @@ function resetFrameEntry() {
   document.getElementById('f-customer-type-purchaser').checked = false;
   document.getElementById('f-customer-type-prospect').checked = false;
   document.getElementById('customer-type-continue-btn').disabled = true;
-  document.getElementById('f-prospect-frame-model').value = '';
-  document.getElementById('f-prospect-frame-color').value = '';
+  resetProspectFrameEntry();
   customerType = 'purchaser';
   applyCustomerTypeToForm();
   toggleLensFields();
@@ -1428,10 +1431,76 @@ function initFrameAutocomplete(id) {
   document.addEventListener('click', e => { if (!wrap.contains(e.target)) closeDropdown(); });
 }
 
-function initProspectFrameAutocomplete() {
-  const wrap = document.getElementById('prospect-frame-ac-wrap');
-  const input = document.getElementById('f-prospect-frame-model');
-  const dropdown = document.getElementById('prospect-frame-dropdown');
+function renderProspectFrameRowList() {
+  const list = document.getElementById('prospect-frame-row-list');
+  if (!list) return;
+  list.innerHTML = prospectFrameRows.map(row => `
+    <div class="prospect-frame-row" data-id="${row.id}">
+      <div class="ac-wrap" id="prospect-frame-ac-wrap-${row.id}">
+        <input type="text" class="ac-input" id="prospect-frame-model-${row.id}" autocomplete="off">
+        <div class="ac-dropdown" id="prospect-frame-dropdown-${row.id}"></div>
+      </div>
+      <input type="text" class="ac-input" id="prospect-frame-color-${row.id}" inputmode="numeric" pattern="[0-9]*" style="width:90px; flex-shrink:0;" oninput="this.value = this.value.replace(/\\D/g, '')">
+      ${prospectFrameRows.length > 1 ? `<button type="button" class="frame-remove-btn" onclick="removeProspectFrameRow(${row.id})" aria-label="Remove">&times;</button>` : ''}
+    </div>
+  `).join('');
+  prospectFrameRows.forEach(row => initProspectFrameAutocomplete(row.id));
+}
+
+function addProspectFrameRow() {
+  if (prospectFrameRows.length >= 3) return;
+  const saved = prospectFrameRows.map(r => ({
+    id: r.id,
+    model: (document.getElementById('prospect-frame-model-' + r.id) || {}).value || '',
+    color: (document.getElementById('prospect-frame-color-' + r.id) || {}).value || ''
+  }));
+  prospectFrameRows.push({ id: prospectFrameRowSeq++ });
+  renderProspectFrameRowList();
+  saved.forEach(({ id, model, color }) => {
+    const modelEl = document.getElementById('prospect-frame-model-' + id);
+    const colorEl = document.getElementById('prospect-frame-color-' + id);
+    if (modelEl) modelEl.value = model;
+    if (colorEl) colorEl.value = color;
+  });
+}
+
+function removeProspectFrameRow(id) {
+  if (prospectFrameRows.length <= 1) return;
+  const saved = prospectFrameRows.map(r => ({
+    id: r.id,
+    model: (document.getElementById('prospect-frame-model-' + r.id) || {}).value || '',
+    color: (document.getElementById('prospect-frame-color-' + r.id) || {}).value || ''
+  }));
+  prospectFrameRows = prospectFrameRows.filter(r => r.id !== id);
+  renderProspectFrameRowList();
+  saved.filter(s => s.id !== id).forEach(({ id, model, color }) => {
+    const modelEl = document.getElementById('prospect-frame-model-' + id);
+    const colorEl = document.getElementById('prospect-frame-color-' + id);
+    if (modelEl) modelEl.value = model;
+    if (colorEl) colorEl.value = color;
+  });
+}
+
+function collectProspectFrames() {
+  return prospectFrameRows
+    .map(row => ({
+      model: (document.getElementById('prospect-frame-model-' + row.id) || {}).value || '',
+      color: (document.getElementById('prospect-frame-color-' + row.id) || {}).value || ''
+    }))
+    .map(f => ({ model: f.model.trim(), color: f.color.trim() }))
+    .filter(f => f.model || f.color);
+}
+
+function resetProspectFrameEntry() {
+  prospectFrameRows = [{ id: 0 }];
+  prospectFrameRowSeq = 1;
+  renderProspectFrameRowList();
+}
+
+function initProspectFrameAutocomplete(id) {
+  const wrap = document.getElementById('prospect-frame-ac-wrap-' + id);
+  const input = document.getElementById('prospect-frame-model-' + id);
+  const dropdown = document.getElementById('prospect-frame-dropdown-' + id);
   if (!wrap || !input || !dropdown) return;
 
   function renderList(query) {
@@ -1856,8 +1925,7 @@ async function handleSubmit() {
     postcode: postcode,
     address: address,
     customerType: customerType,
-    prospectFrameModel: isProspect ? document.getElementById('f-prospect-frame-model').value.trim() : '',
-    prospectFrameColor: isProspect ? document.getElementById('f-prospect-frame-color').value.trim() : ''
+    prospectFrames: isProspect ? collectProspectFrames() : []
   };
 
   try {
@@ -2490,7 +2558,7 @@ renderFrameRowList();
 initAutocomplete();
 initAddressPrefAutocomplete();
 initEmailAutocomplete();
-initProspectFrameAutocomplete();
+renderProspectFrameRowList();
 initPhoneCodeSelect();
 checkAdminMode();
 updateSubmitState();
