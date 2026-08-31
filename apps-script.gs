@@ -3,15 +3,18 @@
  * Deploy as Web App (Execute as: Me / Access: Anyone) and paste the
  * resulting /exec URL into SHEET_WEBHOOK_URL in index.html.
  *
- * Spreadsheet column order (A→J):
- * Timestamp | 会員番号 | Name | Email | Opt-in | Country | Language | Follow-up Sent | Purchased | Staff Notes
+ * Spreadsheet column order (A→Q):
+ * Timestamp | 会員番号 | Name | Email | Opt-in | Country | Language | Follow-up Sent | Purchased |
+ * Staff Notes | Lens Order | Phone | Postcode | Address | Customer Type | Considering Frame | Considering Color
  * (会員番号 and Staff Notes are filled in manually in the sheet.)
+ * Rows submitted by a prospective customer (Customer Type = "Prospect") are
+ * highlighted with a light blue background for quick visual identification.
  */
 function doPost(e) {
   var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
   var data = JSON.parse(e.postData.contents);
 
-  var headers = ['Timestamp', '会員番号', 'Name', 'Email', 'Opt-in', 'Country', 'Language', 'Follow-up Sent', 'Purchased', 'Staff Notes', 'Lens Order', 'Phone', 'Postcode', 'Address'];
+  var headers = ['Timestamp', '会員番号', 'Name', 'Email', 'Opt-in', 'Country', 'Language', 'Follow-up Sent', 'Purchased', 'Staff Notes', 'Lens Order', 'Phone', 'Postcode', 'Address', 'Customer Type', 'Considering Frame', 'Considering Color'];
   if (sheet.getLastRow() === 0) {
     sheet.appendRow(headers);
   }
@@ -21,12 +24,14 @@ function doPost(e) {
     country += ' (' + data.countryCode + ')';
   }
 
+  var isProspect = data.customerType === 'prospect';
+
   sheet.appendRow([
     data.timestamp || '',   // A: Timestamp
     data.memberNo || '',    // B: 会員番号
     data.name || '',        // C: Name
     data.email || '',       // D: Email
-    data.optin ? 'Yes' : 'No', // E: Opt-in
+    isProspect ? 'N/A' : (data.optin ? 'Yes' : 'No'), // E: Opt-in
     country,                // F: Country
     (data.lang || '').toUpperCase(), // G: Language
     '',                                    // H: Follow-up Sent (always blank)
@@ -35,8 +40,16 @@ function doPost(e) {
     data.lensOrder ? 'Yes' : 'No',        // K: Lens Order
     data.phone || '',                      // L: Phone
     data.postcode || '',                   // M: Postcode
-    data.address || ''                     // N: Address
+    data.address || '',                    // N: Address
+    isProspect ? 'Prospect' : 'Purchaser', // O: Customer Type
+    data.prospectFrameModel || '',         // P: Considering Frame
+    data.prospectFrameColor || ''          // Q: Considering Color
   ]);
+
+  if (isProspect) {
+    var newRow = sheet.getLastRow();
+    sheet.getRange(newRow, 1, 1, headers.length).setBackground('#dbe9fb');
+  }
 
   return ContentService.createTextOutput(JSON.stringify({ result: 'success' }))
     .setMimeType(ContentService.MimeType.JSON);
@@ -163,7 +176,7 @@ function readRecords(sheet) {
   var lastRow = sheet.getLastRow();
   if (lastRow < 2) { return []; }
 
-  var values = sheet.getRange(2, 1, lastRow - 1, 14).getValues();
+  var values = sheet.getRange(2, 1, lastRow - 1, 17).getValues();
   var records = [];
   for (var i = 0; i < values.length; i++) {
     var row = values[i];
@@ -182,7 +195,10 @@ function readRecords(sheet) {
       lensOrder:   row[10] || '', // K
       phone:       row[11] || '', // L
       postcode:    row[12] || '', // M
-      address:     row[13] || ''  // N
+      address:     row[13] || '', // N
+      customerType:   row[14] || 'Purchaser', // O
+      considerFrame:  row[15] || '', // P
+      considerColor:  row[16] || ''  // Q
     });
   }
   return records;

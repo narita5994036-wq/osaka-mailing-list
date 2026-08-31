@@ -456,6 +456,9 @@ td {
 tr:hover td { background: #f9f9f9; }
 .badge-yes { background: #e8f5e9; color: #1e7e44; font-size: 11px; padding: 2px 8px; letter-spacing: 0.06em; }
 .badge-no  { background: #fdecea; color: #666; font-size: 11px; padding: 2px 8px; letter-spacing: 0.06em; }
+.badge-prospect { background: #dbe9fb; color: #1a5fa8; font-size: 11px; padding: 2px 8px; letter-spacing: 0.06em; }
+.row-prospect td { background: #eef5fd; }
+.row-prospect:hover td { background: #e0edfa; }
 .lens-blind-dots { color: var(--mid); font-size: 11px; letter-spacing: 0.15em; user-select: none; }
 #lens-blind-toggle.active { border-color: #1a1a1a; color: #1a1a1a; background: #f0f0f0; }
 .admin-settings-row { margin-bottom: 16px; }
@@ -685,15 +688,37 @@ tr:hover td { background: #f9f9f9; }
       </div>
     </div>
 
+    <!-- CUSTOMER TYPE SELECTION (shown when Continue is pressed with no frame name entered) -->
+    <div id="customer-type-area" style="display:none;">
+      <p class="section-label" id="lbl-customer-type-title">Registration Type</p>
+      <p class="optin-desc" id="lbl-customer-type-desc" style="margin-bottom:1.5rem;">No frame name was entered. Please select the registration type for this customer.</p>
+      <div class="radio-group">
+        <label class="radio-btn">
+          <input type="radio" name="customer-type" id="f-customer-type-purchaser" value="purchaser" onchange="updateCustomerTypeContinueState()">
+          <span id="lbl-customer-type-purchaser">Purchaser</span>
+        </label>
+        <label class="radio-btn">
+          <input type="radio" name="customer-type" id="f-customer-type-prospect" value="prospect" onchange="updateCustomerTypeContinueState()">
+          <span id="lbl-customer-type-prospect">Considering</span>
+        </label>
+      </div>
+      <div style="display:flex; gap:10px;">
+        <button class="refresh-btn" style="flex:1; height:48px;" onclick="goToTopScreen()" id="lbl-customer-type-back">Back</button>
+        <button class="submit-btn" style="flex:1; margin-top:0;" onclick="continueCustomerType()" id="customer-type-continue-btn" disabled>Continue</button>
+      </div>
+    </div>
+
     <!-- FORM AREA -->
     <div id="form-area">
 
       <!-- Warranty info -->
-      <div class="warranty-info">
-        <strong id="lbl-warranty-title">Warranty Information</strong>
-        <div id="lbl-warranty-body"></div>
+      <div id="warranty-block">
+        <div class="warranty-info">
+          <strong id="lbl-warranty-title">Warranty Information</strong>
+          <div id="lbl-warranty-body"></div>
+        </div>
+        <p class="optin-desc" id="lbl-warranty-footer"></p>
       </div>
-      <p class="optin-desc" id="lbl-warranty-footer"></p>
 
       <p class="section-label" id="lbl-personal">Personal Information</p>
 
@@ -723,6 +748,14 @@ tr:hover td { background: #f9f9f9; }
           <div class="ac-dropdown" id="email-dropdown"></div>
         </div>
         <div class="err-msg" id="e-email">Please enter a valid email address.</div>
+      </div>
+
+      <!-- Frame of interest (prospect only) -->
+      <div class="field" id="prospect-frame-block" style="display:none;">
+        <label id="lbl-prospect-frame-model">Frame Model of Interest <span style="font-size:10px; text-transform:none; letter-spacing:0;">(optional)</span></label>
+        <input type="text" id="f-prospect-frame-model" placeholder="e.g. Kelly Sun">
+        <label id="lbl-prospect-frame-color" style="margin-top:12px;">Color Number <span style="font-size:10px; text-transform:none; letter-spacing:0;">(optional)</span></label>
+        <input type="text" id="f-prospect-frame-color" placeholder="e.g. 301">
       </div>
 
       <div id="lens-fields">
@@ -769,19 +802,21 @@ tr:hover td { background: #f9f9f9; }
       </div>
 
       <!-- Opt-in -->
-      <p class="section-label required" id="lbl-optin-section" style="margin-top:8px;">Email Opt-in</p>
-      <p class="optin-desc" id="lbl-optin-desc">Would you like to receive exclusive offers, news, and updates from MYKITA JAPAN?</p>
-      <div class="radio-group">
-        <label class="radio-btn">
-          <input type="radio" name="optin" id="f-optin-yes" value="yes" onchange="updateSubmitState()">
-          <span id="lbl-yes">Yes</span>
-        </label>
-        <label class="radio-btn">
-          <input type="radio" name="optin" id="f-optin-no" value="no" onchange="updateSubmitState()">
-          <span id="lbl-no">No</span>
-        </label>
+      <div id="optin-block">
+        <p class="section-label required" id="lbl-optin-section" style="margin-top:8px;">Email Opt-in</p>
+        <p class="optin-desc" id="lbl-optin-desc">Would you like to receive exclusive offers, news, and updates from MYKITA JAPAN?</p>
+        <div class="radio-group">
+          <label class="radio-btn">
+            <input type="radio" name="optin" id="f-optin-yes" value="yes" onchange="updateSubmitState()">
+            <span id="lbl-yes">Yes</span>
+          </label>
+          <label class="radio-btn">
+            <input type="radio" name="optin" id="f-optin-no" value="no" onchange="updateSubmitState()">
+            <span id="lbl-no">No</span>
+          </label>
+        </div>
+        <p class="optin-desc" id="lbl-optin-note" style="margin-top:-8px; font-size:11px;"></p>
       </div>
-      <p class="optin-desc" id="lbl-optin-note" style="margin-top:-8px; font-size:11px;"></p>
 
       <!-- Privacy note -->
       <div class="privacy-note" id="lbl-privacy">
@@ -873,7 +908,7 @@ tr:hover td { background: #f9f9f9; }
       <table>
         <thead><tr>
           <th>#</th><th>Timestamp</th><th>会員番号</th><th>Name</th><th>Country</th>
-          <th>Email</th><th>Opt-in</th><th>Follow-up</th><th>Purchased</th><th>Lens</th><th>Lang</th><th>Staff Notes</th><th></th>
+          <th>Email</th><th>Opt-in</th><th>Follow-up</th><th>Type</th><th>Purchased</th><th>Lens</th><th>Lang</th><th>Staff Notes</th><th></th>
         </tr></thead>
         <tbody id="admin-tbody"></tbody>
       </table>
@@ -942,6 +977,7 @@ let sortNewest = true;
 let activeEmailRow = null;
 let activeEmailEl = null;
 let purchasedFrames = [];
+let customerType = 'purchaser';
 
 // ── FOLLOW-UP TIMING ──
 const FOLLOWUP_WINDOW_MS = 7 * 24 * 60 * 60 * 1000;
@@ -984,6 +1020,11 @@ const i18n = {
     phone: 'Phone Number', postcode: 'Postcode', postcodeLookup: 'Search',
     addressPref: 'Prefecture', addressCity: 'City / Town', addressLine: 'Street / Building', address: 'Address',
     addressLine1: 'Address Line 1', addressLine2: 'Address Line 2', addressCityIntl: 'City / Town', addressState: 'State / Province',
+    customerTypeTitle: 'Registration Type',
+    customerTypeDesc: 'No frame name was entered. Please select the registration type for this customer.',
+    customerTypePurchaser: 'Purchaser', customerTypeProspect: 'Considering',
+    customerTypeBack: 'Back', customerTypeContinue: 'Continue',
+    prospectFrameModel: 'Frame Model of Interest', prospectFrameColor: 'Color Number',
   },
   ja: {
     subtitle: 'フレーム保証登録',
@@ -1020,6 +1061,11 @@ const i18n = {
     phone: '電話番号', postcode: '郵便番号', postcodeLookup: '住所検索',
     addressPref: '都道府県', addressCity: '市区町村', addressLine: '番地・建物名', address: '住所',
     addressLine1: '住所①', addressLine2: '住所②', addressCityIntl: '市区郡', addressState: '州・省',
+    customerTypeTitle: '登録タイプ',
+    customerTypeDesc: 'フレーム名が入力されていません。このお客様の登録タイプを選択してください。',
+    customerTypePurchaser: '購入者', customerTypeProspect: '検討中（見込み客）',
+    customerTypeBack: '戻る', customerTypeContinue: '次へ',
+    prospectFrameModel: '検討中のフレームモデル名', prospectFrameColor: 'カラー番号',
   },
   zh: {
     subtitle: '镜架保修登记',
@@ -1056,6 +1102,11 @@ const i18n = {
     phone: '电话号码', postcode: '邮政编码', postcodeLookup: '查询',
     addressPref: '都道府县', addressCity: '市区町村', addressLine: '街道・楼号', address: '地址',
     addressLine1: '地址①', addressLine2: '地址②', addressCityIntl: '城市/乡镇', addressState: '州/省',
+    customerTypeTitle: '登记类型',
+    customerTypeDesc: '未输入镜架名称。请为该顾客选择登记类型。',
+    customerTypePurchaser: '购买者', customerTypeProspect: '意向顾客（考虑中）',
+    customerTypeBack: '返回', customerTypeContinue: '继续',
+    prospectFrameModel: '意向镜架型号', prospectFrameColor: '颜色编号',
   },
   ko: {
     subtitle: '프레임 보증 등록',
@@ -1092,6 +1143,11 @@ const i18n = {
     phone: '전화번호', postcode: '우편번호', postcodeLookup: '검색',
     addressPref: '도도부현', addressCity: '시구정촌', addressLine: '번지・건물명', address: '주소',
     addressLine1: '주소①', addressLine2: '주소②', addressCityIntl: '시/읍/면', addressState: '주/성',
+    customerTypeTitle: '등록 유형',
+    customerTypeDesc: '프레임 이름이 입력되지 않았습니다. 이 고객의 등록 유형을 선택해 주세요.',
+    customerTypePurchaser: '구매자', customerTypeProspect: '검토 중（잠재 고객）',
+    customerTypeBack: '뒤로', customerTypeContinue: '다음',
+    prospectFrameModel: '검토 중인 프레임 모델명', prospectFrameColor: '컬러 번호',
   }
 };
 
@@ -1150,10 +1206,18 @@ function setLang(lang) {
   document.getElementById('lbl-address-line2').childNodes[0].textContent = t.addressLine2 + ' ';
   document.getElementById('lbl-address-city-intl').textContent = t.addressCityIntl;
   document.getElementById('lbl-address-state').childNodes[0].textContent = t.addressState + ' ';
+  // Customer type selection labels
+  document.getElementById('lbl-customer-type-title').textContent = t.customerTypeTitle;
+  document.getElementById('lbl-customer-type-desc').textContent = t.customerTypeDesc;
+  document.getElementById('lbl-customer-type-purchaser').textContent = t.customerTypePurchaser;
+  document.getElementById('lbl-customer-type-prospect').textContent = t.customerTypeProspect;
+  document.getElementById('lbl-customer-type-back').textContent = t.customerTypeBack;
+  document.getElementById('customer-type-continue-btn').textContent = t.customerTypeContinue;
+  document.getElementById('lbl-prospect-frame-model').childNodes[0].textContent = t.prospectFrameModel + ' ';
+  document.getElementById('lbl-prospect-frame-color').childNodes[0].textContent = t.prospectFrameColor + ' ';
   // Toggle phone/postcode layout based on language
   updateLensFieldsForLang(lang);
-  updateCountryFieldVisibility();
-  updateSubmitState();
+  applyCustomerTypeToForm();
 }
 
 // ── LENS FIELDS ──
@@ -1320,6 +1384,13 @@ function resetFrameEntry() {
   document.getElementById('f-address-line2').value = '';
   document.getElementById('f-address-city-intl').value = '';
   document.getElementById('f-address-state').value = '';
+  document.getElementById('f-customer-type-purchaser').checked = false;
+  document.getElementById('f-customer-type-prospect').checked = false;
+  document.getElementById('customer-type-continue-btn').disabled = true;
+  document.getElementById('f-prospect-frame-model').value = '';
+  document.getElementById('f-prospect-frame-color').value = '';
+  customerType = 'purchaser';
+  applyCustomerTypeToForm();
   toggleLensFields();
 }
 
@@ -1354,6 +1425,7 @@ function collectFrameNames() {
 
 function showFormArea() {
   document.getElementById('frame-entry-area').style.display = 'none';
+  document.getElementById('customer-type-area').style.display = 'none';
   document.getElementById('form-area').style.display = 'block';
   document.getElementById('back-to-top-btn').style.display = '';
   window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -1362,16 +1434,72 @@ function showFormArea() {
 function goToTopScreen() {
   document.querySelectorAll('.ac-wrap').forEach(w => w.classList.remove('open'));
   document.getElementById('form-area').style.display = 'none';
+  document.getElementById('customer-type-area').style.display = 'none';
   document.getElementById('frame-entry-area').style.display = 'block';
   document.getElementById('back-to-top-btn').style.display = 'none';
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
-function skipFrameEntry() { purchasedFrames = []; showFormArea(); }
+function skipFrameEntry() {
+  purchasedFrames = [];
+  customerType = 'purchaser';
+  applyCustomerTypeToForm();
+  showFormArea();
+}
+
 function continueFrameEntry() {
   document.querySelectorAll('.ac-wrap').forEach(w => w.classList.remove('open'));
   purchasedFrames = collectFrameNames();
+  if (purchasedFrames.length === 0) {
+    showCustomerTypeArea();
+  } else {
+    customerType = 'purchaser';
+    applyCustomerTypeToForm();
+    showFormArea();
+  }
+}
+
+// ── CUSTOMER TYPE (purchaser vs. prospective customer) ──
+function showCustomerTypeArea() {
+  document.getElementById('f-customer-type-purchaser').checked = false;
+  document.getElementById('f-customer-type-prospect').checked = false;
+  document.getElementById('customer-type-continue-btn').disabled = true;
+  document.getElementById('frame-entry-area').style.display = 'none';
+  document.getElementById('customer-type-area').style.display = 'block';
+  document.getElementById('back-to-top-btn').style.display = '';
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function updateCustomerTypeContinueState() {
+  const purchaser = document.getElementById('f-customer-type-purchaser');
+  const prospect = document.getElementById('f-customer-type-prospect');
+  document.getElementById('customer-type-continue-btn').disabled = !(purchaser.checked || prospect.checked);
+}
+
+function continueCustomerType() {
+  const prospect = document.getElementById('f-customer-type-prospect');
+  customerType = prospect.checked ? 'prospect' : 'purchaser';
+  applyCustomerTypeToForm();
   showFormArea();
+}
+
+function applyCustomerTypeToForm() {
+  const isProspect = customerType === 'prospect';
+
+  document.getElementById('warranty-block').style.display = isProspect ? 'none' : '';
+  document.getElementById('lens-purchase-block').style.display = isProspect ? 'none' : '';
+  document.getElementById('optin-block').style.display = isProspect ? 'none' : '';
+  document.getElementById('prospect-frame-block').style.display = isProspect ? 'block' : 'none';
+
+  if (isProspect) {
+    document.getElementById('country-field').style.display = 'none';
+    const lensCheckbox = document.getElementById('f-lens');
+    if (lensCheckbox.checked) { lensCheckbox.checked = false; }
+    document.getElementById('lens-fields').classList.remove('open');
+  } else {
+    updateCountryFieldVisibility();
+  }
+  updateSubmitState();
 }
 
 // ── PREFECTURE AUTOCOMPLETE (JA) ──
@@ -1591,9 +1719,10 @@ function updateSubmitState() {
   const agree = document.getElementById('f-agree');
   const btn = document.getElementById('submit-btn');
   if (!btn) return;
+  const isProspect = customerType === 'prospect';
   const valid = name && name.value.trim() &&
     email && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value.trim()) &&
-    (optinYes && optinYes.checked || optinNo && optinNo.checked) &&
+    (isProspect || (optinYes && optinYes.checked || optinNo && optinNo.checked)) &&
     agree && agree.checked &&
     lensFieldsValid();
   btn.disabled = !valid;
@@ -1667,6 +1796,7 @@ async function handleSubmit() {
     }
   }
 
+  const isProspect = customerType === 'prospect';
   const record = {
     timestamp: ts,
     name: name.value.trim(),
@@ -1680,7 +1810,10 @@ async function handleSubmit() {
     lensOrder: lensChecked,
     phone: phone,
     postcode: postcode,
-    address: address
+    address: address,
+    customerType: customerType,
+    prospectFrameModel: isProspect ? document.getElementById('f-prospect-frame-model').value.trim() : '',
+    prospectFrameColor: isProspect ? document.getElementById('f-prospect-frame-color').value.trim() : ''
   };
 
   try {
@@ -2055,7 +2188,7 @@ function renderAdminTable() {
   empty.style.display = 'none';
 
   tbody.innerHTML = records.map((r, i) => `
-    <tr data-row="${r.row}">
+    <tr data-row="${r.row}" class="${r.customerType === 'Prospect' ? 'row-prospect' : ''}">
       <td style="color:var(--light); font-size:11px;">${rankMap.get(r.row)}</td>
       <td style="font-size:11px; color:var(--mid);">${escapeHtml(formatTimestamp(r.timestamp))}</td>
       <td style="font-size:11px; color:var(--mid);">${escapeHtml(r.memberNo || '')}</td>
@@ -2064,13 +2197,22 @@ function renderAdminTable() {
       <td><span class="email-link" style="color:#185FA5; cursor:pointer;" onclick="showEmailActions(event, ${r.row})">${escapeHtml(r.email)}</span></td>
       <td><span class="${r.optin === 'Yes' ? 'badge-yes' : 'badge-no'}">${escapeHtml(r.optin)}</span></td>
       <td>${renderFollowupBadge(r)}</td>
-      <td style="font-size:11px; color:var(--mid);">${escapeHtml(r.frameNames || '')}</td>
+      <td><span class="${r.customerType === 'Prospect' ? 'badge-prospect' : 'badge-yes'}">${escapeHtml(r.customerType || 'Purchaser')}</span></td>
+      <td style="font-size:11px; color:var(--mid);">${renderFrameCell(r)}</td>
       <td>${renderLensCell(r)}</td>
       <td style="text-transform:uppercase; font-size:11px; color:var(--mid);">${escapeHtml(r.lang)}</td>
       <td style="font-size:11px; color:var(--mid); max-width:140px;">${escapeHtml(r.staffNotes || '')}</td>
       <td><button class="row-delete-btn" onclick="deleteRecord(${r.row})" title="Delete this record" aria-label="Delete this record">&times;</button></td>
     </tr>
   `).join('');
+}
+
+function renderFrameCell(r) {
+  if (r.customerType === 'Prospect') {
+    const combined = [r.considerFrame, r.considerColor].filter(Boolean).join(' / ');
+    return combined ? `<span style="font-style:italic;">${escapeHtml('Considering: ' + combined)}</span>` : '';
+  }
+  return escapeHtml(r.frameNames || '');
 }
 
 function formatTimestamp(ts) {
@@ -2138,7 +2280,7 @@ function downloadCSV() {
   if (filter === 'yes') records = records.filter(r => r.optin === 'Yes');
   if (filter === 'no') records = records.filter(r => r.optin !== 'Yes');
 
-  const header = ['No.', 'Timestamp', '会員番号', 'Name', 'Country', 'Email', 'Email Opt-in', 'Language', 'Purchased', 'Staff Notes'];
+  const header = ['No.', 'Timestamp', '会員番号', 'Name', 'Country', 'Email', 'Email Opt-in', 'Language', 'Type', 'Purchased', 'Staff Notes'];
   const rows = records.map((r, i) => [
     i + 1,
     r.timestamp,
@@ -2148,7 +2290,8 @@ function downloadCSV() {
     r.email,
     r.optin,
     String(r.lang).toUpperCase(),
-    `"${String(r.frameNames || '').replace(/"/g, '""')}"`,
+    r.customerType || 'Purchaser',
+    `"${String(r.customerType === 'Prospect' ? [r.considerFrame, r.considerColor].filter(Boolean).join(' / ') : (r.frameNames || '')).replace(/"/g, '""')}"`,
     `"${String(r.staffNotes || '').replace(/"/g, '""')}"`
   ]);
 
