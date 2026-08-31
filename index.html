@@ -2055,19 +2055,19 @@ function showThanks() {
 function buildProspectSmsBody() {
   const name = document.getElementById('f-name').value.trim();
   const frameLines = collectProspectFrames().map(f => {
-    if (f.model && f.color) { return '・' + f.model + '/C' + f.color; }
+    if (f.model && f.color) { return '・' + f.model + '／C' + f.color; }
     if (f.model) { return '・' + f.model; }
     if (f.color) { return '・C' + f.color; }
     return '';
   }).filter(Boolean).join('\n');
 
   return name + ' 様\n\n'
-    + 'この度はMYKITA Osakaへご来店いただき誠にありがとうございます。\n\n'
-    + '今回ご検討いただいたフレーム名とカラー番号は以下の通りです。\n\n'
+    + 'この度はMYKITA Osakaへご来店いただき、誠にありがとうございます。\n\n'
+    + 'ご検討いただいたフレーム名とカラー番号は、以下の通りです。\n\n'
     + frameLines + '\n\n'
-    + 'ご検討いただいたフレームの在庫のお問い合わせも随時承っております。\n'
-    + 'また、お取り置きも可能となっておりますので、お気軽にお問い合わせください。\n\n'
-    + '※お取り置きは原則２週間までとさせていただいております。予めご了承ください。\n\n'
+    + 'ご検討いただいたフレームの在庫状況につきましても、随時お問い合わせを承っております。\n\n'
+    + 'また、お取り置きも可能でございますので、お気軽にお問い合わせください。\n\n'
+    + '※お取り置きは、原則2週間までとさせていただいております。あらかじめご了承ください。\n\n\n'
     + 'MYKITA Osaka';
 }
 
