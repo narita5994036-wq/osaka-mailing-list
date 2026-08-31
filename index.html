@@ -672,7 +672,7 @@ tr:hover td { background: #f9f9f9; }
       <button class="refresh-btn" type="button" onclick="addFrameRow()" id="lbl-frame-add" style="margin-bottom:2rem;">+ Add Frame</button>
 
       <!-- Lens Purchase -->
-      <div id="lens-purchase-block">
+      <div id="lens-purchase-block" style="display:none;">
         <p class="section-label" id="lbl-lens-section">Lens Purchase</p>
         <label class="lens-toggle-row" for="f-lens">
           <input type="checkbox" id="f-lens" onchange="toggleLensFields()">
@@ -964,6 +964,7 @@ const SHEET_WEBHOOK_URL = 'https://script.google.com/macros/s/AKfycbyC5BJU_SSmzf
 let adminPassword = '';
 let adminRecords = [];
 let hideLensSection = false;
+let lensSettingLoaded = false;
 let currentLang = 'en';
 let isAdmin = false;
 const LOGO_TAP_COUNT = 5;
@@ -1520,7 +1521,10 @@ function continueCustomerType() {
 
 function applyCustomerTypeToForm() {
   const isProspect = customerType === 'prospect';
-  const hideLens = isProspect || hideLensSection;
+  // Until the admin's hideLensSection setting has actually loaded, keep the
+  // section hidden rather than briefly showing it and then hiding it (or
+  // vice versa) once the fetch resolves.
+  const hideLens = isProspect || !lensSettingLoaded || hideLensSection;
 
   document.getElementById('lbl-subtitle').style.display = isProspect ? 'none' : '';
   document.getElementById('warranty-block').style.display = isProspect ? 'none' : '';
@@ -2141,11 +2145,15 @@ async function loadLensSectionSetting() {
     const json = await res.json();
     if (json.ok) {
       hideLensSection = !!json.hideLensSection;
-      applyCustomerTypeToForm();
-      const cb = document.getElementById('setting-hide-lens');
-      if (cb) cb.checked = hideLensSection;
     }
-  } catch (err) { /* keep section visible by default on failure */ }
+  } catch (err) {
+    hideLensSection = false; // can't confirm the setting — fail open (visible)
+  } finally {
+    lensSettingLoaded = true;
+    applyCustomerTypeToForm();
+    const cb = document.getElementById('setting-hide-lens');
+    if (cb) cb.checked = hideLensSection;
+  }
 }
 
 async function updateHideLensSetting() {
