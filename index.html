@@ -200,6 +200,7 @@ body {
   cursor: pointer;
 }
 .lens-toggle-row input[type="checkbox"] { accent-color: var(--light); flex-shrink: 0; width: 16px; height: 16px; }
+.lens-toggle-row:has(input:disabled) { cursor: not-allowed; opacity: 0.5; }
 .lens-toggle-label { font-size: 13px; color: var(--light); }
 #lens-fields { display: none; margin-bottom: 12px; }
 #lens-fields.open { display: block; }
@@ -765,7 +766,7 @@ tr:hover td { background: #f9f9f9; }
         <p class="optin-desc" id="lbl-email-or-phone-note" style="margin-top:-8px;">Please provide either your email address above or a phone number below.</p>
         <div class="field">
           <label id="lbl-prospect-phone">Phone Number</label>
-          <input type="tel" id="f-prospect-phone" oninput="updateSubmitState()">
+          <input type="tel" id="f-prospect-phone" oninput="updateProspectSmsAvailability(); updateSubmitState();">
         </div>
         <label class="lens-toggle-row" for="f-prospect-sms">
           <input type="checkbox" id="f-prospect-sms">
@@ -1445,6 +1446,7 @@ function resetFrameEntry() {
   resetProspectFrameEntry();
   document.getElementById('f-prospect-phone').value = '';
   document.getElementById('f-prospect-sms').checked = false;
+  updateProspectSmsAvailability();
   customerType = 'purchaser';
   applyCustomerTypeToForm();
   toggleLensFields();
@@ -1644,6 +1646,7 @@ function applyCustomerTypeToForm() {
   document.getElementById('optin-block').style.display = isProspect ? 'none' : '';
   document.getElementById('prospect-frame-block').style.display = isProspect ? 'block' : 'none';
   document.getElementById('prospect-contact-block').style.display = isProspect ? 'block' : 'none';
+  updateProspectSmsAvailability();
 
   const t = i18n[currentLang];
   document.getElementById('lbl-privacy').textContent = isProspect ? t.privacyProspect : t.privacy;
@@ -1874,13 +1877,25 @@ function initEmailAutocomplete() {
 }
 
 // ── FORM VALIDATION ──
+function isProspectPhoneValid() {
+  const phone = document.getElementById('f-prospect-phone').value;
+  return phone.replace(/\D/g, '').length >= 10;
+}
+
+function updateProspectSmsAvailability() {
+  const cb = document.getElementById('f-prospect-sms');
+  const valid = isProspectPhoneValid();
+  cb.disabled = !valid;
+  if (!valid) { cb.checked = false; }
+}
+
 function emailOrPhoneValid() {
   const emailVal = document.getElementById('f-email').value.trim();
   if (customerType !== 'prospect') {
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailVal);
   }
   if (emailVal) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailVal); }
-  return !!document.getElementById('f-prospect-phone').value.trim();
+  return isProspectPhoneValid();
 }
 
 function updateSubmitState() {
