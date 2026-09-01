@@ -2074,9 +2074,11 @@ function generateConfirmToken() {
   });
 }
 
+// Rendered by the Apps Script Web App itself (script.google.com), not the
+// GitHub Pages copy of confirm.html — a customer-facing link shouldn't
+// surface the personal GitHub account the Pages site is deployed under.
 function buildConfirmPageUrl(token) {
-  const base = location.href.replace(/[^/]*$/, '');
-  return base + 'confirm.html?id=' + encodeURIComponent(token);
+  return SHEET_WEBHOOK_URL + '?page=confirm&id=' + encodeURIComponent(token);
 }
 
 // The full considering-frame details live on confirm.html (linked below)
