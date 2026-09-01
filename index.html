@@ -1991,6 +1991,7 @@ async function handleSubmit() {
   }
 
   const isProspect = customerType === 'prospect';
+  const confirmToken = isProspect ? generateConfirmToken() : '';
   const record = {
     timestamp: ts,
     name: name.value.trim(),
@@ -2011,7 +2012,8 @@ async function handleSubmit() {
     customerType: customerType,
     prospectFrames: isProspect ? collectProspectFrames() : [],
     prospectPhone: isProspect ? document.getElementById('f-prospect-phone').value.trim() : '',
-    prospectSmsOptIn: isProspect ? document.getElementById('f-prospect-sms').checked : false
+    prospectSmsOptIn: isProspect ? document.getElementById('f-prospect-sms').checked : false,
+    confirmToken: confirmToken
   };
 
   try {
@@ -2023,6 +2025,7 @@ async function handleSubmit() {
     });
     lastSubmittedEmail = record.email;
     lastSubmittedTimestamp = record.timestamp;
+    lastProspectConfirmToken = confirmToken;
     showThanks();
   } catch (err) {
     btn.disabled = false;
@@ -2059,28 +2062,37 @@ function showThanks() {
 }
 
 // ── PROSPECT SMS ──
+function generateConfirmToken() {
+  if (window.crypto && typeof crypto.randomUUID === 'function') {
+    return crypto.randomUUID();
+  }
+  // Fallback for contexts without crypto.randomUUID (e.g. very old browsers).
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
+    const r = Math.random() * 16 | 0;
+    const v = c === 'x' ? r : (r & 0x3 | 0x8);
+    return v.toString(16);
+  });
+}
+
+function buildConfirmPageUrl(token) {
+  const base = location.href.replace(/[^/]*$/, '');
+  return base + 'confirm.html?id=' + encodeURIComponent(token);
+}
+
+// The full considering-frame details live on confirm.html (linked below)
+// instead of in the SMS text itself: a long, all-Japanese SMS needs many
+// concatenated segments, and carrier reassembly of those can corrupt a URL
+// enough that phones stop recognizing it as a tappable link. A short SMS
+// with just a link avoids that entirely.
 function buildProspectSmsBody() {
   const name = document.getElementById('f-name').value.trim();
-  const frameLines = collectProspectFrames().map(f => {
-    if (f.model && f.color) { return '・' + f.model + '／C' + f.color; }
-    if (f.model) { return '・' + f.model; }
-    if (f.color) { return '・C' + f.color; }
-    return '';
-  }).filter(Boolean).join('\n');
+  const link = buildConfirmPageUrl(lastProspectConfirmToken);
 
   return name + ' 様\n\n'
     + 'この度はMYKITA Osakaへご来店いただき、誠にありがとうございます。\n\n'
-    + 'ご検討いただいたフレームモデル名とカラー番号は、以下の通りです。\n\n'
-    + frameLines + '\n\n'
-    + '上記フレームモデル名の画像はMYKITAの公式ホームページよりご確認いただけます。\nhttps://mykita.com/en\n\n\n'
-    + 'ご検討いただいたフレームの在庫状況につきましても、随時お問い合わせを承っております。\n\n'
-    + 'また、お取り置きも可能でございますので、お気軽にお問い合わせください。\n\n'
-    + '※お取り置きは、原則2週間までとさせていただいております。あらかじめご了承ください。\n\n\n'
-    + 'MYKITA Osaka\n'
-    + '===============\n'
-    + '06-6563-7747\n'
-    + '[Google map]\n'
-    + 'https://share.google/mw7yBJWFXs3xLcj1Y';
+    + 'ご検討いただいた内容は、以下のページよりご確認いただけます。\n'
+    + link + '\n\n'
+    + 'MYKITA Osaka';
 }
 
 function openProspectSms() {
@@ -2097,6 +2109,7 @@ let thanksFrameRows = [{ id: 0 }];
 let thanksFrameSeq = 1;
 let lastSubmittedEmail = '';
 let lastSubmittedTimestamp = '';
+let lastProspectConfirmToken = '';
 
 function showThanksFrameEntry() {
   document.getElementById('thanks-add-frame-wrap').style.display = 'none';
@@ -2422,7 +2435,7 @@ function renderAdminTable() {
     <tr data-row="${r.row}" class="${r.customerType === 'Prospect' ? 'row-prospect' : ''}">
       <td style="color:var(--light); font-size:11px;">${rankMap.get(r.row)}</td>
       <td style="font-size:11px; color:var(--mid);">${escapeHtml(formatTimestamp(r.timestamp))}</td>
-      <td style="font-size:11px; color:var(--mid);">${escapeHtml(r.memberNo || '')}</td>
+      <td style="font-size:11px; color:var(--mid);">${escapeHtml(r.customerType === 'Prospect' ? '' : (r.memberNo || ''))}</td>
       <td>${escapeHtml(r.name)}</td>
       <td>${escapeHtml(r.country)}</td>
       <td><span class="email-link" style="color:#185FA5; cursor:pointer;" onclick="showEmailActions(event, ${r.row})">${escapeHtml(r.email)}</span></td>
@@ -2515,7 +2528,7 @@ function downloadCSV() {
   const rows = records.map((r, i) => [
     i + 1,
     r.timestamp,
-    `"${String(r.memberNo || '').replace(/"/g, '""')}"`,
+    `"${String(r.customerType === 'Prospect' ? '' : (r.memberNo || '')).replace(/"/g, '""')}"`,
     `"${String(r.name).replace(/"/g, '""')}"`,
     `"${String(r.country).replace(/"/g, '""')}"`,
     r.email,

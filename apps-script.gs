@@ -7,8 +7,10 @@
  * A Timestamp | B 会員番号 | C Name | D Email | E Opt-in | F Country | G Language |
  * H Follow-up Sent | I Purchased (Frame) | J Staff Notes | K Purchased (Lenses) |
  * L Phone Number | M Postcode | N Address(Street) | O Address(Building) |
- * P City/Town | Q State/Province | R considerFrame/Color | S SMS Opt-in | T Customer Type
- * (B and J are filled in manually in the sheet.)
+ * P City/Town | Q State/Province | R considerFrame/Color | S SMS Opt-in |
+ * T Customer Type
+ * (B and J are filled in manually in the sheet for a purchaser; B is
+ * auto-filled with the Confirm Token for a prospect — see below.)
  *
  * A prospect's optional phone number reuses column L (Phone Number) — the
  * same column a purchaser's lens-shipping phone uses — since a single
@@ -27,6 +29,18 @@
  * Timestamp (column A) is stored as a real date and displayed in Japan
  * time as yyyy/mm/dd hh:mm:ss; run fixExistingTimestamps() once to apply
  * the same formatting to rows submitted before this was added.
+ *
+ * Confirm Token: column B (会員番号) is only used for purchasers, filled
+ * in manually by staff, so a prospect's row reuses that same column to
+ * store its random confirm token (generated client-side) instead of
+ * adding a new column. It lets confirm.html look up just this one
+ * prospect's name and considered frames via action=confirm&id=...,
+ * without a password, so it can be linked from a short SMS instead of
+ * cramming the full message into the SMS itself (which risks a URL
+ * getting corrupted by carrier reassembly of long multi-segment Japanese
+ * SMS). handleGetConfirm() intentionally returns only those two fields —
+ * never email/phone/address — since this endpoint requires no
+ * authentication.
  */
 var SPREADSHEET_TIMEZONE = 'Asia/Tokyo';
 var TIMESTAMP_DISPLAY_FORMAT = 'yyyy/mm/dd hh:mm:ss';
@@ -70,7 +84,7 @@ function doPost(e) {
 
   sheet.appendRow([
     timestampValue,          // A: Timestamp
-    data.memberNo || '',    // B: 会員番号
+    isProspect ? (data.confirmToken || '') : (data.memberNo || ''), // B: 会員番号 / Confirm Token
     data.name || '',        // C: Name
     data.email || '',       // D: Email
     isProspect ? 'N/A' : (data.optin ? 'Yes' : 'No'), // E: Opt-in
@@ -88,7 +102,7 @@ function doPost(e) {
     data.addressState || '',               // Q: State/Province
     considerFrameColor,                    // R: considerFrame/Color
     isProspect ? (data.prospectSmsOptIn ? 'Yes' : 'No') : '', // S: SMS Opt-in
-    isProspect ? 'Prospect' : 'Purchaser'  // T: Customer Type
+    isProspect ? 'Prospect' : 'Purchaser' // T: Customer Type
   ]);
 
   var newRow = sheet.getLastRow();
@@ -153,6 +167,8 @@ function doGet(e) {
     out = handleAddFrames(params);
   } else if (params.action === 'settings') {
     out = handleGetSettings();
+  } else if (params.action === 'confirm') {
+    out = handleGetConfirm(params);
   } else {
     out = { ok: false, error: 'unknown action' };
   }
@@ -248,6 +264,34 @@ function handleGetSettings() {
     ok: true,
     hideLensSection: props.getProperty('HIDE_LENS_SECTION') === 'true'
   };
+}
+
+/**
+ * Public, unauthenticated lookup for confirm.html. Given the random token
+ * from the link in a prospect's SMS, returns only what that page needs to
+ * display (name, considered frames) — never email/phone/address, since
+ * there's no password gate on this endpoint.
+ */
+function handleGetConfirm(params) {
+  var token = String(params.id || '').trim();
+  if (!token) { return { ok: false, error: 'missing id' }; }
+
+  var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+  var lastRow = sheet.getLastRow();
+  if (lastRow < 2) { return { ok: false, error: 'not found' }; }
+
+  var values = sheet.getRange(2, 1, lastRow - 1, 20).getValues();
+  for (var i = 0; i < values.length; i++) {
+    var rowToken = String(values[i][1] || ''); // B
+    if (rowToken && rowToken === token) {
+      return {
+        ok: true,
+        name: values[i][2] || '',              // C
+        considerFrameColor: values[i][17] || '' // R
+      };
+    }
+  }
+  return { ok: false, error: 'not found' };
 }
 
 function readRecords(sheet) {
