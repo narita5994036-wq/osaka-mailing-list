@@ -391,7 +391,7 @@ function buildConfirmContentHtml(record) {
     + '<p class="section-label">ご検討中のフレーム</p>'
     + '<ul class="frame-list">' + buildConfirmFrameListHtml(record.considerFrameColor) + '</ul>'
     + (hasNeedsCheckFrame(record.considerFrameColor)
-        ? '<p class="stock-note">※「要確認」のフレームは、在庫がない可能性がございます。店舗へ直接のご確認ください。</p>'
+        ? '<p class="stock-note">※「要確認」のフレームは、在庫がない可能性がございます。店舗へ直接ご確認ください。</p>'
         : '')
     + '<p class="hp-note">上記フレームの画像は<a href="https://mykita.com/en" target="_blank" rel="noopener">MYKITAの公式ホームページ</a>よりご確認いただけます。</p>'
     + '<p class="section-label">ご案内</p>'
