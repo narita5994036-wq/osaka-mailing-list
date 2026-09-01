@@ -1881,7 +1881,7 @@ function initEmailAutocomplete() {
 // ── FORM VALIDATION ──
 function isProspectPhoneValid() {
   const phone = document.getElementById('f-prospect-phone').value;
-  return phone.replace(/\D/g, '').length >= 10;
+  return phone.replace(/\D/g, '').length === 11;
 }
 
 function updateProspectSmsAvailability() {
