@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MYKITA OSAKA - ご確認ページ</title>
+<style>
+:root {
+  --bg: #ffffff;
+  --surface: #f5f5f5;
+  --border: #d0d0d0;
+  --light: #1a1a1a;
+  --mid: #666666;
+  --blue: #185FA5;
+  --note-bg: #eef5fd;
+  --note-border: #cfe3f7;
+  --font: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #121212;
+    --surface: #1c1c1c;
+    --border: #333333;
+    --light: #f0f0f0;
+    --mid: #999999;
+    --blue: #6fb3ff;
+    --note-bg: #14202c;
+    --note-border: #23364a;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #121212;
+  --surface: #1c1c1c;
+  --border: #333333;
+  --light: #f0f0f0;
+  --mid: #999999;
+  --blue: #6fb3ff;
+  --note-bg: #14202c;
+  --note-border: #23364a;
+}
+
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--light);
+  font-family: var(--font);
+  -webkit-font-smoothing: antialiased;
+}
+
+.page {
+  max-width: 480px;
+  margin: 0 auto;
+  padding-bottom: 60px;
+}
+
+.header {
+  padding: 48px 20px 28px;
+  text-align: center;
+  border-bottom: 0.5px solid var(--border);
+}
+.logo {
+  font-size: 20px;
+  letter-spacing: 0.28em;
+  font-weight: 600;
+}
+.logo-sub {
+  margin-top: 8px;
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  color: var(--mid);
+}
+
+.main { padding: 32px 20px 0; }
+
+.greeting {
+  font-size: 15px;
+  margin-bottom: 24px;
+}
+
+.lead {
+  font-size: 14px;
+  line-height: 1.8;
+  color: var(--light);
+  margin-bottom: 32px;
+}
+
+.section-label {
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--mid);
+  border-bottom: 0.5px solid var(--border);
+  padding-bottom: 10px;
+  margin-bottom: 16px;
+}
+
+.frame-list {
+  list-style: none;
+  margin: 0 0 32px;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.frame-item {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  border: 0.5px solid var(--border);
+  padding: 14px 16px;
+  font-size: 14px;
+}
+.frame-item .model { font-weight: 500; }
+.frame-item .color {
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  color: var(--mid);
+  font-variant-numeric: tabular-nums;
+}
+
+.hp-note {
+  font-size: 13px;
+  line-height: 1.7;
+  color: var(--mid);
+  margin: -18px 0 32px;
+}
+.hp-note a { color: var(--blue); }
+
+.info-block {
+  font-size: 13px;
+  line-height: 1.9;
+  color: var(--light);
+  margin-bottom: 20px;
+}
+
+.hold-note {
+  font-size: 12px;
+  line-height: 1.8;
+  color: var(--mid);
+  border-left: 2px solid var(--border);
+  padding-left: 12px;
+  margin-bottom: 44px;
+}
+
+.store-card {
+  border-top: 0.5px solid var(--border);
+  padding-top: 24px;
+}
+.store-name {
+  font-size: 13px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  margin-bottom: 14px;
+}
+.store-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.store-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+}
+.store-row .k {
+  width: 76px;
+  flex-shrink: 0;
+  color: var(--mid);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.store-row a {
+  color: var(--blue);
+  text-decoration: none;
+  word-break: break-all;
+}
+.store-row a:hover, .store-row a:focus-visible { text-decoration: underline; }
+.store-row a:focus-visible { outline: 2px solid var(--blue); outline-offset: 2px; }
+
+.status-block {
+  padding: 60px 20px;
+  text-align: center;
+  font-size: 14px;
+  color: var(--mid);
+  line-height: 1.8;
+}
+
+[hidden] { display: none !important; }
+</style>
+</head>
+<body>
+
+<div class="page">
+
+  <div class="header">
+    <div class="logo">MYKITA OSAKA</div>
+    <div class="logo-sub">フレームのご検討をいただきありがとうございます</div>
+  </div>
+
+  <div id="loading" class="status-block">読み込み中です…</div>
+
+  <div id="not-found" class="status-block" hidden>
+    ページが見つかりませんでした。<br>
+    URLをご確認いただくか、店舗までお問い合わせください。
+  </div>
+
+  <div id="content" class="main" hidden>
+    <p class="greeting"><span id="cf-name"></span> 様</p>
+
+    <p class="lead">この度はMYKITA Osakaへご来店いただき、誠にありがとうございます。<br>ご検討いただいたフレームは以下の通りです。</p>
+
+    <p class="section-label">検討中のフレーム</p>
+    <ul id="cf-frame-list" class="frame-list"></ul>
+    <p class="hp-note">上記フレームの画像は<a href="https://mykita.com/en" target="_blank" rel="noopener">MYKITAの公式ホームページ</a>よりご確認いただけます。</p>
+
+    <p class="section-label">ご案内</p>
+    <p class="info-block">ご検討いただいたフレームの在庫状況につきましても、随時お問い合わせを承っております。<br>また、お取り置きも可能でございますので、お気軽にお問い合わせください。</p>
+    <p class="hold-note">※お取り置きは、原則2週間までとさせていただいております。あらかじめご了承ください。</p>
+
+    <div class="store-card">
+      <div class="store-name">MYKITA Osaka</div>
+      <div class="store-rows">
+        <div class="store-row"><span class="k">Tel</span><a href="tel:0665637747">06-6563-7747</a></div>
+        <div class="store-row"><span class="k">HP</span><a href="https://mykita.com/en" target="_blank" rel="noopener">mykita.com/en</a></div>
+        <div class="store-row"><span class="k">Map</span><a href="https://share.google/mw7yBJWFXs3xLcj1Y" target="_blank" rel="noopener">Google マップで開く</a></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const SHEET_WEBHOOK_URL = 'https://script.google.com/macros/s/AKfycbzH0S_tvB3ewp6MCT5spSbhGYzWRQK5V26wxUBObEeOAejHtnt29fO6y_p59VVG6ixS5A/exec';
+
+function escapeHtml(str) {
+  const div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
+}
+
+function renderFrames(considerFrameColor) {
+  const list = document.getElementById('cf-frame-list');
+  const frames = String(considerFrameColor || '')
+    .split(',')
+    .map(s => s.trim())
+    .filter(Boolean);
+
+  frames.forEach(frame => {
+    const parts = frame.split('/C');
+    const model = (parts[0] || '').trim();
+    const color = parts.length > 1 ? 'C' + parts[1].trim() : '';
+    const li = document.createElement('li');
+    li.className = 'frame-item';
+    li.innerHTML = '<span class="model">' + escapeHtml(model) + '</span>'
+      + (color ? '<span class="color">' + escapeHtml(color) + '</span>' : '');
+    list.appendChild(li);
+  });
+}
+
+async function loadConfirmData() {
+  const params = new URLSearchParams(location.search);
+  const id = params.get('id');
+  const loading = document.getElementById('loading');
+  const notFound = document.getElementById('not-found');
+  const content = document.getElementById('content');
+
+  if (!id) {
+    loading.hidden = true;
+    notFound.hidden = false;
+    return;
+  }
+
+  try {
+    const res = await fetch(SHEET_WEBHOOK_URL + '?action=confirm&id=' + encodeURIComponent(id));
+    const data = await res.json();
+    if (!data || !data.ok) {
+      loading.hidden = true;
+      notFound.hidden = false;
+      return;
+    }
+    document.getElementById('cf-name').textContent = data.name || '';
+    renderFrames(data.considerFrameColor);
+    loading.hidden = true;
+    content.hidden = false;
+  } catch (err) {
+    loading.hidden = true;
+    notFound.hidden = false;
+  }
+}
+
+loadConfirmData();
+</script>
+
+</body>
+</html>
