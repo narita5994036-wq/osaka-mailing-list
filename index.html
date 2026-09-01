@@ -1886,9 +1886,16 @@ function isProspectPhoneValid() {
 
 function updateProspectSmsAvailability() {
   const cb = document.getElementById('f-prospect-sms');
+  const wasValid = !cb.disabled;
   const valid = isProspectPhoneValid();
   cb.disabled = !valid;
-  if (!valid) { cb.checked = false; }
+  if (!valid) {
+    cb.checked = false;
+  } else if (!wasValid) {
+    // Just became valid: check it automatically. Once valid, further edits
+    // to the phone number won't re-check a box the user unchecked by hand.
+    cb.checked = true;
+  }
 }
 
 function emailOrPhoneValid() {
@@ -2069,9 +2076,9 @@ function buildProspectSmsBody() {
     + 'また、お取り置きも可能でございますので、お気軽にお問い合わせください。\n\n'
     + '※お取り置きは、原則2週間までとさせていただいております。あらかじめご了承ください。\n\n\n'
     + 'MYKITA Osaka\n'
-    + '+81-(0)6 6563 7747\n'
-    + 'https://mykita.com/en\n'
-    + 'https://share.google/mw7yBJWFXs3xLcj1Y';
+    + '06-6563-7747\n'
+    + '[HP] https://mykita.com/en\n'
+    + '[Google map] https://share.google/mw7yBJWFXs3xLcj1Y';
 }
 
 function openProspectSms() {
