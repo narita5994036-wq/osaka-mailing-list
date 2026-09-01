@@ -2435,7 +2435,7 @@ function renderAdminTable() {
     <tr data-row="${r.row}" class="${r.customerType === 'Prospect' ? 'row-prospect' : ''}">
       <td style="color:var(--light); font-size:11px;">${rankMap.get(r.row)}</td>
       <td style="font-size:11px; color:var(--mid);">${escapeHtml(formatTimestamp(r.timestamp))}</td>
-      <td style="font-size:11px; color:var(--mid);">${escapeHtml(r.memberNo || '')}</td>
+      <td style="font-size:11px; color:var(--mid);">${escapeHtml(r.customerType === 'Prospect' ? '' : (r.memberNo || ''))}</td>
       <td>${escapeHtml(r.name)}</td>
       <td>${escapeHtml(r.country)}</td>
       <td><span class="email-link" style="color:#185FA5; cursor:pointer;" onclick="showEmailActions(event, ${r.row})">${escapeHtml(r.email)}</span></td>
@@ -2528,7 +2528,7 @@ function downloadCSV() {
   const rows = records.map((r, i) => [
     i + 1,
     r.timestamp,
-    `"${String(r.memberNo || '').replace(/"/g, '""')}"`,
+    `"${String(r.customerType === 'Prospect' ? '' : (r.memberNo || '')).replace(/"/g, '""')}"`,
     `"${String(r.name).replace(/"/g, '""')}"`,
     `"${String(r.country).replace(/"/g, '""')}"`,
     r.email,

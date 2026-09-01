@@ -3,13 +3,14 @@
  * Deploy as Web App (Execute as: Me / Access: Anyone) and paste the
  * resulting /exec URL into SHEET_WEBHOOK_URL in index.html.
  *
- * Spreadsheet column order (A→U), matching the live sheet's actual headers:
+ * Spreadsheet column order (A→T), matching the live sheet's actual headers:
  * A Timestamp | B 会員番号 | C Name | D Email | E Opt-in | F Country | G Language |
  * H Follow-up Sent | I Purchased (Frame) | J Staff Notes | K Purchased (Lenses) |
  * L Phone Number | M Postcode | N Address(Street) | O Address(Building) |
  * P City/Town | Q State/Province | R considerFrame/Color | S SMS Opt-in |
- * T Customer Type | U Confirm Token
- * (B and J are filled in manually in the sheet.)
+ * T Customer Type
+ * (B and J are filled in manually in the sheet for a purchaser; B is
+ * auto-filled with the Confirm Token for a prospect — see below.)
  *
  * A prospect's optional phone number reuses column L (Phone Number) — the
  * same column a purchaser's lens-shipping phone uses — since a single
@@ -17,9 +18,8 @@
  * purchaser's lens-shipping address, split the same way the intl address
  * form splits it (street / building / city / state-province); the JA
  * address form doesn't separate street and building, so both go into N.
- * SMS Opt-in (S), Customer Type (T), and Confirm Token (U) are blank/
- * "Purchaser" for a normal purchaser registration, since they only apply
- * to prospects.
+ * SMS Opt-in (S) and Customer Type (T) are blank/"Purchaser" for a normal
+ * purchaser registration, since they only apply to prospects.
  *
  * Rows submitted by a prospective customer (Customer Type = "Prospect") are
  * highlighted with a light blue background for quick visual identification.
@@ -30,14 +30,17 @@
  * time as yyyy/mm/dd hh:mm:ss; run fixExistingTimestamps() once to apply
  * the same formatting to rows submitted before this was added.
  *
- * Confirm Token (U) is a random ID (generated client-side) that lets
- * confirm.html look up just this one prospect's name and considered
- * frames via action=confirm&id=..., without a password, so it can be
- * linked from a short SMS instead of cramming the full message into the
- * SMS itself (which risks a URL getting corrupted by carrier reassembly
- * of long multi-segment Japanese SMS). handleGetConfirm() intentionally
- * returns only those two fields — never email/phone/address — since this
- * endpoint requires no authentication.
+ * Confirm Token: column B (会員番号) is only used for purchasers, filled
+ * in manually by staff, so a prospect's row reuses that same column to
+ * store its random confirm token (generated client-side) instead of
+ * adding a new column. It lets confirm.html look up just this one
+ * prospect's name and considered frames via action=confirm&id=...,
+ * without a password, so it can be linked from a short SMS instead of
+ * cramming the full message into the SMS itself (which risks a URL
+ * getting corrupted by carrier reassembly of long multi-segment Japanese
+ * SMS). handleGetConfirm() intentionally returns only those two fields —
+ * never email/phone/address — since this endpoint requires no
+ * authentication.
  */
 var SPREADSHEET_TIMEZONE = 'Asia/Tokyo';
 var TIMESTAMP_DISPLAY_FORMAT = 'yyyy/mm/dd hh:mm:ss';
@@ -50,7 +53,7 @@ function doPost(e) {
   var sheet = ss.getActiveSheet();
   var data = JSON.parse(e.postData.contents);
 
-  var headers = ['Timestamp', '会員番号', 'Name', 'Email', 'Opt-in', 'Country', 'Language', 'Follow-up Sent', 'Purchased (Frame)', 'Staff Notes', 'Purchased (Lenses)', 'Phone Number', 'Postcode', 'Address(Street)', 'Address(Building)', 'City/Town', 'State/Province', 'considerFrame/Color', 'SMS Opt-in', 'Customer Type', 'Confirm Token'];
+  var headers = ['Timestamp', '会員番号', 'Name', 'Email', 'Opt-in', 'Country', 'Language', 'Follow-up Sent', 'Purchased (Frame)', 'Staff Notes', 'Purchased (Lenses)', 'Phone Number', 'Postcode', 'Address(Street)', 'Address(Building)', 'City/Town', 'State/Province', 'considerFrame/Color', 'SMS Opt-in', 'Customer Type'];
   if (sheet.getLastRow() === 0) {
     sheet.appendRow(headers);
   }
@@ -81,7 +84,7 @@ function doPost(e) {
 
   sheet.appendRow([
     timestampValue,          // A: Timestamp
-    data.memberNo || '',    // B: 会員番号
+    isProspect ? (data.confirmToken || '') : (data.memberNo || ''), // B: 会員番号 / Confirm Token
     data.name || '',        // C: Name
     data.email || '',       // D: Email
     isProspect ? 'N/A' : (data.optin ? 'Yes' : 'No'), // E: Opt-in
@@ -99,8 +102,7 @@ function doPost(e) {
     data.addressState || '',               // Q: State/Province
     considerFrameColor,                    // R: considerFrame/Color
     isProspect ? (data.prospectSmsOptIn ? 'Yes' : 'No') : '', // S: SMS Opt-in
-    isProspect ? 'Prospect' : 'Purchaser', // T: Customer Type
-    isProspect ? (data.confirmToken || '') : '' // U: Confirm Token
+    isProspect ? 'Prospect' : 'Purchaser' // T: Customer Type
   ]);
 
   var newRow = sheet.getLastRow();
@@ -278,9 +280,9 @@ function handleGetConfirm(params) {
   var lastRow = sheet.getLastRow();
   if (lastRow < 2) { return { ok: false, error: 'not found' }; }
 
-  var values = sheet.getRange(2, 1, lastRow - 1, 21).getValues();
+  var values = sheet.getRange(2, 1, lastRow - 1, 20).getValues();
   for (var i = 0; i < values.length; i++) {
-    var rowToken = String(values[i][20] || ''); // U
+    var rowToken = String(values[i][1] || ''); // B
     if (rowToken && rowToken === token) {
       return {
         ok: true,
