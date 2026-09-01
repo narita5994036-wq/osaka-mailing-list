@@ -14,6 +14,8 @@
   --blue: #185FA5;
   --note-bg: #eef5fd;
   --note-border: #cfe3f7;
+  --orange: #b85c00;
+  --orange-bg: #fff3e0;
   --font: 'Helvetica Neue', Helvetica, Arial, sans-serif;
 }
 @media (prefers-color-scheme: dark) {
@@ -26,6 +28,8 @@
     --blue: #6fb3ff;
     --note-bg: #14202c;
     --note-border: #23364a;
+    --orange: #ffb74d;
+    --orange-bg: #3a2a12;
   }
 }
 :root[data-theme="dark"] {
@@ -37,6 +41,8 @@
   --blue: #6fb3ff;
   --note-bg: #14202c;
   --note-border: #23364a;
+  --orange: #ffb74d;
+  --orange-bg: #3a2a12;
 }
 
 * { box-sizing: border-box; }
@@ -113,11 +119,25 @@ body {
   font-size: 14px;
 }
 .frame-item .model { font-weight: 500; }
+.frame-item .item-right {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
 .frame-item .color {
   font-size: 12px;
   letter-spacing: 0.04em;
   color: var(--mid);
   font-variant-numeric: tabular-nums;
+}
+.frame-item .stock-badge {
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  color: var(--orange);
+  background: var(--orange-bg);
+  padding: 3px 8px;
+  border-radius: 3px;
+  white-space: nowrap;
 }
 
 .hp-note {
@@ -251,12 +271,21 @@ function renderFrames(considerFrameColor) {
 
   frames.forEach(frame => {
     const parts = frame.split('/C');
-    const model = (parts[0] || '').trim();
+    let model = (parts[0] || '').trim();
     const color = parts.length > 1 ? 'C' + parts[1].trim() : '';
+
+    // Staff mark a frame out of stock by appending "*" right after the
+    // model name in the sheet cell (e.g. "LAGON*/C222").
+    const needsCheck = model.endsWith('*');
+    if (needsCheck) { model = model.slice(0, -1).trim(); }
+
     const li = document.createElement('li');
     li.className = 'frame-item';
     li.innerHTML = '<span class="model">' + escapeHtml(model) + '</span>'
-      + (color ? '<span class="color">' + escapeHtml(color) + '</span>' : '');
+      + '<span class="item-right">'
+      + (needsCheck ? '<span class="stock-badge">要確認</span>' : '')
+      + (color ? '<span class="color">' + escapeHtml(color) + '</span>' : '')
+      + '</span>';
     list.appendChild(li);
   });
 }
