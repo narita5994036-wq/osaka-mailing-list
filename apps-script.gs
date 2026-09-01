@@ -21,8 +21,6 @@
  * SMS Opt-in (S) and Customer Type (T) are blank/"Purchaser" for a normal
  * purchaser registration, since they only apply to prospects.
  *
- * Rows submitted by a prospective customer (Customer Type = "Prospect") are
- * highlighted with a light blue background for quick visual identification.
  * Up to 3 considering frames (model + color number) are combined into a
  * single cell (column R), each formatted as "Frame Name/C###" and joined
  * with ", ", e.g. "Kelly Sun/C301, Aiko/C204".
@@ -112,10 +110,6 @@ function doPost(e) {
   var newRow = sheet.getLastRow();
   if (timestampValue) {
     sheet.getRange(newRow, 1).setNumberFormat(TIMESTAMP_DISPLAY_FORMAT);
-  }
-
-  if (isProspect) {
-    sheet.getRange(newRow, 1, 1, headers.length).setBackground('#dbe9fb');
   }
 
   return ContentService.createTextOutput(JSON.stringify({ result: 'success' }))
