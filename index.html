@@ -753,16 +753,6 @@ tr:hover td { background: #f9f9f9; }
 
       <p class="optin-desc" id="lbl-email-or-phone-note" style="display:none;">Please provide either an email address or phone number below.</p>
 
-      <!-- Email -->
-      <div class="field">
-        <label id="lbl-email" class="required">Email Address</label>
-        <div class="ac-wrap" id="email-ac-wrap">
-          <input type="email" class="ac-input" id="f-email" autocomplete="email" oninput="updateSubmitState()">
-          <div class="ac-dropdown" id="email-dropdown"></div>
-        </div>
-        <div class="err-msg" id="e-email">Please enter a valid email address.</div>
-      </div>
-
       <!-- Phone + SMS opt-in (prospect only) -->
       <div id="prospect-contact-block" style="display:none;">
         <div class="field">
@@ -773,6 +763,16 @@ tr:hover td { background: #f9f9f9; }
           <input type="checkbox" id="f-prospect-sms">
           <span class="lens-toggle-label" id="lbl-prospect-sms">I would like to receive SMS notifications.</span>
         </label>
+      </div>
+
+      <!-- Email -->
+      <div class="field">
+        <label id="lbl-email" class="required">Email Address</label>
+        <div class="ac-wrap" id="email-ac-wrap">
+          <input type="email" class="ac-input" id="f-email" autocomplete="email" oninput="updateSubmitState()">
+          <div class="ac-dropdown" id="email-dropdown"></div>
+        </div>
+        <div class="err-msg" id="e-email">Please enter a valid email address.</div>
       </div>
 
       <div id="lens-fields">
