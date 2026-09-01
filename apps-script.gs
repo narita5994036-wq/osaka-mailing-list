@@ -33,14 +33,18 @@
  * Confirm Token: column B (会員番号) is only used for purchasers, filled
  * in manually by staff, so a prospect's row reuses that same column to
  * store its random confirm token (generated client-side) instead of
- * adding a new column. It lets confirm.html look up just this one
- * prospect's name and considered frames via action=confirm&id=...,
- * without a password, so it can be linked from a short SMS instead of
- * cramming the full message into the SMS itself (which risks a URL
- * getting corrupted by carrier reassembly of long multi-segment Japanese
- * SMS). handleGetConfirm() intentionally returns only those two fields —
- * never email/phone/address — since this endpoint requires no
- * authentication.
+ * adding a new column. It lets a prospect's SMS link that one
+ * registration's name and considered frames, without a password.
+ *
+ * That link (built by index.html as SHEET_WEBHOOK_URL + "?page=confirm
+ * &id=...") is rendered by renderConfirmPage() below as a full HTML page
+ * on this Web App's own script.google.com domain, rather than pointing to
+ * the GitHub Pages copy of confirm.html — a customer-facing link should
+ * not surface the personal GitHub account the Pages site is deployed
+ * under. handleGetConfirm() (action=confirm, JSON) is kept for the static
+ * confirm.html page in the repo, but nothing links to that page anymore.
+ * Both intentionally expose only name + considered frames — never email/
+ * phone/address — since this is unauthenticated.
  */
 var SPREADSHEET_TIMEZONE = 'Asia/Tokyo';
 var TIMESTAMP_DISPLAY_FORMAT = 'yyyy/mm/dd hh:mm:ss';
@@ -159,6 +163,11 @@ function fixExistingTimestamps() {
  */
 function doGet(e) {
   var params = e.parameter || {};
+
+  if (params.page === 'confirm') {
+    return renderConfirmPage(params);
+  }
+
   var out;
 
   if (params.action === 'admin') {
@@ -267,32 +276,166 @@ function handleGetSettings() {
 }
 
 /**
- * Public, unauthenticated lookup for confirm.html. Given the random token
- * from the link in a prospect's SMS, returns only what that page needs to
- * display (name, considered frames) — never email/phone/address, since
- * there's no password gate on this endpoint.
+ * Given the random confirm token from a prospect's SMS link, finds that
+ * one row and returns only what a customer-facing page needs to display
+ * (name, considered frames) — never email/phone/address, since both
+ * callers below (JSON and HTML) are unauthenticated.
  */
-function handleGetConfirm(params) {
-  var token = String(params.id || '').trim();
-  if (!token) { return { ok: false, error: 'missing id' }; }
+function findConfirmRecord(token) {
+  if (!token) { return null; }
 
   var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
   var lastRow = sheet.getLastRow();
-  if (lastRow < 2) { return { ok: false, error: 'not found' }; }
+  if (lastRow < 2) { return null; }
 
   var values = sheet.getRange(2, 1, lastRow - 1, 20).getValues();
   for (var i = 0; i < values.length; i++) {
     var rowToken = String(values[i][1] || ''); // B
     if (rowToken && rowToken === token) {
       return {
-        ok: true,
         name: values[i][2] || '',              // C
         considerFrameColor: values[i][17] || '' // R
       };
     }
   }
-  return { ok: false, error: 'not found' };
+  return null;
 }
+
+/**
+ * JSON lookup kept for the static confirm.html page in the repo (not
+ * currently linked from anywhere live — see the header comment above).
+ */
+function handleGetConfirm(params) {
+  var token = String(params.id || '').trim();
+  if (!token) { return { ok: false, error: 'missing id' }; }
+  var record = findConfirmRecord(token);
+  if (!record) { return { ok: false, error: 'not found' }; }
+  return { ok: true, name: record.name, considerFrameColor: record.considerFrameColor };
+}
+
+/**
+ * Server-rendered confirmation page for a prospect's SMS link, served
+ * from this Web App's own script.google.com domain (rather than GitHub
+ * Pages) so the link doesn't surface the personal GitHub account the
+ * Pages site is deployed under. Renders fully on the server, so there's
+ * no client-side fetch/loading flash.
+ */
+function renderConfirmPage(params) {
+  var token = String(params.id || '').trim();
+  var record = token ? findConfirmRecord(token) : null;
+  var bodyHtml = record ? buildConfirmContentHtml(record) : buildConfirmNotFoundHtml();
+
+  var html = '<!DOCTYPE html><html lang="ja"><head>'
+    + '<meta charset="UTF-8">'
+    + '<meta name="viewport" content="width=device-width, initial-scale=1.0">'
+    + '<title>MYKITA OSAKA - ご確認ページ</title>'
+    + '<style>' + CONFIRM_PAGE_CSS + '</style>'
+    + '</head><body><div class="page">'
+    + '<div class="header"><div class="logo">MYKITA OSAKA</div>'
+    + '<div class="logo-sub">フレームのご検討をいただきありがとうございます</div></div>'
+    + bodyHtml
+    + '</div></body></html>';
+
+  return HtmlService.createHtmlOutput(html)
+    .setTitle('MYKITA OSAKA - ご確認ページ')
+    .addMetaTag('viewport', 'width=device-width, initial-scale=1.0');
+}
+
+function escapeHtmlGs(str) {
+  return String(str || '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+function buildConfirmFrameListHtml(considerFrameColor) {
+  var frames = String(considerFrameColor || '')
+    .split(',')
+    .map(function(s) { return s.trim(); })
+    .filter(function(s) { return s; });
+
+  return frames.map(function(frame) {
+    var parts = frame.split('/C');
+    var model = (parts[0] || '').trim();
+    var color = parts.length > 1 ? 'C' + parts[1].trim() : '';
+
+    // Staff mark a frame out of stock by appending "*" right after the
+    // model name in the sheet cell (e.g. "LAGON*/C222").
+    var needsCheck = model.slice(-1) === '*';
+    if (needsCheck) { model = model.slice(0, -1).trim(); }
+
+    return '<li class="frame-item"><span class="model">' + escapeHtmlGs(model) + '</span>'
+      + '<span class="item-right">'
+      + (needsCheck ? '<span class="stock-badge">要確認</span>' : '')
+      + (color ? '<span class="color">' + escapeHtmlGs(color) + '</span>' : '')
+      + '</span></li>';
+  }).join('');
+}
+
+function buildConfirmContentHtml(record) {
+  return '<div class="main">'
+    + '<p class="greeting">' + escapeHtmlGs(record.name) + ' 様</p>'
+    + '<p class="lead">この度はMYKITA Osakaへご来店いただき、誠にありがとうございます。<br>ご検討いただいたフレームは以下の通りです。</p>'
+    + '<p class="section-label">検討中のフレーム</p>'
+    + '<ul class="frame-list">' + buildConfirmFrameListHtml(record.considerFrameColor) + '</ul>'
+    + '<p class="hp-note">上記フレームの画像は<a href="https://mykita.com/en" target="_blank" rel="noopener">MYKITAの公式ホームページ</a>よりご確認いただけます。</p>'
+    + '<p class="section-label">ご案内</p>'
+    + '<p class="info-block">ご検討いただいたフレームの在庫状況につきましても、随時お問い合わせを承っております。<br>また、お取り置きも可能でございますので、お気軽にお問い合わせください。</p>'
+    + '<p class="hold-note">※お取り置きは、原則2週間までとさせていただいております。あらかじめご了承ください。</p>'
+    + '<div class="store-card">'
+    + '<div class="store-name">MYKITA Osaka</div>'
+    + '<div class="store-rows">'
+    + '<div class="store-row"><span class="k">Tel</span><a href="tel:0665637747">06-6563-7747</a></div>'
+    + '<div class="store-row"><span class="k">HP</span><a href="https://mykita.com/en" target="_blank" rel="noopener">mykita.com/en</a></div>'
+    + '<div class="store-row"><span class="k">Map</span><a href="https://share.google/mw7yBJWFXs3xLcj1Y" target="_blank" rel="noopener">Google マップで開く</a></div>'
+    + '</div></div></div>';
+}
+
+function buildConfirmNotFoundHtml() {
+  return '<div class="status-block">ページが見つかりませんでした。<br>URLをご確認いただくか、店舗までお問い合わせください。</div>';
+}
+
+var CONFIRM_PAGE_CSS = ':root{--bg:#ffffff;--surface:#f5f5f5;--border:#d0d0d0;--light:#1a1a1a;--mid:#666666;'
+  + '--blue:#185FA5;--orange:#b85c00;--orange-bg:#fff3e0;--font:\'Helvetica Neue\',Helvetica,Arial,sans-serif;}'
+  + '@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#121212;--surface:#1c1c1c;'
+  + '--border:#333333;--light:#f0f0f0;--mid:#999999;--blue:#6fb3ff;--orange:#ffb74d;--orange-bg:#3a2a12;}}'
+  + ':root[data-theme="dark"]{--bg:#121212;--surface:#1c1c1c;--border:#333333;--light:#f0f0f0;--mid:#999999;'
+  + '--blue:#6fb3ff;--orange:#ffb74d;--orange-bg:#3a2a12;}'
+  + '*{box-sizing:border-box;}'
+  + 'body{margin:0;background:var(--bg);color:var(--light);font-family:var(--font);-webkit-font-smoothing:antialiased;}'
+  + '.page{max-width:480px;margin:0 auto;padding-bottom:60px;}'
+  + '.header{padding:48px 20px 28px;text-align:center;border-bottom:0.5px solid var(--border);}'
+  + '.logo{font-size:20px;letter-spacing:0.28em;font-weight:600;}'
+  + '.logo-sub{margin-top:8px;font-size:12px;letter-spacing:0.1em;color:var(--mid);}'
+  + '.main{padding:32px 20px 0;}'
+  + '.greeting{font-size:15px;margin-bottom:24px;}'
+  + '.lead{font-size:14px;line-height:1.8;color:var(--light);margin-bottom:32px;}'
+  + '.section-label{font-size:11px;letter-spacing:0.14em;text-transform:uppercase;color:var(--mid);'
+  + 'border-bottom:0.5px solid var(--border);padding-bottom:10px;margin-bottom:16px;}'
+  + '.frame-list{list-style:none;margin:0 0 32px;padding:0;display:flex;flex-direction:column;gap:10px;}'
+  + '.frame-item{display:flex;align-items:baseline;justify-content:space-between;gap:12px;'
+  + 'border:0.5px solid var(--border);padding:14px 16px;font-size:14px;}'
+  + '.frame-item .model{font-weight:500;}'
+  + '.frame-item .item-right{display:flex;align-items:baseline;gap:8px;}'
+  + '.frame-item .color{font-size:12px;letter-spacing:0.04em;color:var(--mid);font-variant-numeric:tabular-nums;}'
+  + '.frame-item .stock-badge{font-size:11px;letter-spacing:0.04em;color:var(--orange);background:var(--orange-bg);'
+  + 'padding:3px 8px;border-radius:3px;white-space:nowrap;}'
+  + '.hp-note{font-size:13px;line-height:1.7;color:var(--mid);margin:-18px 0 32px;}'
+  + '.hp-note a{color:var(--blue);}'
+  + '.info-block{font-size:13px;line-height:1.9;color:var(--light);margin-bottom:20px;}'
+  + '.hold-note{font-size:12px;line-height:1.8;color:var(--mid);border-left:2px solid var(--border);'
+  + 'padding-left:12px;margin-bottom:44px;}'
+  + '.store-card{border-top:0.5px solid var(--border);padding-top:24px;}'
+  + '.store-name{font-size:13px;letter-spacing:0.16em;text-transform:uppercase;margin-bottom:14px;}'
+  + '.store-rows{display:flex;flex-direction:column;gap:10px;}'
+  + '.store-row{display:flex;align-items:center;gap:10px;font-size:13px;}'
+  + '.store-row .k{width:76px;flex-shrink:0;color:var(--mid);font-size:11px;letter-spacing:0.08em;text-transform:uppercase;}'
+  + '.store-row a{color:var(--blue);text-decoration:none;word-break:break-all;}'
+  + '.store-row a:hover,.store-row a:focus-visible{text-decoration:underline;}'
+  + '.store-row a:focus-visible{outline:2px solid var(--blue);outline-offset:2px;}'
+  + '.status-block{padding:60px 20px;text-align:center;font-size:14px;color:var(--mid);line-height:1.8;}';
 
 function readRecords(sheet) {
   var lastRow = sheet.getLastRow();

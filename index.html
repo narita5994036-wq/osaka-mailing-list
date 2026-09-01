@@ -2074,25 +2074,23 @@ function generateConfirmToken() {
   });
 }
 
+// Rendered by the Apps Script Web App itself (script.google.com), not the
+// GitHub Pages copy of confirm.html — a customer-facing link shouldn't
+// surface the personal GitHub account the Pages site is deployed under.
 function buildConfirmPageUrl(token) {
-  const base = location.href.replace(/[^/]*$/, '');
-  return base + 'confirm.html?id=' + encodeURIComponent(token);
+  return SHEET_WEBHOOK_URL + '?page=confirm&id=' + encodeURIComponent(token);
 }
 
 // The full considering-frame details live on confirm.html (linked below)
-// instead of in the SMS text itself: a long, all-Japanese SMS needs many
-// concatenated segments, and carrier reassembly of those can corrupt a URL
-// enough that phones stop recognizing it as a tappable link. A short SMS
-// with just a link avoids that entirely.
+// instead of in the SMS text itself, so this stays short.
 function buildProspectSmsBody() {
   const name = document.getElementById('f-name').value.trim();
   const link = buildConfirmPageUrl(lastProspectConfirmToken);
 
-  return name + ' 様\n\n'
-    + 'この度はMYKITA Osakaへご来店いただき、誠にありがとうございます。\n\n'
-    + 'ご検討いただいた内容は、以下のページよりご確認いただけます。\n'
-    + link + '\n\n'
-    + 'MYKITA Osaka';
+  return name + ' 様\n'
+    + 'ご来店ありがとうございます\n'
+    + 'ご検討内容はこちら\n'
+    + link;
 }
 
 function openProspectSms() {
