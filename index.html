@@ -1486,7 +1486,7 @@ function renderProspectFrameRowList() {
         <input type="text" class="ac-input" id="prospect-frame-model-${row.id}" autocomplete="off">
         <div class="ac-dropdown" id="prospect-frame-dropdown-${row.id}"></div>
       </div>
-      <input type="text" class="ac-input" id="prospect-frame-color-${row.id}" inputmode="numeric" pattern="[0-9]*" style="width:90px; flex-shrink:0;" oninput="this.value = this.value.replace(/\\D/g, '')">
+      <input type="text" class="ac-input" id="prospect-frame-color-${row.id}" inputmode="numeric" pattern="[0-9]*" maxlength="3" style="width:90px; flex-shrink:0;" oninput="this.value = this.value.replace(/\\D/g, '').slice(0, 3)">
       ${prospectFrameRows.length > 1 ? `<button type="button" class="frame-remove-btn" onclick="removeProspectFrameRow(${row.id})" aria-label="Remove">&times;</button>` : ''}
     </div>
   `).join('');
