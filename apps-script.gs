@@ -378,7 +378,7 @@ function buildConfirmContentHtml(record) {
   return '<div class="main">'
     + '<p class="greeting">' + escapeHtmlGs(record.name) + ' 様</p>'
     + '<p class="lead">この度はMYKITA Osakaへご来店いただき、誠にありがとうございます。<br>ご検討いただいたフレームは以下の通りです。</p>'
-    + '<p class="section-label">検討中のフレーム</p>'
+    + '<p class="section-label">ご検討中のフレーム</p>'
     + '<ul class="frame-list">' + buildConfirmFrameListHtml(record.considerFrameColor) + '</ul>'
     + '<p class="hp-note">上記フレームの画像は<a href="https://mykita.com/en" target="_blank" rel="noopener">MYKITAの公式ホームページ</a>よりご確認いただけます。</p>'
     + '<p class="section-label">ご案内</p>'
