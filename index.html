@@ -1886,9 +1886,16 @@ function isProspectPhoneValid() {
 
 function updateProspectSmsAvailability() {
   const cb = document.getElementById('f-prospect-sms');
+  const wasValid = !cb.disabled;
   const valid = isProspectPhoneValid();
   cb.disabled = !valid;
-  if (!valid) { cb.checked = false; }
+  if (!valid) {
+    cb.checked = false;
+  } else if (!wasValid) {
+    // Just became valid: check it automatically. Once valid, further edits
+    // to the phone number won't re-check a box the user unchecked by hand.
+    cb.checked = true;
+  }
 }
 
 function emailOrPhoneValid() {
