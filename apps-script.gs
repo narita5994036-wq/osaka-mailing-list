@@ -374,12 +374,25 @@ function buildConfirmFrameListHtml(considerFrameColor) {
   }).join('');
 }
 
+function hasNeedsCheckFrame(considerFrameColor) {
+  return String(considerFrameColor || '')
+    .split(',')
+    .map(function(s) { return s.trim(); })
+    .some(function(frame) {
+      var model = (frame.split('/C')[0] || '').trim();
+      return model.slice(-1) === '*';
+    });
+}
+
 function buildConfirmContentHtml(record) {
   return '<div class="main">'
     + '<p class="greeting">' + escapeHtmlGs(record.name) + ' 様</p>'
     + '<p class="lead">この度はMYKITA Osakaへご来店いただき、誠にありがとうございます。<br>ご検討いただいたフレームは以下の通りです。</p>'
     + '<p class="section-label">ご検討中のフレーム</p>'
     + '<ul class="frame-list">' + buildConfirmFrameListHtml(record.considerFrameColor) + '</ul>'
+    + (hasNeedsCheckFrame(record.considerFrameColor)
+        ? '<p class="stock-note">※「要確認」のフレームは、在庫がない可能性がございます。店舗へ直接ご確認ください。</p>'
+        : '')
     + '<p class="hp-note">上記フレームの画像は<a href="https://mykita.com/en" target="_blank" rel="noopener">MYKITAの公式ホームページ</a>よりご確認いただけます。</p>'
     + '<p class="section-label">ご案内</p>'
     + '<p class="info-block">ご検討いただいたフレームの在庫状況につきましても、随時お問い合わせを承っております。<br>また、お取り置きも可能でございますので、お気軽にお問い合わせください。</p>'
@@ -422,6 +435,8 @@ var CONFIRM_PAGE_CSS = ':root{--bg:#ffffff;--surface:#f5f5f5;--border:#d0d0d0;--
   + '.frame-item .color{font-size:12px;letter-spacing:0.04em;color:var(--mid);font-variant-numeric:tabular-nums;}'
   + '.frame-item .stock-badge{font-size:11px;letter-spacing:0.04em;color:var(--orange);background:var(--orange-bg);'
   + 'padding:3px 8px;border-radius:3px;white-space:nowrap;}'
+  + '.stock-note{font-size:12px;line-height:1.8;color:var(--orange);border-left:2px solid var(--orange);'
+  + 'padding-left:12px;margin:-18px 0 24px;}'
   + '.hp-note{font-size:13px;line-height:1.7;color:var(--mid);margin:-18px 0 32px;}'
   + '.hp-note a{color:var(--blue);}'
   + '.info-block{font-size:13px;line-height:1.9;color:var(--light);margin-bottom:20px;}'
