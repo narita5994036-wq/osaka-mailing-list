@@ -927,7 +927,7 @@ tr:hover td { background: #f9f9f9; }
       <table>
         <thead><tr>
           <th>#</th><th>Timestamp</th><th>ID</th><th>Name</th><th>Country</th>
-          <th>Email</th><th>Opt-in</th><th>Follow-up</th><th>Type</th><th>Purchased</th><th>Lens</th><th>Lang</th><th>Staff Notes</th><th></th>
+          <th>Email</th><th>Phone</th><th>Opt-in</th><th>Follow-up</th><th>Type</th><th>Purchased</th><th>Lens</th><th>Lang</th><th>Staff Notes</th><th></th>
         </tr></thead>
         <tbody id="admin-tbody"></tbody>
       </table>
@@ -2436,6 +2436,7 @@ function renderAdminTable() {
       <td>${escapeHtml(r.name)}</td>
       <td>${escapeHtml(r.country)}</td>
       <td><span class="email-link" style="color:#185FA5; cursor:pointer;" onclick="showEmailActions(event, ${r.row})">${escapeHtml(r.email)}</span></td>
+      <td style="font-size:11px; color:var(--mid); white-space:nowrap;">${escapeHtml(r.phone || '')}</td>
       <td><span class="${r.optin === 'Yes' ? 'badge-yes' : 'badge-no'}">${escapeHtml(r.optin)}</span></td>
       <td>${renderFollowupBadge(r)}</td>
       <td><span class="${r.customerType === 'Prospect' ? 'badge-prospect' : 'badge-yes'}">${escapeHtml(r.customerType || 'Purchaser')}</span></td>
