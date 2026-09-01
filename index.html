@@ -2081,15 +2081,14 @@ function buildConfirmPageUrl(token) {
   return SHEET_WEBHOOK_URL + '?page=confirm&id=' + encodeURIComponent(token);
 }
 
-// The full considering-frame details live on confirm.html (linked below)
-// instead of in the SMS text itself, so this stays short.
 function buildProspectSmsBody() {
   const name = document.getElementById('f-name').value.trim();
   const link = buildConfirmPageUrl(lastProspectConfirmToken);
 
-  return name + ' 様\n'
-    + 'ご来店ありがとうございます\n'
-    + 'ご検討内容はこちら\n'
+  return name + '　様\n\n'
+    + 'この度はMYKITA Osakaへご来店いただき、誠にありがとうございます。\n'
+    + 'ご検討いただいた内容は以下のページよりご確認いただけます。\n\n'
+    + 'MYKITA Osaka\n\n'
     + link;
 }
 
