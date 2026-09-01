@@ -4,7 +4,7 @@
  * resulting /exec URL into SHEET_WEBHOOK_URL in index.html.
  *
  * Spreadsheet column order (A→T), matching the live sheet's actual headers:
- * A Timestamp | B 会員番号 | C Name | D Email | E Opt-in | F Country | G Language |
+ * A Timestamp | B ID | C Name | D Email | E Opt-in | F Country | G Language |
  * H Follow-up Sent | I Purchased (Frame) | J Staff Notes | K Purchased (Lenses) |
  * L Phone Number | M Postcode | N Address(Street) | O Address(Building) |
  * P City/Town | Q State/Province | R considerFrame/Color | S SMS Opt-in |
@@ -30,7 +30,7 @@
  * time as yyyy/mm/dd hh:mm:ss; run fixExistingTimestamps() once to apply
  * the same formatting to rows submitted before this was added.
  *
- * Confirm Token: column B (会員番号) is only used for purchasers, filled
+ * Confirm Token: column B (ID) is only used for purchasers, filled
  * in manually by staff, so a prospect's row reuses that same column to
  * store its random confirm token (generated client-side) instead of
  * adding a new column. It lets a prospect's SMS link that one
@@ -57,7 +57,7 @@ function doPost(e) {
   var sheet = ss.getActiveSheet();
   var data = JSON.parse(e.postData.contents);
 
-  var headers = ['Timestamp', '会員番号', 'Name', 'Email', 'Opt-in', 'Country', 'Language', 'Follow-up Sent', 'Purchased (Frame)', 'Staff Notes', 'Purchased (Lenses)', 'Phone Number', 'Postcode', 'Address(Street)', 'Address(Building)', 'City/Town', 'State/Province', 'considerFrame/Color', 'SMS Opt-in', 'Customer Type'];
+  var headers = ['Timestamp', 'ID', 'Name', 'Email', 'Opt-in', 'Country', 'Language', 'Follow-up Sent', 'Purchased (Frame)', 'Staff Notes', 'Purchased (Lenses)', 'Phone Number', 'Postcode', 'Address(Street)', 'Address(Building)', 'City/Town', 'State/Province', 'considerFrame/Color', 'SMS Opt-in', 'Customer Type'];
   if (sheet.getLastRow() === 0) {
     sheet.appendRow(headers);
   }
@@ -88,7 +88,7 @@ function doPost(e) {
 
   sheet.appendRow([
     timestampValue,          // A: Timestamp
-    isProspect ? (data.confirmToken || '') : (data.memberNo || ''), // B: 会員番号 / Confirm Token
+    isProspect ? (data.confirmToken || '') : (data.memberNo || ''), // B: ID / Confirm Token
     data.name || '',        // C: Name
     data.email || '',       // D: Email
     isProspect ? 'N/A' : (data.optin ? 'Yes' : 'No'), // E: Opt-in
