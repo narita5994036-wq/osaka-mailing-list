@@ -411,11 +411,8 @@ function buildConfirmNotFoundHtml() {
 }
 
 var CONFIRM_PAGE_CSS = ':root{--bg:#ffffff;--surface:#f5f5f5;--border:#d0d0d0;--light:#1a1a1a;--mid:#666666;'
-  + '--blue:#185FA5;--orange:#b85c00;--orange-bg:#fff3e0;--font:\'Helvetica Neue\',Helvetica,Arial,sans-serif;}'
-  + '@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#121212;--surface:#1c1c1c;'
-  + '--border:#333333;--light:#f0f0f0;--mid:#999999;--blue:#6fb3ff;--orange:#ffb74d;--orange-bg:#3a2a12;}}'
-  + ':root[data-theme="dark"]{--bg:#121212;--surface:#1c1c1c;--border:#333333;--light:#f0f0f0;--mid:#999999;'
-  + '--blue:#6fb3ff;--orange:#ffb74d;--orange-bg:#3a2a12;}'
+  + '--blue:#185FA5;--orange:#b85c00;--orange-bg:#fff3e0;--font:\'Helvetica Neue\',Helvetica,Arial,sans-serif;'
+  + 'color-scheme:light;}'
   + '*{box-sizing:border-box;}'
   + 'body{margin:0;background:var(--bg);color:var(--light);font-family:var(--font);-webkit-font-smoothing:antialiased;}'
   + '.page{max-width:480px;margin:0 auto;padding-bottom:60px;}'
