@@ -521,7 +521,7 @@ function buildConfirmContentHtml(record) {
     + '<p class="section-label">ご検討中のフレーム</p>'
     + '<ul class="frame-list">' + buildConfirmFrameListHtml(record.considerFrameColor) + '</ul>'
     + (hasNeedsCheckFrame(record.considerFrameColor)
-        ? '<p class="stock-note">※「要確認」のフレームは、在庫がない可能性がございます。店舗へ直接ご確認ください。</p>'
+        ? '<p class="stock-note">※「要確認」のフレームは、在庫がない可能性がございます。</p>'
         : '')
     + '<p class="hp-note">上記フレームの画像は<a href="https://mykita.com/en" target="_blank" rel="noopener">MYKITAの公式ホームページ</a>よりご確認いただけます。</p>'
     + '<p class="section-label">ご案内</p>'
@@ -531,6 +531,7 @@ function buildConfirmContentHtml(record) {
     + '<div class="store-name">MYKITA Osaka</div>'
     + '<div class="store-rows">'
     + '<div class="store-row"><span class="k">Tel</span><a href="tel:0665637747">06-6563-7747</a></div>'
+    + '<div class="store-row"><span class="k">Email</span><a href="mailto:osaka@mykita.com">osaka@mykita.com</a></div>'
     + '<div class="store-row"><span class="k">HP</span><a href="https://mykita.com/en" target="_blank" rel="noopener">mykita.com/en</a></div>'
     + '<div class="store-row"><span class="k">Map</span><a href="https://share.google/mw7yBJWFXs3xLcj1Y" target="_blank" rel="noopener">Google マップで開く</a></div>'
     + '</div></div></div>';
