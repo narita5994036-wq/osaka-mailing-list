@@ -868,8 +868,7 @@ tr:hover td { background: #f9f9f9; }
         <div id="thanks-frame-status" style="font-size:12px; color:var(--mid); margin-top:10px; text-align:center;"></div>
       </div>
       <div id="thanks-sms-wrap" style="display:none; margin-bottom:20px;">
-        <button class="submit-btn" style="width:100%; margin-top:0; margin-bottom:10px;" onclick="openProspectSms(1)" id="lbl-thanks-sms-1">Send SMS (1/2)</button>
-        <button class="submit-btn" style="width:100%; margin-top:0;" onclick="openProspectSms(2)" id="lbl-thanks-sms-2">Send SMS (2/2)</button>
+        <button class="submit-btn" style="width:100%; margin-top:0;" onclick="openProspectSms()" id="lbl-thanks-sms">Send SMS</button>
       </div>
       <button class="refresh-btn" onclick="resetForm()" id="lbl-register-another">Register Another Frame</button>
     </div>
@@ -1026,7 +1025,7 @@ const i18n = {
     prospectThanksTitle: 'Thank You',
     prospectThanksSub: "Thank you for your interest in MYKITA. We'll be happy to follow up with more information about the frame you're considering.",
     prospectRegisterAnother: 'New Registration',
-    thanksSms1: 'Send SMS (1/2)', thanksSms2: 'Send SMS (2/2)',
+    thanksSms: 'Send SMS',
     registerAnother: 'Register Another Frame',
     addFrameBtn: '+ Add Frame Name(s)',
     thanksFrameInfo: 'Purchased Frame(s)',
@@ -1076,7 +1075,7 @@ const i18n = {
     prospectThanksTitle: 'ご登録ありがとうございます',
     prospectThanksSub: 'MYKITAへのご関心をお寄せいただきありがとうございます。検討中のフレームについて、改めてご案内させていただきます。',
     prospectRegisterAnother: '新規登録へ戻る',
-    thanksSms1: 'SMSを送る (1/2)', thanksSms2: 'SMSを送る (2/2)',
+    thanksSms: 'SMSを送る',
     registerAnother: '別のフレームを登録する',
     addFrameBtn: '+ フレーム名を追加する',
     thanksFrameInfo: 'ご購入フレーム',
@@ -1126,7 +1125,7 @@ const i18n = {
     prospectThanksTitle: '感谢您的登记',
     prospectThanksSub: '感谢您对MYKITA的关注。我们会就您意向的镜架为您提供进一步信息。',
     prospectRegisterAnother: '新登记',
-    thanksSms1: '发送短信 (1/2)', thanksSms2: '发送短信 (2/2)',
+    thanksSms: '发送短信',
     registerAnother: '登记另一副镜架',
     addFrameBtn: '+ 添加镜架名称',
     thanksFrameInfo: '购买的镜架',
@@ -1176,7 +1175,7 @@ const i18n = {
     prospectThanksTitle: '등록해 주셔서 감사합니다',
     prospectThanksSub: 'MYKITA에 관심을 가져주셔서 감사합니다. 검토 중이신 프레임에 대해 추후 안내해 드리겠습니다.',
     prospectRegisterAnother: '새 등록 시작',
-    thanksSms1: 'SMS 보내기 (1/2)', thanksSms2: 'SMS 보내기 (2/2)',
+    thanksSms: 'SMS 보내기',
     registerAnother: '다른 프레임 등록',
     addFrameBtn: '+ 프레임 이름 추가',
     thanksFrameInfo: '구매하신 프레임',
@@ -2038,8 +2037,7 @@ function updateThanksLabels() {
   document.getElementById('lbl-thanks-title').textContent = isProspect ? t.prospectThanksTitle : t.thanksTitle;
   document.getElementById('lbl-thanks-sub').textContent = isProspect ? t.prospectThanksSub : t.thanksSub;
   document.getElementById('lbl-register-another').textContent = isProspect ? t.prospectRegisterAnother : t.registerAnother;
-  document.getElementById('lbl-thanks-sms-1').textContent = t.thanksSms1;
-  document.getElementById('lbl-thanks-sms-2').textContent = t.thanksSms2;
+  document.getElementById('lbl-thanks-sms').textContent = t.thanksSms;
 }
 
 function showThanks() {
@@ -2061,10 +2059,7 @@ function showThanks() {
 }
 
 // ── PROSPECT SMS ──
-// Sent as two separate SMS messages (rather than one long one) so each
-// stays within a few segments — long multi-segment SMS can arrive with a
-// URL corrupted by carrier reassembly, breaking link auto-detection.
-function buildProspectSmsBody1() {
+function buildProspectSmsBody() {
   const name = document.getElementById('f-name').value.trim();
   const frameLines = collectProspectFrames().map(f => {
     if (f.model && f.color) { return '・' + f.model + '／C' + f.color; }
@@ -2077,11 +2072,8 @@ function buildProspectSmsBody1() {
     + 'この度はMYKITA Osakaへご来店いただき、誠にありがとうございます。\n\n'
     + 'ご検討いただいたフレームモデル名とカラー番号は、以下の通りです。\n\n'
     + frameLines + '\n\n'
-    + '上記フレームモデル名の画像はMYKITAの公式ホームページよりご確認いただけます。\nhttps://mykita.com/en';
-}
-
-function buildProspectSmsBody2() {
-  return 'ご検討いただいたフレームの在庫状況につきましても、随時お問い合わせを承っております。\n\n'
+    + '上記フレームモデル名の画像はMYKITAの公式ホームページよりご確認いただけます。\nhttps://mykita.com/en\n\n\n'
+    + 'ご検討いただいたフレームの在庫状況につきましても、随時お問い合わせを承っております。\n\n'
     + 'また、お取り置きも可能でございますので、お気軽にお問い合わせください。\n\n'
     + '※お取り置きは、原則2週間までとさせていただいております。あらかじめご了承ください。\n\n\n'
     + 'MYKITA Osaka\n'
@@ -2091,10 +2083,10 @@ function buildProspectSmsBody2() {
     + 'https://share.google/mw7yBJWFXs3xLcj1Y';
 }
 
-function openProspectSms(part) {
+function openProspectSms() {
   const phone = document.getElementById('f-prospect-phone').value.trim();
   if (!phone) return;
-  const body = part === 2 ? buildProspectSmsBody2() : buildProspectSmsBody1();
+  const body = buildProspectSmsBody();
   const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
   const separator = isIOS ? '&' : '?';
   window.location.href = 'sms:' + phone + separator + 'body=' + encodeURIComponent(body);
