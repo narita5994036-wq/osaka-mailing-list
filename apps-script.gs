@@ -43,9 +43,145 @@
  * confirm.html page in the repo, but nothing links to that page anymore.
  * Both intentionally expose only name + considered frames — never email/
  * phone/address — since this is unauthenticated.
+ *
+ * Phone Number (L) is stored encrypted, not as plain text, so the raw
+ * cell is unreadable to anyone who can merely view the spreadsheet.
+ * Apps Script has no built-in symmetric cipher (Utilities only offers
+ * hashing/HMAC), so encryptPhone_()/decryptPhone_() build one from
+ * HMAC-SHA-256: a keyed counter-mode keystream (HMAC(key, nonce||counter))
+ * XORed with the plaintext, plus an encrypt-then-MAC tag so a corrupted or
+ * tampered cell decrypts to "[復号エラー]" instead of garbage. The key is
+ * a random 32 bytes generated on first use and stored in this project's
+ * Script Properties (PHONE_ENC_KEY) — never in the sheet, never returned
+ * by any endpoint. Randomness comes from hashing pairs of Utilities.
+ * getUuid() (backed by a real CSPRNG), not Math.random(). doPost()
+ * encrypts on write; readRecords() decrypts for the password-gated admin
+ * panel only. Run encryptExistingPhoneNumbers() once (see its own comment)
+ * to convert phone numbers saved before this was added.
  */
 var SPREADSHEET_TIMEZONE = 'Asia/Tokyo';
 var TIMESTAMP_DISPLAY_FORMAT = 'yyyy/mm/dd hh:mm:ss';
+
+// ── Phone number encryption (see the header comment above for the design) ──
+var PHONE_ENC_KEY_PROP = 'PHONE_ENC_KEY';
+var PHONE_ENC_PREFIX = 'ENC1:';
+
+// Utilities.getUuid() is backed by a real CSPRNG (unlike Math.random()),
+// so hashing pairs of them is a reasonable way to get random bytes without
+// a native crypto.getRandomValues() in Apps Script.
+function generateRandomBytes_(n) {
+  var out = [];
+  while (out.length < n) {
+    var raw = Utilities.getUuid() + '-' + Utilities.getUuid();
+    out = out.concat(Utilities.computeDigest(Utilities.DigestAlgorithm.SHA_256, raw));
+  }
+  return out.slice(0, n);
+}
+
+function getPhoneEncKeyBytes_() {
+  var props = PropertiesService.getScriptProperties();
+  var keyB64 = props.getProperty(PHONE_ENC_KEY_PROP);
+  if (!keyB64) {
+    keyB64 = Utilities.base64Encode(generateRandomBytes_(32));
+    props.setProperty(PHONE_ENC_KEY_PROP, keyB64);
+  }
+  return Utilities.base64Decode(keyB64);
+}
+
+// HMAC-SHA-256 in counter mode: keystream block i = HMAC(key, nonce || i).
+// XORing this with the plaintext is the same construction as AES-CTR, just
+// with HMAC-SHA-256 as the keyed PRF instead of an AES block cipher.
+function hmacKeystream_(keyBytes, nonceBytes, byteLen) {
+  var out = [];
+  var counter = 0;
+  while (out.length < byteLen) {
+    var counterBytes = [(counter >>> 24) & 0xff, (counter >>> 16) & 0xff, (counter >>> 8) & 0xff, counter & 0xff];
+    out = out.concat(Utilities.computeHmacSignature(Utilities.MacAlgorithm.HMAC_SHA_256, nonceBytes.concat(counterBytes), keyBytes));
+    counter++;
+  }
+  return out.slice(0, byteLen);
+}
+
+function xorBytes_(a, b) {
+  var out = [];
+  for (var i = 0; i < a.length; i++) { out.push((a[i] & 0xff) ^ (b[i] & 0xff)); }
+  return out;
+}
+
+// Constant-time-ish comparison so MAC verification doesn't leak timing.
+function bytesEqual_(a, b) {
+  if (a.length !== b.length) { return false; }
+  var diff = 0;
+  for (var i = 0; i < a.length; i++) { diff |= (a[i] & 0xff) ^ (b[i] & 0xff); }
+  return diff === 0;
+}
+
+function encryptPhone_(plaintext) {
+  var text = String(plaintext || '');
+  if (!text) { return ''; }
+  var keyBytes = getPhoneEncKeyBytes_();
+  var nonceBytes = generateRandomBytes_(16);
+  var ptBytes = Utilities.newBlob(text).getBytes();
+  var ctBytes = xorBytes_(ptBytes, hmacKeystream_(keyBytes, nonceBytes, ptBytes.length));
+  var mac = Utilities.computeHmacSignature(Utilities.MacAlgorithm.HMAC_SHA_256, nonceBytes.concat(ctBytes), keyBytes);
+  return PHONE_ENC_PREFIX + Utilities.base64Encode(nonceBytes) + '.' + Utilities.base64Encode(ctBytes) + '.' + Utilities.base64Encode(mac);
+}
+
+// Returns the stored value unchanged if it isn't in our encrypted format
+// (a legacy plaintext row), and "[復号エラー]" if it's tagged as encrypted
+// but the MAC doesn't check out (corrupted cell or wrong key).
+function decryptPhone_(stored) {
+  var text = String(stored || '');
+  if (!text) { return ''; }
+  if (text.indexOf(PHONE_ENC_PREFIX) !== 0) { return text; }
+
+  var parts = text.slice(PHONE_ENC_PREFIX.length).split('.');
+  if (parts.length !== 3) { return '[復号エラー]'; }
+
+  try {
+    var nonceBytes = Utilities.base64Decode(parts[0]);
+    var ctBytes = Utilities.base64Decode(parts[1]);
+    var macBytes = Utilities.base64Decode(parts[2]);
+    var keyBytes = getPhoneEncKeyBytes_();
+
+    var expectedMac = Utilities.computeHmacSignature(Utilities.MacAlgorithm.HMAC_SHA_256, nonceBytes.concat(ctBytes), keyBytes);
+    if (!bytesEqual_(expectedMac, macBytes)) { return '[復号エラー]'; }
+
+    var ptBytes = xorBytes_(ctBytes, hmacKeystream_(keyBytes, nonceBytes, ctBytes.length));
+    return Utilities.newBlob(ptBytes).getDataAsString('UTF-8');
+  } catch (err) {
+    return '[復号エラー]';
+  }
+}
+
+/**
+ * One-time utility: open this script in the Apps Script editor, select
+ * "encryptExistingPhoneNumbers" in the function dropdown next to Run, and
+ * click Run. Encrypts every existing plaintext Phone Number cell (column L)
+ * in place; already-encrypted or empty cells are left untouched.
+ *
+ * Back up the sheet first (File > Make a copy) — this overwrites column L
+ * directly and there is no undo button for a script-driven edit beyond the
+ * sheet's own version history.
+ */
+function encryptExistingPhoneNumbers() {
+  var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+  var lastRow = sheet.getLastRow();
+  if (lastRow < 2) { return; }
+
+  var range = sheet.getRange(2, 12, lastRow - 1, 1); // column L
+  var values = range.getValues();
+  var changed = 0;
+  for (var i = 0; i < values.length; i++) {
+    var v = String(values[i][0] || '');
+    if (v && v.indexOf(PHONE_ENC_PREFIX) !== 0) {
+      values[i][0] = encryptPhone_(v);
+      changed++;
+    }
+  }
+  range.setValues(values);
+  Logger.log('Encrypted ' + changed + ' phone number(s).');
+}
 
 function doPost(e) {
   var ss = SpreadsheetApp.getActiveSpreadsheet();
@@ -96,7 +232,7 @@ function doPost(e) {
     data.frameNames || '',                 // I: Purchased (Frame)
     '',                                    // J: Staff Notes
     data.lensOrder ? 'Yes' : 'No',        // K: Purchased (Lenses)
-    isProspect ? (data.prospectPhone || '') : (data.phone || ''), // L: Phone Number
+    encryptPhone_(isProspect ? (data.prospectPhone || '') : (data.phone || '')), // L: Phone Number (encrypted)
     data.postcode || '',                   // M: Postcode
     data.addressStreet || '',              // N: Address(Street)
     data.addressBuilding || '',            // O: Address(Building)
@@ -385,7 +521,7 @@ function buildConfirmContentHtml(record) {
     + '<p class="section-label">ご検討中のフレーム</p>'
     + '<ul class="frame-list">' + buildConfirmFrameListHtml(record.considerFrameColor) + '</ul>'
     + (hasNeedsCheckFrame(record.considerFrameColor)
-        ? '<p class="stock-note">※「要確認」のフレームは、在庫がない可能性がございます。店舗へ直接ご確認ください。</p>'
+        ? '<p class="stock-note">※「要確認」のフレームは、在庫がない可能性がございます。</p>'
         : '')
     + '<p class="hp-note">上記フレームの画像は<a href="https://mykita.com/en" target="_blank" rel="noopener">MYKITAの公式ホームページ</a>よりご確認いただけます。</p>'
     + '<p class="section-label">ご案内</p>'
@@ -395,6 +531,7 @@ function buildConfirmContentHtml(record) {
     + '<div class="store-name">MYKITA Osaka</div>'
     + '<div class="store-rows">'
     + '<div class="store-row"><span class="k">Tel</span><a href="tel:0665637747">06-6563-7747</a></div>'
+    + '<div class="store-row"><span class="k">Email</span><a href="mailto:osaka@mykita.com">osaka@mykita.com</a></div>'
     + '<div class="store-row"><span class="k">HP</span><a href="https://mykita.com/en" target="_blank" rel="noopener">mykita.com/en</a></div>'
     + '<div class="store-row"><span class="k">Map</span><a href="https://share.google/mw7yBJWFXs3xLcj1Y" target="_blank" rel="noopener">Google マップで開く</a></div>'
     + '</div></div></div>';
@@ -464,7 +601,7 @@ function readRecords(sheet) {
       frameNames:  row[8] || '',  // I
       staffNotes:  row[9] || '',  // J
       lensOrder:   row[10] || '', // K
-      phone:       row[11] || '', // L
+      phone:       decryptPhone_(row[11]), // L (decrypted for the password-gated admin panel)
       postcode:    row[12] || '', // M
       addressStreet:   row[13] || '', // N
       addressBuilding: row[14] || '', // O
