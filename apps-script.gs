@@ -3,15 +3,15 @@
  * Deploy as Web App (Execute as: Me / Access: Anyone) and paste the
  * resulting /exec URL into SHEET_WEBHOOK_URL in index.html.
  *
- * Spreadsheet column order (A→U), matching the live sheet's actual headers:
+ * Spreadsheet column order (A→W), matching the live sheet's actual headers:
  * A Timestamp | B ID | C Name | D Email | E Opt-in | F Country | G Language |
  * H Follow-up Sent | I Purchased (Frame) | J Staff Notes | K Purchased (Lenses) |
  * L Phone Number | M Postcode | N Address(Street) | O Address(Building) |
  * P City/Town | Q State/Province | R considerFrame/Color | S SMS Opt-in |
- * T Customer Type | U considerFrameURL
+ * T Customer Type | U Frame URL 1 | V Frame URL 2 | W Frame URL 3
  * (B and J are filled in manually in the sheet for a purchaser; B is
- * auto-filled with the Confirm Token for a prospect — see below. U is
- * always blank on submission — staff fill it in manually afterward.)
+ * auto-filled with the Confirm Token for a prospect — see below. U-W are
+ * always blank on submission — staff fill them in manually afterward.)
  *
  * A prospect's optional phone number reuses column L (Phone Number) — the
  * same column a purchaser's lens-shipping phone uses — since a single
@@ -24,11 +24,11 @@
  *
  * Up to 3 considering frames (model + color number) are combined into a
  * single cell (column R), each formatted as "Frame Name/C###" and joined
- * with ", ", e.g. "Kelly Sun/C301, Aiko/C204". Column U optionally holds
- * one product-page URL per frame, in the same order and also joined with
- * ", " (e.g. "https://.../kelly-sun, https://.../aiko") — staff type these
- * in directly; a blank entry for a given position just leaves that frame
- * unlinked. buildConfirmFrameListHtml() matches them to frames by index.
+ * with ", ", e.g. "Kelly Sun/C301, Aiko/C204". Columns U/V/W each
+ * optionally hold one product-page URL, matched to the 1st/2nd/3rd frame
+ * in column R by position — staff type each URL into its own column
+ * directly; leaving one blank just leaves that frame unlinked.
+ * buildConfirmFrameListHtml() zips them together by index.
  * Timestamp (column A) is stored as a real date and displayed in Japan
  * time as yyyy/mm/dd hh:mm:ss; run fixExistingTimestamps() once to apply
  * the same formatting to rows submitted before this was added.
@@ -196,7 +196,7 @@ function doPost(e) {
   var sheet = ss.getActiveSheet();
   var data = JSON.parse(e.postData.contents);
 
-  var headers = ['Timestamp', 'ID', 'Name', 'Email', 'Opt-in', 'Country', 'Language', 'Follow-up Sent', 'Purchased (Frame)', 'Staff Notes', 'Purchased (Lenses)', 'Phone Number', 'Postcode', 'Address(Street)', 'Address(Building)', 'City/Town', 'State/Province', 'considerFrame/Color', 'SMS Opt-in', 'Customer Type', 'considerFrameURL'];
+  var headers = ['Timestamp', 'ID', 'Name', 'Email', 'Opt-in', 'Country', 'Language', 'Follow-up Sent', 'Purchased (Frame)', 'Staff Notes', 'Purchased (Lenses)', 'Phone Number', 'Postcode', 'Address(Street)', 'Address(Building)', 'City/Town', 'State/Province', 'considerFrame/Color', 'SMS Opt-in', 'Customer Type', 'Frame URL 1', 'Frame URL 2', 'Frame URL 3'];
   if (sheet.getLastRow() === 0) {
     sheet.appendRow(headers);
   }
@@ -246,7 +246,9 @@ function doPost(e) {
     considerFrameColor,                    // R: considerFrame/Color
     isProspect ? (data.prospectSmsOptIn ? 'Yes' : 'No') : '', // S: SMS Opt-in
     isProspect ? 'Prospect' : 'Purchaser', // T: Customer Type
-    ''                                     // U: considerFrameURL (filled in manually by staff)
+    '', // U: Frame URL 1 (filled in manually by staff)
+    '', // V: Frame URL 2 (filled in manually by staff)
+    ''  // W: Frame URL 3 (filled in manually by staff)
   ]);
 
   var newRow = sheet.getLastRow();
@@ -424,14 +426,18 @@ function findConfirmRecord(token) {
   var lastRow = sheet.getLastRow();
   if (lastRow < 2) { return null; }
 
-  var values = sheet.getRange(2, 1, lastRow - 1, 21).getValues();
+  var values = sheet.getRange(2, 1, lastRow - 1, 23).getValues();
   for (var i = 0; i < values.length; i++) {
     var rowToken = String(values[i][1] || ''); // B
     if (rowToken && rowToken === token) {
       return {
-        name: values[i][2] || '',                // C
-        considerFrameColor: values[i][17] || '',  // R
-        considerFrameUrl: values[i][20] || ''      // U
+        name: values[i][2] || '',               // C
+        considerFrameColor: values[i][17] || '', // R
+        considerFrameUrls: [
+          values[i][20] || '', // U: Frame URL 1
+          values[i][21] || '', // V: Frame URL 2
+          values[i][22] || ''  // W: Frame URL 3
+        ]
       };
     }
   }
@@ -451,7 +457,7 @@ function handleGetConfirm(params) {
     ok: true,
     name: record.name,
     considerFrameColor: record.considerFrameColor,
-    considerFrameUrl: record.considerFrameUrl
+    considerFrameUrls: record.considerFrameUrls
   };
 }
 
@@ -499,16 +505,13 @@ function isSafeHttpUrl_(url) {
   return /^https?:\/\//i.test(url);
 }
 
-function buildConfirmFrameListHtml(considerFrameColor, considerFrameUrl) {
+function buildConfirmFrameListHtml(considerFrameColor, considerFrameUrls) {
   var frames = String(considerFrameColor || '')
     .split(',')
     .map(function(s) { return s.trim(); })
     .filter(function(s) { return s; });
 
-  // Not filtered: a blank between two commas (e.g. "url1, , url3") is a
-  // deliberate "no link for frame 2", kept so positions still line up with
-  // considerFrameColor's frames by index.
-  var urls = String(considerFrameUrl || '').split(',').map(function(s) { return s.trim(); });
+  var urls = considerFrameUrls || [];
 
   return frames.map(function(frame, i) {
     var parts = frame.split('/C');
@@ -549,7 +552,7 @@ function buildConfirmContentHtml(record) {
     + '<p class="greeting">' + escapeHtmlGs(record.name) + ' 様</p>'
     + '<p class="lead">この度はMYKITA Osakaへご来店いただき、誠にありがとうございます。<br>ご検討いただいたフレームは以下の通りです。</p>'
     + '<p class="section-label">ご検討中のフレーム</p>'
-    + '<ul class="frame-list">' + buildConfirmFrameListHtml(record.considerFrameColor, record.considerFrameUrl) + '</ul>'
+    + '<ul class="frame-list">' + buildConfirmFrameListHtml(record.considerFrameColor, record.considerFrameUrls) + '</ul>'
     + (hasNeedsCheckFrame(record.considerFrameColor)
         ? '<p class="stock-note">※「要確認」のフレームは、在庫がない可能性がございます。</p>'
         : '')
