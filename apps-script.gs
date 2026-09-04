@@ -646,3 +646,193 @@ function readRecords(sheet) {
   }
   return records;
 }
+
+// ── "Prospect URLs" spreadsheet menu ──
+// A small custom-menu dialog for staff to fill in the U column (considering-
+// frame product URLs) without having to hand-type comma-joined, position-
+// matched strings directly into the cell. onOpen() runs automatically each
+// time the spreadsheet is opened; it adds the menu, which opens a modal
+// dialog (showProspectFrameUrlDialog) backed by getProspectFrameUrlList(),
+// getProspectFrameUrlDetail() and saveProspectFrameUrls() via google.script.run.
+
+function onOpen() {
+  SpreadsheetApp.getUi()
+    .createMenu('Prospect URLs')
+    .addItem('開く', 'showProspectFrameUrlDialog')
+    .addToUi();
+}
+
+function showProspectFrameUrlDialog() {
+  var html = HtmlService.createHtmlOutput(PROSPECT_URL_DIALOG_HTML)
+    .setWidth(480)
+    .setHeight(560);
+  SpreadsheetApp.getUi().showModalDialog(html, 'Prospect URLs');
+}
+
+// Every "type=prospect" row (Customer Type = "Prospect", column T), newest
+// timestamp first, for the dialog's selection list.
+function getProspectFrameUrlList() {
+  var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+  var lastRow = sheet.getLastRow();
+  if (lastRow < 2) { return []; }
+
+  var values = sheet.getRange(2, 1, lastRow - 1, 21).getValues();
+  var list = [];
+  for (var i = 0; i < values.length; i++) {
+    var row = values[i];
+    if (String(row[19] || '') !== 'Prospect') { continue; } // T
+
+    var ts = row[0]; // A
+    var tsDate = ts instanceof Date ? ts : new Date(ts);
+    var tsMillis = isNaN(tsDate.getTime()) ? 0 : tsDate.getTime();
+
+    list.push({
+      row: i + 2,
+      name: row[2] || '', // C
+      timestamp: tsMillis,
+      timestampDisplay: tsMillis
+        ? Utilities.formatDate(tsDate, SPREADSHEET_TIMEZONE, TIMESTAMP_DISPLAY_FORMAT)
+        : ''
+    });
+  }
+  list.sort(function(a, b) { return b.timestamp - a.timestamp; });
+  return list;
+}
+
+// One row's considering frames, each paired with its current U-column URL
+// (blank if none yet) so the dialog can pre-fill the input fields.
+function getProspectFrameUrlDetail(row) {
+  var rowNum = parseInt(row, 10);
+  if (!rowNum || rowNum < 2) { return null; }
+
+  var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+  var values = sheet.getRange(rowNum, 1, 1, 21).getValues()[0];
+  var name = values[2] || '';               // C
+  var considerFrameColor = values[17] || ''; // R
+  var considerFrameUrl = values[20] || '';   // U
+
+  var frames = String(considerFrameColor)
+    .split(',')
+    .map(function(s) { return s.trim(); })
+    .filter(function(s) { return s; });
+  var urls = String(considerFrameUrl).split(',').map(function(s) { return s.trim(); });
+
+  var items = frames.map(function(frame, i) {
+    var parts = frame.split('/C');
+    var model = (parts[0] || '').trim();
+    var color = parts.length > 1 ? 'C' + parts[1].trim() : '';
+    return { model: model, color: color, url: urls[i] || '' };
+  });
+
+  return { row: rowNum, name: name, frames: items };
+}
+
+// Writes urls (one per frame, in order) back into column U as the same
+// comma-joined, position-matched format buildConfirmFrameListHtml() expects
+// — an empty string at index i just leaves that frame unlinked. Trailing
+// empty entries are dropped so an unused 2nd/3rd box doesn't leave a
+// dangling ", " in the cell; a blank *between* two filled entries is kept.
+function saveProspectFrameUrls(row, urls) {
+  var rowNum = parseInt(row, 10);
+  if (!rowNum || rowNum < 2) { return { ok: false, error: 'invalid row' }; }
+
+  var cleaned = (urls || []).map(function(u) { return String(u || '').trim(); });
+  while (cleaned.length && !cleaned[cleaned.length - 1]) { cleaned.pop(); }
+
+  var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+  sheet.getRange(rowNum, 21).setValue(cleaned.join(', ')); // U
+  return { ok: true };
+}
+
+var PROSPECT_URL_DIALOG_HTML = '<!DOCTYPE html><html><head><base target="_top">'
+  + '<style>'
+  + 'body{margin:0;padding:16px;font-family:\'Helvetica Neue\',Helvetica,Arial,sans-serif;'
+  + 'font-size:13px;color:#1a1a1a;}'
+  + '.hint{font-size:12px;color:#666666;margin:0 0 12px;}'
+  + '#list{display:flex;flex-direction:column;gap:6px;max-height:460px;overflow-y:auto;}'
+  + '.list-item{display:flex;justify-content:space-between;align-items:center;gap:10px;'
+  + 'width:100%;text-align:left;padding:10px 12px;border:1px solid #d0d0d0;border-radius:4px;'
+  + 'background:#ffffff;font-size:13px;font-family:inherit;color:#1a1a1a;cursor:pointer;}'
+  + '.list-item:hover{border-color:#185FA5;}'
+  + '.list-item .name{font-weight:500;}'
+  + '.list-item .ts{font-size:11px;color:#666666;white-space:nowrap;}'
+  + '#detail-view{display:none;}'
+  + '#back-btn{background:none;border:none;color:#185FA5;font-size:13px;cursor:pointer;'
+  + 'padding:0 0 12px;font-family:inherit;}'
+  + '#detail-name{font-size:14px;font-weight:500;margin:0 0 14px;}'
+  + '.frame-row{margin-bottom:12px;}'
+  + '.frame-label{font-size:12px;color:#666666;margin-bottom:4px;}'
+  + '.url-input{width:100%;box-sizing:border-box;padding:8px 10px;border:1px solid #d0d0d0;'
+  + 'border-radius:4px;font-size:13px;font-family:inherit;}'
+  + '.url-input:focus{outline:none;border-color:#185FA5;}'
+  + '#save-btn{margin-top:8px;padding:10px 16px;border:none;border-radius:4px;background:#185FA5;'
+  + 'color:#ffffff;font-size:13px;font-family:inherit;cursor:pointer;}'
+  + '#save-btn:hover{background:#124a85;}'
+  + '#status{font-size:12px;color:#666666;margin-top:10px;}'
+  + '</style></head><body>'
+  + '<div id="list-view">'
+  + '<p class="hint">検討中のお客様を選択してください（新しい順）</p>'
+  + '<div id="list"></div>'
+  + '</div>'
+  + '<div id="detail-view">'
+  + '<button id="back-btn">&larr; 一覧に戻る</button>'
+  + '<p id="detail-name"></p>'
+  + '<div id="frame-fields"></div>'
+  + '<button id="save-btn">保存</button>'
+  + '<p id="status"></p>'
+  + '</div>'
+  + '<script>'
+  + 'function escapeHtml(s){var d=document.createElement("div");d.textContent=s||"";return d.innerHTML;}'
+  + 'function loadList(){'
+  + 'google.script.run.withSuccessHandler(renderList).withFailureHandler(showError).getProspectFrameUrlList();'
+  + '}'
+  + 'function renderList(list){'
+  + 'var el=document.getElementById("list");'
+  + 'if(!list.length){el.textContent="検討中のお客様が見つかりません。";return;}'
+  + 'el.innerHTML=list.map(function(item){'
+  + 'return "<button class=\\"list-item\\" data-row=\\""+item.row+"\\">"'
+  + '+"<span class=\\"name\\">"+escapeHtml(item.name)+"</span>"'
+  + '+"<span class=\\"ts\\">"+escapeHtml(item.timestampDisplay)+"</span>"'
+  + '+"</button>";'
+  + '}).join("");'
+  + '[].forEach.call(el.querySelectorAll(".list-item"),function(btn){'
+  + 'btn.addEventListener("click",function(){openDetail(btn.dataset.row);});'
+  + '});'
+  + '}'
+  + 'function openDetail(row){'
+  + 'google.script.run.withSuccessHandler(renderDetail).withFailureHandler(showError).getProspectFrameUrlDetail(row);'
+  + '}'
+  + 'function renderDetail(detail){'
+  + 'document.getElementById("list-view").style.display="none";'
+  + 'document.getElementById("detail-view").style.display="block";'
+  + 'document.getElementById("detail-name").textContent=detail.name+" 様";'
+  + 'var el=document.getElementById("frame-fields");'
+  + 'el.innerHTML=detail.frames.map(function(f,i){'
+  + 'var label=escapeHtml(f.model)+(f.color?" / "+escapeHtml(f.color):"");'
+  + 'return "<div class=\\"frame-row\\">"'
+  + '+"<div class=\\"frame-label\\">"+label+"</div>"'
+  + '+"<input type=\\"url\\" class=\\"url-input\\" data-index=\\""+i+"\\" value=\\""+escapeHtml(f.url)+"\\" placeholder=\\"https://...\\">"'
+  + '+"</div>";'
+  + '}).join("");'
+  + 'document.getElementById("save-btn").dataset.row=detail.row;'
+  + 'document.getElementById("status").textContent="";'
+  + '}'
+  + 'document.getElementById("back-btn").addEventListener("click",function(){'
+  + 'document.getElementById("detail-view").style.display="none";'
+  + 'document.getElementById("list-view").style.display="block";'
+  + '});'
+  + 'document.getElementById("save-btn").addEventListener("click",function(){'
+  + 'var row=this.dataset.row;'
+  + 'var inputs=[].slice.call(document.querySelectorAll(".url-input"));'
+  + 'var urls=inputs.map(function(el){return el.value;});'
+  + 'var status=document.getElementById("status");'
+  + 'status.textContent="保存中…";'
+  + 'google.script.run.withSuccessHandler(function(){'
+  + 'status.textContent="保存しました。";'
+  + '}).withFailureHandler(showError).saveProspectFrameUrls(row,urls);'
+  + '});'
+  + 'function showError(err){'
+  + 'document.getElementById("status").textContent="エラー: "+(err&&err.message?err.message:err);'
+  + '}'
+  + 'loadList();'
+  + '</script></body></html>';
