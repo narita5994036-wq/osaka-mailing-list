@@ -94,6 +94,8 @@ body {
   font-size: 14px;
 }
 .frame-item .model { font-weight: 500; }
+.frame-item .model a { color: var(--blue); text-decoration: none; }
+.frame-item .model a:hover, .frame-item .model a:focus-visible { text-decoration: underline; }
 .frame-item .item-right {
   display: flex;
   align-items: baseline;
@@ -248,16 +250,21 @@ function escapeHtml(str) {
   return div.innerHTML;
 }
 
-function renderFrames(considerFrameColor) {
+function renderFrames(considerFrameColor, considerFrameUrl) {
   const list = document.getElementById('cf-frame-list');
   const frames = String(considerFrameColor || '')
     .split(',')
     .map(s => s.trim())
     .filter(Boolean);
 
+  // Not filtered: a blank between two commas (e.g. "url1, , url3") is a
+  // deliberate "no link for frame 2", kept so positions still line up with
+  // frames above by index.
+  const urls = String(considerFrameUrl || '').split(',').map(s => s.trim());
+
   let anyNeedsCheck = false;
 
-  frames.forEach(frame => {
+  frames.forEach((frame, i) => {
     const parts = frame.split('/C');
     let model = (parts[0] || '').trim();
     const color = parts.length > 1 ? 'C' + parts[1].trim() : '';
@@ -267,9 +274,15 @@ function renderFrames(considerFrameColor) {
     const needsCheck = model.endsWith('*');
     if (needsCheck) { model = model.slice(0, -1).trim(); anyNeedsCheck = true; }
 
+    const url = urls[i] || '';
+    let modelHtml = escapeHtml(model);
+    if (/^https?:\/\//i.test(url)) {
+      modelHtml = '<a href="' + escapeHtml(url) + '" target="_blank" rel="noopener">' + modelHtml + '</a>';
+    }
+
     const li = document.createElement('li');
     li.className = 'frame-item';
-    li.innerHTML = '<span class="model">' + escapeHtml(model) + '</span>'
+    li.innerHTML = '<span class="model">' + modelHtml + '</span>'
       + '<span class="item-right">'
       + (needsCheck ? '<span class="stock-badge">要確認</span>' : '')
       + (color ? '<span class="color">' + escapeHtml(color) + '</span>' : '')
@@ -302,7 +315,7 @@ async function loadConfirmData() {
       return;
     }
     document.getElementById('cf-name').textContent = data.name || '';
-    renderFrames(data.considerFrameColor);
+    renderFrames(data.considerFrameColor, data.considerFrameUrl);
     loading.hidden = true;
     content.hidden = false;
   } catch (err) {

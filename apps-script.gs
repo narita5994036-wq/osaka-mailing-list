@@ -3,14 +3,15 @@
  * Deploy as Web App (Execute as: Me / Access: Anyone) and paste the
  * resulting /exec URL into SHEET_WEBHOOK_URL in index.html.
  *
- * Spreadsheet column order (A→T), matching the live sheet's actual headers:
+ * Spreadsheet column order (A→U), matching the live sheet's actual headers:
  * A Timestamp | B ID | C Name | D Email | E Opt-in | F Country | G Language |
  * H Follow-up Sent | I Purchased (Frame) | J Staff Notes | K Purchased (Lenses) |
  * L Phone Number | M Postcode | N Address(Street) | O Address(Building) |
  * P City/Town | Q State/Province | R considerFrame/Color | S SMS Opt-in |
- * T Customer Type
+ * T Customer Type | U considerFrameURL
  * (B and J are filled in manually in the sheet for a purchaser; B is
- * auto-filled with the Confirm Token for a prospect — see below.)
+ * auto-filled with the Confirm Token for a prospect — see below. U is
+ * always blank on submission — staff fill it in manually afterward.)
  *
  * A prospect's optional phone number reuses column L (Phone Number) — the
  * same column a purchaser's lens-shipping phone uses — since a single
@@ -23,7 +24,11 @@
  *
  * Up to 3 considering frames (model + color number) are combined into a
  * single cell (column R), each formatted as "Frame Name/C###" and joined
- * with ", ", e.g. "Kelly Sun/C301, Aiko/C204".
+ * with ", ", e.g. "Kelly Sun/C301, Aiko/C204". Column U optionally holds
+ * one product-page URL per frame, in the same order and also joined with
+ * ", " (e.g. "https://.../kelly-sun, https://.../aiko") — staff type these
+ * in directly; a blank entry for a given position just leaves that frame
+ * unlinked. buildConfirmFrameListHtml() matches them to frames by index.
  * Timestamp (column A) is stored as a real date and displayed in Japan
  * time as yyyy/mm/dd hh:mm:ss; run fixExistingTimestamps() once to apply
  * the same formatting to rows submitted before this was added.
@@ -191,7 +196,7 @@ function doPost(e) {
   var sheet = ss.getActiveSheet();
   var data = JSON.parse(e.postData.contents);
 
-  var headers = ['Timestamp', 'ID', 'Name', 'Email', 'Opt-in', 'Country', 'Language', 'Follow-up Sent', 'Purchased (Frame)', 'Staff Notes', 'Purchased (Lenses)', 'Phone Number', 'Postcode', 'Address(Street)', 'Address(Building)', 'City/Town', 'State/Province', 'considerFrame/Color', 'SMS Opt-in', 'Customer Type'];
+  var headers = ['Timestamp', 'ID', 'Name', 'Email', 'Opt-in', 'Country', 'Language', 'Follow-up Sent', 'Purchased (Frame)', 'Staff Notes', 'Purchased (Lenses)', 'Phone Number', 'Postcode', 'Address(Street)', 'Address(Building)', 'City/Town', 'State/Province', 'considerFrame/Color', 'SMS Opt-in', 'Customer Type', 'considerFrameURL'];
   if (sheet.getLastRow() === 0) {
     sheet.appendRow(headers);
   }
@@ -240,7 +245,8 @@ function doPost(e) {
     data.addressState || '',               // Q: State/Province
     considerFrameColor,                    // R: considerFrame/Color
     isProspect ? (data.prospectSmsOptIn ? 'Yes' : 'No') : '', // S: SMS Opt-in
-    isProspect ? 'Prospect' : 'Purchaser' // T: Customer Type
+    isProspect ? 'Prospect' : 'Purchaser', // T: Customer Type
+    ''                                     // U: considerFrameURL (filled in manually by staff)
   ]);
 
   var newRow = sheet.getLastRow();
@@ -418,13 +424,14 @@ function findConfirmRecord(token) {
   var lastRow = sheet.getLastRow();
   if (lastRow < 2) { return null; }
 
-  var values = sheet.getRange(2, 1, lastRow - 1, 20).getValues();
+  var values = sheet.getRange(2, 1, lastRow - 1, 21).getValues();
   for (var i = 0; i < values.length; i++) {
     var rowToken = String(values[i][1] || ''); // B
     if (rowToken && rowToken === token) {
       return {
-        name: values[i][2] || '',              // C
-        considerFrameColor: values[i][17] || '' // R
+        name: values[i][2] || '',                // C
+        considerFrameColor: values[i][17] || '',  // R
+        considerFrameUrl: values[i][20] || ''      // U
       };
     }
   }
@@ -440,7 +447,12 @@ function handleGetConfirm(params) {
   if (!token) { return { ok: false, error: 'missing id' }; }
   var record = findConfirmRecord(token);
   if (!record) { return { ok: false, error: 'not found' }; }
-  return { ok: true, name: record.name, considerFrameColor: record.considerFrameColor };
+  return {
+    ok: true,
+    name: record.name,
+    considerFrameColor: record.considerFrameColor,
+    considerFrameUrl: record.considerFrameUrl
+  };
 }
 
 /**
@@ -480,13 +492,25 @@ function escapeHtmlGs(str) {
     .replace(/'/g, '&#39;');
 }
 
-function buildConfirmFrameListHtml(considerFrameColor) {
+// Only http(s) links are ever emitted as href — a stray value staff might
+// paste into the URL column (or leave blank) never becomes a javascript:
+// or other unexpected scheme.
+function isSafeHttpUrl_(url) {
+  return /^https?:\/\//i.test(url);
+}
+
+function buildConfirmFrameListHtml(considerFrameColor, considerFrameUrl) {
   var frames = String(considerFrameColor || '')
     .split(',')
     .map(function(s) { return s.trim(); })
     .filter(function(s) { return s; });
 
-  return frames.map(function(frame) {
+  // Not filtered: a blank between two commas (e.g. "url1, , url3") is a
+  // deliberate "no link for frame 2", kept so positions still line up with
+  // considerFrameColor's frames by index.
+  var urls = String(considerFrameUrl || '').split(',').map(function(s) { return s.trim(); });
+
+  return frames.map(function(frame, i) {
     var parts = frame.split('/C');
     var model = (parts[0] || '').trim();
     var color = parts.length > 1 ? 'C' + parts[1].trim() : '';
@@ -496,7 +520,13 @@ function buildConfirmFrameListHtml(considerFrameColor) {
     var needsCheck = model.slice(-1) === '*';
     if (needsCheck) { model = model.slice(0, -1).trim(); }
 
-    return '<li class="frame-item"><span class="model">' + escapeHtmlGs(model) + '</span>'
+    var url = urls[i] || '';
+    var modelHtml = escapeHtmlGs(model);
+    if (isSafeHttpUrl_(url)) {
+      modelHtml = '<a href="' + escapeHtmlGs(url) + '" target="_blank" rel="noopener">' + modelHtml + '</a>';
+    }
+
+    return '<li class="frame-item"><span class="model">' + modelHtml + '</span>'
       + '<span class="item-right">'
       + (needsCheck ? '<span class="stock-badge">要確認</span>' : '')
       + (color ? '<span class="color">' + escapeHtmlGs(color) + '</span>' : '')
@@ -519,7 +549,7 @@ function buildConfirmContentHtml(record) {
     + '<p class="greeting">' + escapeHtmlGs(record.name) + ' 様</p>'
     + '<p class="lead">この度はMYKITA Osakaへご来店いただき、誠にありがとうございます。<br>ご検討いただいたフレームは以下の通りです。</p>'
     + '<p class="section-label">ご検討中のフレーム</p>'
-    + '<ul class="frame-list">' + buildConfirmFrameListHtml(record.considerFrameColor) + '</ul>'
+    + '<ul class="frame-list">' + buildConfirmFrameListHtml(record.considerFrameColor, record.considerFrameUrl) + '</ul>'
     + (hasNeedsCheckFrame(record.considerFrameColor)
         ? '<p class="stock-note">※「要確認」のフレームは、在庫がない可能性がございます。</p>'
         : '')
@@ -559,6 +589,8 @@ var CONFIRM_PAGE_CSS = ':root{--bg:#ffffff;--surface:#f5f5f5;--border:#d0d0d0;--
   + '.frame-item{display:flex;align-items:baseline;justify-content:space-between;gap:12px;'
   + 'border:0.5px solid var(--border);padding:14px 16px;font-size:14px;}'
   + '.frame-item .model{font-weight:500;}'
+  + '.frame-item .model a{color:var(--blue);text-decoration:none;}'
+  + '.frame-item .model a:hover,.frame-item .model a:focus-visible{text-decoration:underline;}'
   + '.frame-item .item-right{display:flex;align-items:baseline;gap:8px;}'
   + '.frame-item .color{font-size:12px;letter-spacing:0.04em;color:var(--mid);font-variant-numeric:tabular-nums;}'
   + '.frame-item .stock-badge{font-size:11px;letter-spacing:0.04em;color:var(--orange);background:var(--orange-bg);'
