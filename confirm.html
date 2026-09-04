@@ -250,14 +250,17 @@ function escapeHtml(str) {
   return div.innerHTML;
 }
 
-function renderFrames(considerFrameColor, considerFrameUrls) {
+function renderFrames(considerFrameColor, considerFrameUrl) {
   const list = document.getElementById('cf-frame-list');
   const frames = String(considerFrameColor || '')
     .split(',')
     .map(s => s.trim())
     .filter(Boolean);
 
-  const urls = considerFrameUrls || [];
+  // Not filtered: a blank between two commas (e.g. "url1, , url3") is a
+  // deliberate "no link for frame 2", kept so positions still line up with
+  // frames above by index.
+  const urls = String(considerFrameUrl || '').split(',').map(s => s.trim());
 
   let anyNeedsCheck = false;
 
@@ -312,7 +315,7 @@ async function loadConfirmData() {
       return;
     }
     document.getElementById('cf-name').textContent = data.name || '';
-    renderFrames(data.considerFrameColor, data.considerFrameUrls);
+    renderFrames(data.considerFrameColor, data.considerFrameUrl);
     loading.hidden = true;
     content.hidden = false;
   } catch (err) {
