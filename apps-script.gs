@@ -10,10 +10,12 @@
  * P City/Town | Q State/Province | R considerFrame/Color | S SMS Opt-in |
  * T Customer Type | U considerFrameURL
  * (B is filled in manually in the sheet for a purchaser, or auto-filled
- * with the Confirm Token for a prospect — see below. J is auto-filled
- * with the purchaser's optional Date of Birth (YYYY-MM-DD, from the
- * form's date input) when given, otherwise left blank for staff to use
- * as an actual note. U is always blank on submission — staff fill it in
+ * with the Confirm Token for a prospect — see below. J (Staff Notes) is
+ * auto-filled with the purchaser's optional Gender when given, otherwise
+ * left blank for staff to use as an actual note. K (Purchased (Lenses),
+ * no longer tracked — the header label is stale) is auto-filled with the
+ * purchaser's optional Date of Birth (YYYY-MM-DD, from the form's date
+ * input) when given. U is always blank on submission — staff fill it in
  * manually afterward.)
  *
  * A prospect's optional phone number reuses column L (Phone Number) — the
@@ -238,8 +240,8 @@ function doPost(e) {
     (data.lang || '').toUpperCase(), // G: Language
     '',                                    // H: Follow-up Sent (always blank)
     data.frameNames || '',                 // I: Purchased (Frame)
-    isProspect ? '' : (data.dob || ''),    // J: Staff Notes (purchaser's optional date of birth)
-    data.lensOrder ? 'Yes' : 'No',        // K: Purchased (Lenses)
+    isProspect ? '' : (data.gender || ''), // J: Staff Notes (purchaser's optional gender)
+    isProspect ? '' : (data.dob || ''),    // K: Purchased (Lenses) (purchaser's optional date of birth)
     encryptPhone_(isProspect ? (data.prospectPhone || '') : (data.phone || '')), // L: Phone Number (encrypted)
     data.postcode || '',                   // M: Postcode
     data.addressStreet || '',              // N: Address(Street)
@@ -635,7 +637,7 @@ function readRecords(sheet) {
       followupSent: String(row[7]).toUpperCase() === 'TRUE', // H
       frameNames:  row[8] || '',  // I
       staffNotes:  row[9] || '',  // J
-      lensOrder:   row[10] || '', // K
+      dob:         row[10] || '', // K (purchaser's optional date of birth)
       phone:       decryptPhone_(row[11]), // L (decrypted for the password-gated admin panel)
       postcode:    row[12] || '', // M
       addressStreet:   row[13] || '', // N
