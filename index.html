@@ -150,6 +150,21 @@ body {
 }
 .field input:focus { border-color: var(--light); }
 .field input.err { border-color: var(--red); }
+.field select {
+  width: 100%;
+  background: var(--surface);
+  border: 0.5px solid var(--border);
+  color: var(--light);
+  font-family: var(--font);
+  font-size: 16px;
+  padding: 15px 16px;
+  outline: none;
+  transition: border-color 0.15s;
+  -webkit-appearance: none;
+  border-radius: 0;
+  box-sizing: border-box;
+}
+.field select:focus { border-color: var(--light); }
 .err-msg {
   font-size: 12px;
   color: var(--red);
@@ -754,7 +769,7 @@ tr:hover td { background: #f9f9f9; }
       <!-- Date of Birth (purchaser only, optional) -->
       <div class="field" id="dob-field">
         <label id="lbl-dob">Date of Birth</label>
-        <input type="date" id="f-dob">
+        <input type="text" id="f-dob" inputmode="numeric" placeholder="YYYY-MM-DD" maxlength="10" oninput="this.value = this.value.replace(/[^0-9-]/g, '')">
       </div>
 
       <!-- Gender (purchaser only, optional) -->
