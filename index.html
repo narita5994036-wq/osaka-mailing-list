@@ -242,19 +242,27 @@ body {
   align-items: center;
   justify-content: center;
   scroll-snap-align: center;
-  font-size: 17px;
-  color: var(--light);
+  font-size: 21px;
+  color: var(--mid);
   font-variant-numeric: tabular-nums;
+  transition: color 0.1s;
 }
-.dob-wheel-highlight {
+.dob-wheel-item.selected { color: var(--light); }
+.dob-wheel-fade-top,
+.dob-wheel-fade-bottom {
   position: absolute;
-  left: 16px;
-  right: 16px;
-  top: 88px;
-  height: 44px;
-  border-top: 0.5px solid var(--border);
-  border-bottom: 0.5px solid var(--border);
+  left: 0;
+  right: 0;
+  height: 88px;
   pointer-events: none;
+}
+.dob-wheel-fade-top {
+  top: 0;
+  background: linear-gradient(to bottom, rgba(255,255,255,1) 0%, rgba(255,255,255,0) 100%);
+}
+.dob-wheel-fade-bottom {
+  bottom: 0;
+  background: linear-gradient(to top, rgba(255,255,255,1) 0%, rgba(255,255,255,0) 100%);
 }
 .err-msg {
   font-size: 12px;
@@ -1011,7 +1019,8 @@ tr:hover td { background: #f9f9f9; }
       <button type="button" class="dob-picker-btn dob-picker-done" onclick="confirmDobPicker()" id="lbl-dob-done">Done</button>
     </div>
     <div class="dob-picker-wheels">
-      <div class="dob-wheel-highlight"></div>
+      <div class="dob-wheel-fade-top"></div>
+      <div class="dob-wheel-fade-bottom"></div>
       <div class="dob-wheel" id="dob-wheel-year"></div>
       <div class="dob-wheel" id="dob-wheel-month"></div>
       <div class="dob-wheel" id="dob-wheel-day"></div>
@@ -1849,10 +1858,21 @@ function buildDobWheel(el, values, selectedValue) {
   el.innerHTML = values.map(v => `<div class="dob-wheel-item">${v}</div>`).join('');
   const index = Math.max(0, values.indexOf(selectedValue));
   el.scrollTop = index * DOB_ITEM_HEIGHT;
+  updateDobWheelDimming(el);
 }
 
 function getDobWheelIndex(el) {
   return Math.round(el.scrollTop / DOB_ITEM_HEIGHT);
+}
+
+// iOS-style wheel: only the centered row is fully opaque, the rest are
+// dimmed — combined with the fade gradients, this stands in for the
+// depth/curve cue a native UIPickerView gives with plain CSS.
+function updateDobWheelDimming(el) {
+  const index = getDobWheelIndex(el);
+  Array.from(el.children).forEach((item, i) => {
+    item.classList.toggle('selected', i === index);
+  });
 }
 
 function rebuildDobDayWheel(preserveDay) {
@@ -1870,6 +1890,8 @@ function onDobYearOrMonthScroll() {
   const years = dobYearList();
   dobWheelState.year = years[getDobWheelIndex(yearEl)] ?? dobWheelState.year;
   dobWheelState.month = getDobWheelIndex(monthEl) + 1;
+  updateDobWheelDimming(yearEl);
+  updateDobWheelDimming(monthEl);
   rebuildDobDayWheel(dobWheelState.day);
 }
 
@@ -1891,12 +1913,14 @@ function openDobPicker() {
 
   const yearEl = document.getElementById('dob-wheel-year');
   const monthEl = document.getElementById('dob-wheel-month');
+  const dayEl = document.getElementById('dob-wheel-day');
   buildDobWheel(yearEl, dobYearList(), dobWheelState.year);
   buildDobWheel(monthEl, Array.from({ length: 12 }, (_, i) => i + 1), dobWheelState.month);
   rebuildDobDayWheel(dobWheelState.day);
 
   yearEl.onscroll = debounce(onDobYearOrMonthScroll, 100);
   monthEl.onscroll = debounce(onDobYearOrMonthScroll, 100);
+  dayEl.onscroll = debounce(() => updateDobWheelDimming(dayEl), 100);
 }
 
 function closeDobPicker() {
