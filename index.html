@@ -165,6 +165,97 @@ body {
   box-sizing: border-box;
 }
 .field select:focus { border-color: var(--light); }
+.dob-display {
+  display: block;
+  width: 100%;
+  background: var(--surface);
+  border: 0.5px solid var(--border);
+  color: var(--light);
+  font-family: var(--font);
+  font-size: 16px;
+  padding: 15px 16px;
+  text-align: left;
+  outline: none;
+  cursor: pointer;
+  transition: border-color 0.15s;
+  border-radius: 0;
+  box-sizing: border-box;
+}
+.dob-display.placeholder { color: var(--mid); }
+.dob-display:focus { border-color: var(--light); }
+
+/* ── DOB PICKER ── */
+.dob-picker-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.4);
+  z-index: 300;
+  align-items: flex-end;
+  justify-content: center;
+}
+.dob-picker-overlay.open { display: flex; }
+.dob-picker-sheet {
+  background: var(--bg);
+  width: 100%;
+  max-width: 500px;
+  border-top: 0.5px solid var(--border);
+}
+.dob-picker-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px;
+  border-bottom: 0.5px solid var(--border);
+  font-size: 13px;
+  color: var(--light);
+}
+.dob-picker-btn {
+  background: none;
+  border: none;
+  font-family: var(--font);
+  font-size: 14px;
+  color: var(--mid);
+  cursor: pointer;
+  padding: 4px;
+}
+.dob-picker-done { color: var(--blue); font-weight: 600; }
+.dob-picker-wheels {
+  position: relative;
+  display: flex;
+  height: 220px;
+  padding: 0 16px 24px;
+}
+.dob-wheel {
+  flex: 1;
+  overflow-y: scroll;
+  scroll-snap-type: y mandatory;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+  padding: 88px 0;
+  box-sizing: border-box;
+}
+.dob-wheel::-webkit-scrollbar { display: none; }
+.dob-wheel-item {
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  scroll-snap-align: center;
+  font-size: 17px;
+  color: var(--light);
+  font-variant-numeric: tabular-nums;
+}
+.dob-wheel-highlight {
+  position: absolute;
+  left: 16px;
+  right: 16px;
+  top: 88px;
+  height: 44px;
+  border-top: 0.5px solid var(--border);
+  border-bottom: 0.5px solid var(--border);
+  pointer-events: none;
+}
 .err-msg {
   font-size: 12px;
   color: var(--red);
@@ -769,7 +860,8 @@ tr:hover td { background: #f9f9f9; }
       <!-- Date of Birth (purchaser only, optional) -->
       <div class="field" id="dob-field">
         <label id="lbl-dob">Date of Birth</label>
-        <input type="text" id="f-dob" inputmode="numeric" placeholder="YYYY-MM-DD" maxlength="10" oninput="this.value = this.value.replace(/[^0-9-]/g, '')">
+        <button type="button" class="dob-display placeholder" id="dob-display" onclick="openDobPicker()">Select date</button>
+        <input type="hidden" id="f-dob">
       </div>
 
       <!-- Gender (purchaser only, optional) -->
@@ -905,6 +997,25 @@ tr:hover td { background: #f9f9f9; }
       <button class="refresh-btn" onclick="resetForm()" id="lbl-register-another">Register Another Frame</button>
     </div>
 
+  </div>
+</div>
+
+<!-- Date of Birth wheel picker (top-level so it isn't nested inside a
+     display:none ancestor like #admin-panel, or the wheels get built
+     with zero height and scrollTop assignments silently no-op) -->
+<div class="dob-picker-overlay" id="dob-picker-overlay" onclick="closeDobPickerOnOverlay(event)">
+  <div class="dob-picker-sheet">
+    <div class="dob-picker-header">
+      <button type="button" class="dob-picker-btn" onclick="closeDobPicker()" id="lbl-dob-cancel">Cancel</button>
+      <span id="lbl-dob-picker-title">Date of Birth</span>
+      <button type="button" class="dob-picker-btn dob-picker-done" onclick="confirmDobPicker()" id="lbl-dob-done">Done</button>
+    </div>
+    <div class="dob-picker-wheels">
+      <div class="dob-wheel-highlight"></div>
+      <div class="dob-wheel" id="dob-wheel-year"></div>
+      <div class="dob-wheel" id="dob-wheel-month"></div>
+      <div class="dob-wheel" id="dob-wheel-day"></div>
+    </div>
   </div>
 </div>
 
@@ -1044,6 +1155,7 @@ const i18n = {
     personal: 'Personal Information',
     name: 'Full Name', country: 'Country / Region', email: 'Email Address', dob: 'Date of Birth',
     gender: 'Gender', genderMale: 'Male', genderFemale: 'Female', genderNA: 'Prefer not to say',
+    dobSelect: 'Select date', dobPickerTitle: 'Date of Birth', dobCancel: 'Cancel', dobDone: 'Done',
     optinSection: 'Email Opt-in',
     optinDesc: 'Would you like to receive exclusive offers, news, and updates from MYKITA JAPAN?',
     optinNote: '＊Even if you select No, we will send you a thank-you email to confirm your registration.',
@@ -1095,6 +1207,7 @@ const i18n = {
     personal: 'お客様情報',
     name: 'お名前', country: '都道府県', email: 'メールアドレス', dob: '生年月日',
     gender: '性別', genderMale: '男性', genderFemale: '女性', genderNA: '回答しない',
+    dobSelect: '日付を選択', dobPickerTitle: '生年月日', dobCancel: 'キャンセル', dobDone: '完了',
     optinSection: 'メール配信',
     optinDesc: 'MYKITA JAPANからの最新情報・限定オファーをお受け取りになりますか？',
     optinNote: '＊Noを選択した場合でもご登録確認を兼ねたサンキューメールをお送りさせていただきます。',
@@ -1146,6 +1259,7 @@ const i18n = {
     personal: '个人信息',
     name: '姓名', country: '国家 / 地区', email: '电子邮箱', dob: '出生日期',
     gender: '性别', genderMale: '男', genderFemale: '女', genderNA: '不愿透露',
+    dobSelect: '选择日期', dobPickerTitle: '出生日期', dobCancel: '取消', dobDone: '完成',
     optinSection: '邮件订阅',
     optinDesc: '您是否希望收到来自MYKITA JAPAN的独家优惠、资讯和最新动态？',
     optinNote: '＊即使选择"否"，我们也会向您发送一封感谢邮件以确认您的注册。',
@@ -1197,6 +1311,7 @@ const i18n = {
     personal: '개인 정보',
     name: '성명', country: '국가 / 지역', email: '이메일 주소', dob: '생년월일',
     gender: '성별', genderMale: '남성', genderFemale: '여성', genderNA: '응답하지 않음',
+    dobSelect: '날짜 선택', dobPickerTitle: '생년월일', dobCancel: '취소', dobDone: '완료',
     optinSection: '이메일 수신 동의',
     optinDesc: 'MYKITA JAPAN의 독점 혜택, 소식, 최신 정보를 받아보시겠습니까?',
     optinNote: '＊아니요를 선택하시더라도 등록 확인을 겸한 감사 메일을 보내드립니다。',
@@ -1260,6 +1375,11 @@ function setLang(lang) {
   document.getElementById('opt-gender-male').textContent = t.genderMale;
   document.getElementById('opt-gender-female').textContent = t.genderFemale;
   document.getElementById('opt-gender-na').textContent = t.genderNA;
+  const dobDisplay = document.getElementById('dob-display');
+  if (dobDisplay.classList.contains('placeholder')) { dobDisplay.textContent = t.dobSelect; }
+  document.getElementById('lbl-dob-picker-title').textContent = t.dobPickerTitle;
+  document.getElementById('lbl-dob-cancel').textContent = t.dobCancel;
+  document.getElementById('lbl-dob-done').textContent = t.dobDone;
   document.getElementById('lbl-email').textContent = t.email;
   document.getElementById('lbl-optin-section').textContent = t.optinSection;
   document.getElementById('lbl-optin-desc').textContent = t.optinDesc;
@@ -1483,6 +1603,7 @@ function resetFrameEntry() {
   document.getElementById('f-address-city-intl').value = '';
   document.getElementById('f-address-state').value = '';
   document.getElementById('f-dob').value = '';
+  resetDobDisplay();
   document.getElementById('f-gender').value = '';
   document.getElementById('f-customer-type-purchaser').checked = false;
   document.getElementById('f-customer-type-prospect').checked = false;
@@ -1713,6 +1834,112 @@ function applyCustomerTypeToForm() {
     updateCountryFieldVisibility();
   }
   updateSubmitState();
+}
+
+// ── DOB WHEEL PICKER ──
+const DOB_ITEM_HEIGHT = 44;
+const DOB_DEFAULT = { year: 2000, month: 1, day: 1 };
+let dobWheelState = { year: DOB_DEFAULT.year, month: DOB_DEFAULT.month, day: DOB_DEFAULT.day };
+
+function daysInMonth(year, month) {
+  return new Date(year, month, 0).getDate();
+}
+
+function buildDobWheel(el, values, selectedValue) {
+  el.innerHTML = values.map(v => `<div class="dob-wheel-item">${v}</div>`).join('');
+  const index = Math.max(0, values.indexOf(selectedValue));
+  el.scrollTop = index * DOB_ITEM_HEIGHT;
+}
+
+function getDobWheelIndex(el) {
+  return Math.round(el.scrollTop / DOB_ITEM_HEIGHT);
+}
+
+function rebuildDobDayWheel(preserveDay) {
+  const el = document.getElementById('dob-wheel-day');
+  const maxDay = daysInMonth(dobWheelState.year, dobWheelState.month);
+  const days = Array.from({ length: maxDay }, (_, i) => i + 1);
+  const day = Math.min(preserveDay, maxDay);
+  buildDobWheel(el, days, day);
+  dobWheelState.day = day;
+}
+
+function onDobYearOrMonthScroll() {
+  const yearEl = document.getElementById('dob-wheel-year');
+  const monthEl = document.getElementById('dob-wheel-month');
+  const years = dobYearList();
+  dobWheelState.year = years[getDobWheelIndex(yearEl)] ?? dobWheelState.year;
+  dobWheelState.month = getDobWheelIndex(monthEl) + 1;
+  rebuildDobDayWheel(dobWheelState.day);
+}
+
+function dobYearList() {
+  const currentYear = new Date().getFullYear();
+  return Array.from({ length: currentYear - 1900 + 1 }, (_, i) => 1900 + i);
+}
+
+function openDobPicker() {
+  const existing = document.getElementById('f-dob').value; // "YYYY-MM-DD" or ""
+  const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(existing);
+  dobWheelState = match
+    ? { year: parseInt(match[1], 10), month: parseInt(match[2], 10), day: parseInt(match[3], 10) }
+    : { ...DOB_DEFAULT };
+
+  // Must be visible (not display:none) before setting scrollTop on the
+  // wheels below, or the assignment is silently ignored.
+  document.getElementById('dob-picker-overlay').classList.add('open');
+
+  const yearEl = document.getElementById('dob-wheel-year');
+  const monthEl = document.getElementById('dob-wheel-month');
+  buildDobWheel(yearEl, dobYearList(), dobWheelState.year);
+  buildDobWheel(monthEl, Array.from({ length: 12 }, (_, i) => i + 1), dobWheelState.month);
+  rebuildDobDayWheel(dobWheelState.day);
+
+  yearEl.onscroll = debounce(onDobYearOrMonthScroll, 100);
+  monthEl.onscroll = debounce(onDobYearOrMonthScroll, 100);
+}
+
+function closeDobPicker() {
+  document.getElementById('dob-picker-overlay').classList.remove('open');
+}
+
+function closeDobPickerOnOverlay(e) {
+  if (e.target.id === 'dob-picker-overlay') closeDobPicker();
+}
+
+function confirmDobPicker() {
+  const yearEl = document.getElementById('dob-wheel-year');
+  const monthEl = document.getElementById('dob-wheel-month');
+  const dayEl = document.getElementById('dob-wheel-day');
+  const years = dobYearList();
+  const year = years[getDobWheelIndex(yearEl)] ?? dobWheelState.year;
+  const month = getDobWheelIndex(monthEl) + 1;
+  const maxDay = daysInMonth(year, month);
+  const day = Math.min(getDobWheelIndex(dayEl) + 1, maxDay);
+
+  const pad = n => String(n).padStart(2, '0');
+  const value = `${year}-${pad(month)}-${pad(day)}`;
+  document.getElementById('f-dob').value = value;
+  const display = document.getElementById('dob-display');
+  display.textContent = value;
+  display.classList.remove('placeholder');
+
+  closeDobPicker();
+}
+
+function resetDobDisplay() {
+  const t = i18n[currentLang];
+  const display = document.getElementById('dob-display');
+  display.textContent = t.dobSelect;
+  display.classList.add('placeholder');
+}
+
+function debounce(fn, ms) {
+  let timer;
+  return function() {
+    clearTimeout(timer);
+    timer = setTimeout(fn, ms);
+  };
 }
 
 // ── PREFECTURE AUTOCOMPLETE (JA) ──
