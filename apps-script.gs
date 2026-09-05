@@ -3,15 +3,15 @@
  * Deploy as Web App (Execute as: Me / Access: Anyone) and paste the
  * resulting /exec URL into SHEET_WEBHOOK_URL in index.html.
  *
- * Spreadsheet column order (A→W), matching the live sheet's actual headers:
+ * Spreadsheet column order (A→U), matching the live sheet's actual headers:
  * A Timestamp | B ID | C Name | D Email | E Opt-in | F Country | G Language |
  * H Follow-up Sent | I Purchased (Frame) | J Staff Notes | K Purchased (Lenses) |
  * L Phone Number | M Postcode | N Address(Street) | O Address(Building) |
  * P City/Town | Q State/Province | R considerFrame/Color | S SMS Opt-in |
- * T Customer Type | U Frame URL 1 | V Frame URL 2 | W Frame URL 3
+ * T Customer Type | U considerFrameURL
  * (B and J are filled in manually in the sheet for a purchaser; B is
- * auto-filled with the Confirm Token for a prospect — see below. U-W are
- * always blank on submission — staff fill them in manually afterward.)
+ * auto-filled with the Confirm Token for a prospect — see below. U is
+ * always blank on submission — staff fill it in manually afterward.)
  *
  * A prospect's optional phone number reuses column L (Phone Number) — the
  * same column a purchaser's lens-shipping phone uses — since a single
@@ -24,11 +24,11 @@
  *
  * Up to 3 considering frames (model + color number) are combined into a
  * single cell (column R), each formatted as "Frame Name/C###" and joined
- * with ", ", e.g. "Kelly Sun/C301, Aiko/C204". Columns U/V/W each
- * optionally hold one product-page URL, matched to the 1st/2nd/3rd frame
- * in column R by position — staff type each URL into its own column
- * directly; leaving one blank just leaves that frame unlinked.
- * buildConfirmFrameListHtml() zips them together by index.
+ * with ", ", e.g. "Kelly Sun/C301, Aiko/C204". Column U optionally holds
+ * one product-page URL per frame, in the same order and also joined with
+ * ", " (e.g. "https://.../kelly-sun, https://.../aiko") — staff type these
+ * in directly; a blank entry for a given position just leaves that frame
+ * unlinked. buildConfirmFrameListHtml() matches them to frames by index.
  * Timestamp (column A) is stored as a real date and displayed in Japan
  * time as yyyy/mm/dd hh:mm:ss; run fixExistingTimestamps() once to apply
  * the same formatting to rows submitted before this was added.
@@ -196,7 +196,7 @@ function doPost(e) {
   var sheet = ss.getActiveSheet();
   var data = JSON.parse(e.postData.contents);
 
-  var headers = ['Timestamp', 'ID', 'Name', 'Email', 'Opt-in', 'Country', 'Language', 'Follow-up Sent', 'Purchased (Frame)', 'Staff Notes', 'Purchased (Lenses)', 'Phone Number', 'Postcode', 'Address(Street)', 'Address(Building)', 'City/Town', 'State/Province', 'considerFrame/Color', 'SMS Opt-in', 'Customer Type', 'Frame URL 1', 'Frame URL 2', 'Frame URL 3'];
+  var headers = ['Timestamp', 'ID', 'Name', 'Email', 'Opt-in', 'Country', 'Language', 'Follow-up Sent', 'Purchased (Frame)', 'Staff Notes', 'Purchased (Lenses)', 'Phone Number', 'Postcode', 'Address(Street)', 'Address(Building)', 'City/Town', 'State/Province', 'considerFrame/Color', 'SMS Opt-in', 'Customer Type', 'considerFrameURL'];
   if (sheet.getLastRow() === 0) {
     sheet.appendRow(headers);
   }
@@ -246,9 +246,7 @@ function doPost(e) {
     considerFrameColor,                    // R: considerFrame/Color
     isProspect ? (data.prospectSmsOptIn ? 'Yes' : 'No') : '', // S: SMS Opt-in
     isProspect ? 'Prospect' : 'Purchaser', // T: Customer Type
-    '', // U: Frame URL 1 (filled in manually by staff)
-    '', // V: Frame URL 2 (filled in manually by staff)
-    ''  // W: Frame URL 3 (filled in manually by staff)
+    ''                                     // U: considerFrameURL (filled in manually by staff)
   ]);
 
   var newRow = sheet.getLastRow();
@@ -426,18 +424,14 @@ function findConfirmRecord(token) {
   var lastRow = sheet.getLastRow();
   if (lastRow < 2) { return null; }
 
-  var values = sheet.getRange(2, 1, lastRow - 1, 23).getValues();
+  var values = sheet.getRange(2, 1, lastRow - 1, 21).getValues();
   for (var i = 0; i < values.length; i++) {
     var rowToken = String(values[i][1] || ''); // B
     if (rowToken && rowToken === token) {
       return {
-        name: values[i][2] || '',               // C
+        name: values[i][2] || '',              // C
         considerFrameColor: values[i][17] || '', // R
-        considerFrameUrls: [
-          values[i][20] || '', // U: Frame URL 1
-          values[i][21] || '', // V: Frame URL 2
-          values[i][22] || ''  // W: Frame URL 3
-        ]
+        considerFrameUrl: values[i][20] || ''    // U
       };
     }
   }
@@ -457,7 +451,7 @@ function handleGetConfirm(params) {
     ok: true,
     name: record.name,
     considerFrameColor: record.considerFrameColor,
-    considerFrameUrls: record.considerFrameUrls
+    considerFrameUrl: record.considerFrameUrl
   };
 }
 
@@ -505,13 +499,16 @@ function isSafeHttpUrl_(url) {
   return /^https?:\/\//i.test(url);
 }
 
-function buildConfirmFrameListHtml(considerFrameColor, considerFrameUrls) {
+function buildConfirmFrameListHtml(considerFrameColor, considerFrameUrl) {
   var frames = String(considerFrameColor || '')
     .split(',')
     .map(function(s) { return s.trim(); })
     .filter(function(s) { return s; });
 
-  var urls = considerFrameUrls || [];
+  // Not filtered: a blank between two commas (e.g. "url1, , url3") is a
+  // deliberate "no link for frame 2", kept so positions still line up with
+  // considerFrameColor's frames by index.
+  var urls = String(considerFrameUrl || '').split(',').map(function(s) { return s.trim(); });
 
   return frames.map(function(frame, i) {
     var parts = frame.split('/C');
@@ -552,7 +549,7 @@ function buildConfirmContentHtml(record) {
     + '<p class="greeting">' + escapeHtmlGs(record.name) + ' 様</p>'
     + '<p class="lead">この度はMYKITA Osakaへご来店いただき、誠にありがとうございます。<br>ご検討いただいたフレームは以下の通りです。</p>'
     + '<p class="section-label">ご検討中のフレーム</p>'
-    + '<ul class="frame-list">' + buildConfirmFrameListHtml(record.considerFrameColor, record.considerFrameUrls) + '</ul>'
+    + '<ul class="frame-list">' + buildConfirmFrameListHtml(record.considerFrameColor, record.considerFrameUrl) + '</ul>'
     + (hasNeedsCheckFrame(record.considerFrameColor)
         ? '<p class="stock-note">※「要確認」のフレームは、在庫がない可能性がございます。</p>'
         : '')
@@ -649,3 +646,193 @@ function readRecords(sheet) {
   }
   return records;
 }
+
+// ── "Prospect URLs" spreadsheet menu ──
+// A small custom-menu dialog for staff to fill in the U column (considering-
+// frame product URLs) without having to hand-type comma-joined, position-
+// matched strings directly into the cell. onOpen() runs automatically each
+// time the spreadsheet is opened; it adds the menu, which opens a modal
+// dialog (showProspectFrameUrlDialog) backed by getProspectFrameUrlList(),
+// getProspectFrameUrlDetail() and saveProspectFrameUrls() via google.script.run.
+
+function onOpen() {
+  SpreadsheetApp.getUi()
+    .createMenu('Prospect URLs')
+    .addItem('開く', 'showProspectFrameUrlDialog')
+    .addToUi();
+}
+
+function showProspectFrameUrlDialog() {
+  var html = HtmlService.createHtmlOutput(PROSPECT_URL_DIALOG_HTML)
+    .setWidth(480)
+    .setHeight(560);
+  SpreadsheetApp.getUi().showModalDialog(html, 'Prospect URLs');
+}
+
+// Every "type=prospect" row (Customer Type = "Prospect", column T), newest
+// timestamp first, for the dialog's selection list.
+function getProspectFrameUrlList() {
+  var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+  var lastRow = sheet.getLastRow();
+  if (lastRow < 2) { return []; }
+
+  var values = sheet.getRange(2, 1, lastRow - 1, 21).getValues();
+  var list = [];
+  for (var i = 0; i < values.length; i++) {
+    var row = values[i];
+    if (String(row[19] || '') !== 'Prospect') { continue; } // T
+
+    var ts = row[0]; // A
+    var tsDate = ts instanceof Date ? ts : new Date(ts);
+    var tsMillis = isNaN(tsDate.getTime()) ? 0 : tsDate.getTime();
+
+    list.push({
+      row: i + 2,
+      name: row[2] || '', // C
+      timestamp: tsMillis,
+      timestampDisplay: tsMillis
+        ? Utilities.formatDate(tsDate, SPREADSHEET_TIMEZONE, TIMESTAMP_DISPLAY_FORMAT)
+        : ''
+    });
+  }
+  list.sort(function(a, b) { return b.timestamp - a.timestamp; });
+  return list;
+}
+
+// One row's considering frames, each paired with its current U-column URL
+// (blank if none yet) so the dialog can pre-fill the input fields.
+function getProspectFrameUrlDetail(row) {
+  var rowNum = parseInt(row, 10);
+  if (!rowNum || rowNum < 2) { return null; }
+
+  var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+  var values = sheet.getRange(rowNum, 1, 1, 21).getValues()[0];
+  var name = values[2] || '';               // C
+  var considerFrameColor = values[17] || ''; // R
+  var considerFrameUrl = values[20] || '';   // U
+
+  var frames = String(considerFrameColor)
+    .split(',')
+    .map(function(s) { return s.trim(); })
+    .filter(function(s) { return s; });
+  var urls = String(considerFrameUrl).split(',').map(function(s) { return s.trim(); });
+
+  var items = frames.map(function(frame, i) {
+    var parts = frame.split('/C');
+    var model = (parts[0] || '').trim();
+    var color = parts.length > 1 ? 'C' + parts[1].trim() : '';
+    return { model: model, color: color, url: urls[i] || '' };
+  });
+
+  return { row: rowNum, name: name, frames: items };
+}
+
+// Writes urls (one per frame, in order) back into column U as the same
+// comma-joined, position-matched format buildConfirmFrameListHtml() expects
+// — an empty string at index i just leaves that frame unlinked. Trailing
+// empty entries are dropped so an unused 2nd/3rd box doesn't leave a
+// dangling ", " in the cell; a blank *between* two filled entries is kept.
+function saveProspectFrameUrls(row, urls) {
+  var rowNum = parseInt(row, 10);
+  if (!rowNum || rowNum < 2) { return { ok: false, error: 'invalid row' }; }
+
+  var cleaned = (urls || []).map(function(u) { return String(u || '').trim(); });
+  while (cleaned.length && !cleaned[cleaned.length - 1]) { cleaned.pop(); }
+
+  var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+  sheet.getRange(rowNum, 21).setValue(cleaned.join(', ')); // U
+  return { ok: true };
+}
+
+var PROSPECT_URL_DIALOG_HTML = '<!DOCTYPE html><html><head><base target="_top">'
+  + '<style>'
+  + 'body{margin:0;padding:16px;font-family:\'Helvetica Neue\',Helvetica,Arial,sans-serif;'
+  + 'font-size:13px;color:#1a1a1a;}'
+  + '.hint{font-size:12px;color:#666666;margin:0 0 12px;}'
+  + '#list{display:flex;flex-direction:column;gap:6px;max-height:460px;overflow-y:auto;}'
+  + '.list-item{display:flex;justify-content:space-between;align-items:center;gap:10px;'
+  + 'width:100%;text-align:left;padding:10px 12px;border:1px solid #d0d0d0;border-radius:4px;'
+  + 'background:#ffffff;font-size:13px;font-family:inherit;color:#1a1a1a;cursor:pointer;}'
+  + '.list-item:hover{border-color:#185FA5;}'
+  + '.list-item .name{font-weight:500;}'
+  + '.list-item .ts{font-size:11px;color:#666666;white-space:nowrap;}'
+  + '#detail-view{display:none;}'
+  + '#back-btn{background:none;border:none;color:#185FA5;font-size:13px;cursor:pointer;'
+  + 'padding:0 0 12px;font-family:inherit;}'
+  + '#detail-name{font-size:14px;font-weight:500;margin:0 0 14px;}'
+  + '.frame-row{margin-bottom:12px;}'
+  + '.frame-label{font-size:12px;color:#666666;margin-bottom:4px;}'
+  + '.url-input{width:100%;box-sizing:border-box;padding:8px 10px;border:1px solid #d0d0d0;'
+  + 'border-radius:4px;font-size:13px;font-family:inherit;}'
+  + '.url-input:focus{outline:none;border-color:#185FA5;}'
+  + '#save-btn{margin-top:8px;padding:10px 16px;border:none;border-radius:4px;background:#185FA5;'
+  + 'color:#ffffff;font-size:13px;font-family:inherit;cursor:pointer;}'
+  + '#save-btn:hover{background:#124a85;}'
+  + '#status{font-size:12px;color:#666666;margin-top:10px;}'
+  + '</style></head><body>'
+  + '<div id="list-view">'
+  + '<p class="hint">検討中のお客様を選択してください（新しい順）</p>'
+  + '<div id="list"></div>'
+  + '</div>'
+  + '<div id="detail-view">'
+  + '<button id="back-btn">&larr; 一覧に戻る</button>'
+  + '<p id="detail-name"></p>'
+  + '<div id="frame-fields"></div>'
+  + '<button id="save-btn">保存</button>'
+  + '<p id="status"></p>'
+  + '</div>'
+  + '<script>'
+  + 'function escapeHtml(s){var d=document.createElement("div");d.textContent=s||"";return d.innerHTML;}'
+  + 'function loadList(){'
+  + 'google.script.run.withSuccessHandler(renderList).withFailureHandler(showError).getProspectFrameUrlList();'
+  + '}'
+  + 'function renderList(list){'
+  + 'var el=document.getElementById("list");'
+  + 'if(!list.length){el.textContent="検討中のお客様が見つかりません。";return;}'
+  + 'el.innerHTML=list.map(function(item){'
+  + 'return "<button class=\\"list-item\\" data-row=\\""+item.row+"\\">"'
+  + '+"<span class=\\"name\\">"+escapeHtml(item.name)+"</span>"'
+  + '+"<span class=\\"ts\\">"+escapeHtml(item.timestampDisplay)+"</span>"'
+  + '+"</button>";'
+  + '}).join("");'
+  + '[].forEach.call(el.querySelectorAll(".list-item"),function(btn){'
+  + 'btn.addEventListener("click",function(){openDetail(btn.dataset.row);});'
+  + '});'
+  + '}'
+  + 'function openDetail(row){'
+  + 'google.script.run.withSuccessHandler(renderDetail).withFailureHandler(showError).getProspectFrameUrlDetail(row);'
+  + '}'
+  + 'function renderDetail(detail){'
+  + 'document.getElementById("list-view").style.display="none";'
+  + 'document.getElementById("detail-view").style.display="block";'
+  + 'document.getElementById("detail-name").textContent=detail.name+" 様";'
+  + 'var el=document.getElementById("frame-fields");'
+  + 'el.innerHTML=detail.frames.map(function(f,i){'
+  + 'var label=escapeHtml(f.model)+(f.color?" / "+escapeHtml(f.color):"");'
+  + 'return "<div class=\\"frame-row\\">"'
+  + '+"<div class=\\"frame-label\\">"+label+"</div>"'
+  + '+"<input type=\\"url\\" class=\\"url-input\\" data-index=\\""+i+"\\" value=\\""+escapeHtml(f.url)+"\\" placeholder=\\"https://...\\">"'
+  + '+"</div>";'
+  + '}).join("");'
+  + 'document.getElementById("save-btn").dataset.row=detail.row;'
+  + 'document.getElementById("status").textContent="";'
+  + '}'
+  + 'document.getElementById("back-btn").addEventListener("click",function(){'
+  + 'document.getElementById("detail-view").style.display="none";'
+  + 'document.getElementById("list-view").style.display="block";'
+  + '});'
+  + 'document.getElementById("save-btn").addEventListener("click",function(){'
+  + 'var row=this.dataset.row;'
+  + 'var inputs=[].slice.call(document.querySelectorAll(".url-input"));'
+  + 'var urls=inputs.map(function(el){return el.value;});'
+  + 'var status=document.getElementById("status");'
+  + 'status.textContent="保存中…";'
+  + 'google.script.run.withSuccessHandler(function(){'
+  + 'status.textContent="保存しました。";'
+  + '}).withFailureHandler(showError).saveProspectFrameUrls(row,urls);'
+  + '});'
+  + 'function showError(err){'
+  + 'document.getElementById("status").textContent="エラー: "+(err&&err.message?err.message:err);'
+  + '}'
+  + 'loadList();'
+  + '</script></body></html>';
