@@ -637,7 +637,11 @@ function readRecords(sheet) {
       followupSent: String(row[7]).toUpperCase() === 'TRUE', // H
       frameNames:  row[8] || '',  // I
       staffNotes:  row[9] || '',  // J
-      dob:         row[10] || '', // K (purchaser's optional date of birth)
+      // Sheets auto-converts a "YYYY-MM-DD"-looking string into an actual
+      // Date cell on write, so this can come back as a Date (with a time
+      // and timezone) rather than the plain string that was stored —
+      // reformat it back down to a bare yyyy-mm-dd for display.
+      dob: row[10] instanceof Date ? Utilities.formatDate(row[10], SPREADSHEET_TIMEZONE, 'yyyy-MM-dd') : (row[10] || ''), // K (purchaser's optional date of birth)
       phone:       decryptPhone_(row[11]), // L (decrypted for the password-gated admin panel)
       postcode:    row[12] || '', // M
       addressStreet:   row[13] || '', // N
