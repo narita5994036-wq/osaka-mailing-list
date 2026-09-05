@@ -220,6 +220,18 @@ body {
   padding: 4px;
 }
 .dob-picker-done { color: var(--blue); font-weight: 600; }
+.dob-picker-labels {
+  display: flex;
+  padding: 14px 16px 0;
+}
+.dob-picker-labels span {
+  flex: 1;
+  text-align: center;
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--mid);
+}
 .dob-picker-wheels {
   position: relative;
   display: flex;
@@ -1018,6 +1030,11 @@ tr:hover td { background: #f9f9f9; }
       <span id="lbl-dob-picker-title">Date of Birth</span>
       <button type="button" class="dob-picker-btn dob-picker-done" onclick="confirmDobPicker()" id="lbl-dob-done">Done</button>
     </div>
+    <div class="dob-picker-labels">
+      <span id="lbl-dob-year">Year</span>
+      <span id="lbl-dob-month">Month</span>
+      <span id="lbl-dob-day">Day</span>
+    </div>
     <div class="dob-picker-wheels">
       <div class="dob-wheel-fade-top"></div>
       <div class="dob-wheel-fade-bottom"></div>
@@ -1165,6 +1182,7 @@ const i18n = {
     name: 'Full Name', country: 'Country / Region', email: 'Email Address', dob: 'Date of Birth',
     gender: 'Gender', genderMale: 'Male', genderFemale: 'Female', genderNA: 'Prefer not to say',
     dobSelect: 'Select date', dobPickerTitle: 'Date of Birth', dobCancel: 'Cancel', dobDone: 'Done',
+    dobYear: 'Year', dobMonth: 'Month', dobDay: 'Day',
     optinSection: 'Email Opt-in',
     optinDesc: 'Would you like to receive exclusive offers, news, and updates from MYKITA JAPAN?',
     optinNote: '＊Even if you select No, we will send you a thank-you email to confirm your registration.',
@@ -1217,6 +1235,7 @@ const i18n = {
     name: 'お名前', country: '都道府県', email: 'メールアドレス', dob: '生年月日',
     gender: '性別', genderMale: '男性', genderFemale: '女性', genderNA: '回答しない',
     dobSelect: '日付を選択', dobPickerTitle: '生年月日', dobCancel: 'キャンセル', dobDone: '完了',
+    dobYear: '年', dobMonth: '月', dobDay: '日',
     optinSection: 'メール配信',
     optinDesc: 'MYKITA JAPANからの最新情報・限定オファーをお受け取りになりますか？',
     optinNote: '＊Noを選択した場合でもご登録確認を兼ねたサンキューメールをお送りさせていただきます。',
@@ -1269,6 +1288,7 @@ const i18n = {
     name: '姓名', country: '国家 / 地区', email: '电子邮箱', dob: '出生日期',
     gender: '性别', genderMale: '男', genderFemale: '女', genderNA: '不愿透露',
     dobSelect: '选择日期', dobPickerTitle: '出生日期', dobCancel: '取消', dobDone: '完成',
+    dobYear: '年', dobMonth: '月', dobDay: '日',
     optinSection: '邮件订阅',
     optinDesc: '您是否希望收到来自MYKITA JAPAN的独家优惠、资讯和最新动态？',
     optinNote: '＊即使选择"否"，我们也会向您发送一封感谢邮件以确认您的注册。',
@@ -1321,6 +1341,7 @@ const i18n = {
     name: '성명', country: '국가 / 지역', email: '이메일 주소', dob: '생년월일',
     gender: '성별', genderMale: '남성', genderFemale: '여성', genderNA: '응답하지 않음',
     dobSelect: '날짜 선택', dobPickerTitle: '생년월일', dobCancel: '취소', dobDone: '완료',
+    dobYear: '년', dobMonth: '월', dobDay: '일',
     optinSection: '이메일 수신 동의',
     optinDesc: 'MYKITA JAPAN의 독점 혜택, 소식, 최신 정보를 받아보시겠습니까?',
     optinNote: '＊아니요를 선택하시더라도 등록 확인을 겸한 감사 메일을 보내드립니다。',
@@ -1389,6 +1410,9 @@ function setLang(lang) {
   document.getElementById('lbl-dob-picker-title').textContent = t.dobPickerTitle;
   document.getElementById('lbl-dob-cancel').textContent = t.dobCancel;
   document.getElementById('lbl-dob-done').textContent = t.dobDone;
+  document.getElementById('lbl-dob-year').textContent = t.dobYear;
+  document.getElementById('lbl-dob-month').textContent = t.dobMonth;
+  document.getElementById('lbl-dob-day').textContent = t.dobDay;
   document.getElementById('lbl-email').textContent = t.email;
   document.getElementById('lbl-optin-section').textContent = t.optinSection;
   document.getElementById('lbl-optin-desc').textContent = t.optinDesc;
