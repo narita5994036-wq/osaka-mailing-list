@@ -751,6 +751,23 @@ tr:hover td { background: #f9f9f9; }
         <div class="err-msg" id="e-country">Please select your country.</div>
       </div>
 
+      <!-- Date of Birth (purchaser only, optional) -->
+      <div class="field" id="dob-field">
+        <label id="lbl-dob">Date of Birth</label>
+        <input type="date" id="f-dob">
+      </div>
+
+      <!-- Gender (purchaser only, optional) -->
+      <div class="field" id="gender-field">
+        <label id="lbl-gender">Gender</label>
+        <select id="f-gender">
+          <option value=""></option>
+          <option value="Male" id="opt-gender-male">Male</option>
+          <option value="Female" id="opt-gender-female">Female</option>
+          <option value="Prefer not to say" id="opt-gender-na">Prefer not to say</option>
+        </select>
+      </div>
+
       <p class="optin-desc" id="lbl-email-or-phone-note" style="display:none;">Please provide either an email address or phone number below.</p>
 
       <!-- Phone + SMS opt-in (prospect only) -->
@@ -927,7 +944,7 @@ tr:hover td { background: #f9f9f9; }
       <table>
         <thead><tr>
           <th>#</th><th>Timestamp</th><th>ID</th><th>Name</th><th>Country</th>
-          <th>Email</th><th>Phone</th><th>Opt-in</th><th>Follow-up</th><th>Type</th><th>Purchased</th><th>Lens</th><th>Lang</th><th>Staff Notes</th><th></th>
+          <th>Email</th><th>Phone</th><th>Opt-in</th><th>Follow-up</th><th>Type</th><th>Purchased</th><th>DOB</th><th>Lang</th><th>Staff Notes</th><th></th>
         </tr></thead>
         <tbody id="admin-tbody"></tbody>
       </table>
@@ -1010,7 +1027,8 @@ const i18n = {
     warrantyBody: '・This warranty is valid only at MYKITA JAPAN stores.<br>・MYKITA frames are covered by a 2-year product warranty from the date of purchase.<br>・The warranty covers product defects under normal use, excluding initial defects. (Damage from dropping or crushing, and lens damage, are not covered.)',
     warrantyFooter: 'Please complete this registration to activate your warranty.',
     personal: 'Personal Information',
-    name: 'Full Name', country: 'Country / Region', email: 'Email Address',
+    name: 'Full Name', country: 'Country / Region', email: 'Email Address', dob: 'Date of Birth',
+    gender: 'Gender', genderMale: 'Male', genderFemale: 'Female', genderNA: 'Prefer not to say',
     optinSection: 'Email Opt-in',
     optinDesc: 'Would you like to receive exclusive offers, news, and updates from MYKITA JAPAN?',
     optinNote: '＊Even if you select No, we will send you a thank-you email to confirm your registration.',
@@ -1060,7 +1078,8 @@ const i18n = {
     warrantyBody: '・本保証はMYKITA JAPAN店舗でのみ有効です。<br>・MYKITAフレームには、ご購入日より2年間の製品保証が適用されます。<br>・保証範囲は、初期不良を除く通常使用下での製品トラブルに限ります。（落下や踏みつけによる損傷・破損、また、レンズ破損は対象外）',
     warrantyFooter: '保証を有効にするために、以下の登録を完了してください。',
     personal: 'お客様情報',
-    name: 'お名前', country: '都道府県', email: 'メールアドレス',
+    name: 'お名前', country: '都道府県', email: 'メールアドレス', dob: '生年月日',
+    gender: '性別', genderMale: '男性', genderFemale: '女性', genderNA: '回答しない',
     optinSection: 'メール配信',
     optinDesc: 'MYKITA JAPANからの最新情報・限定オファーをお受け取りになりますか？',
     optinNote: '＊Noを選択した場合でもご登録確認を兼ねたサンキューメールをお送りさせていただきます。',
@@ -1110,7 +1129,8 @@ const i18n = {
     warrantyBody: '・本保修仅在MYKITA JAPAN门店有效。<br>・MYKITA镜架自购买之日起享有2年产品保修。<br>・保修范围仅限正常使用下的产品故障（初期不良除外）。（因跌落或踩踏造成的损伤、破损及镜片破损不在保修范围内。）',
     warrantyFooter: '请完成以下登记以激活您的保修。',
     personal: '个人信息',
-    name: '姓名', country: '国家 / 地区', email: '电子邮箱',
+    name: '姓名', country: '国家 / 地区', email: '电子邮箱', dob: '出生日期',
+    gender: '性别', genderMale: '男', genderFemale: '女', genderNA: '不愿透露',
     optinSection: '邮件订阅',
     optinDesc: '您是否希望收到来自MYKITA JAPAN的独家优惠、资讯和最新动态？',
     optinNote: '＊即使选择"否"，我们也会向您发送一封感谢邮件以确认您的注册。',
@@ -1160,7 +1180,8 @@ const i18n = {
     warrantyBody: '・본 보증은 MYKITA JAPAN 매장에서만 유효합니다.<br>・MYKITA 프레임은 구매일로부터 2년간 제품 보증이 적용됩니다.<br>・보증 범위는 초기 불량을 제외한 정상 사용 중 발생한 제품 문제에 한합니다. （낙하 또는 밟힘으로 인한 손상·파손, 렌즈 파손은 대상 외）',
     warrantyFooter: '보증을 활성화하려면 아래 등록을 완료해 주세요.',
     personal: '개인 정보',
-    name: '성명', country: '국가 / 지역', email: '이메일 주소',
+    name: '성명', country: '국가 / 지역', email: '이메일 주소', dob: '생년월일',
+    gender: '성별', genderMale: '남성', genderFemale: '여성', genderNA: '응답하지 않음',
     optinSection: '이메일 수신 동의',
     optinDesc: 'MYKITA JAPAN의 독점 혜택, 소식, 최신 정보를 받아보시겠습니까?',
     optinNote: '＊아니요를 선택하시더라도 등록 확인을 겸한 감사 메일을 보내드립니다。',
@@ -1219,6 +1240,11 @@ function setLang(lang) {
   document.getElementById('lbl-personal').textContent = t.personal;
   document.getElementById('lbl-name').textContent = t.name;
   document.getElementById('lbl-country').textContent = t.country;
+  document.getElementById('lbl-dob').textContent = t.dob;
+  document.getElementById('lbl-gender').textContent = t.gender;
+  document.getElementById('opt-gender-male').textContent = t.genderMale;
+  document.getElementById('opt-gender-female').textContent = t.genderFemale;
+  document.getElementById('opt-gender-na').textContent = t.genderNA;
   document.getElementById('lbl-email').textContent = t.email;
   document.getElementById('lbl-optin-section').textContent = t.optinSection;
   document.getElementById('lbl-optin-desc').textContent = t.optinDesc;
@@ -1441,6 +1467,8 @@ function resetFrameEntry() {
   document.getElementById('f-address-line2').value = '';
   document.getElementById('f-address-city-intl').value = '';
   document.getElementById('f-address-state').value = '';
+  document.getElementById('f-dob').value = '';
+  document.getElementById('f-gender').value = '';
   document.getElementById('f-customer-type-purchaser').checked = false;
   document.getElementById('f-customer-type-prospect').checked = false;
   document.getElementById('customer-type-continue-btn').disabled = true;
@@ -1647,6 +1675,8 @@ function applyCustomerTypeToForm() {
   document.getElementById('optin-block').style.display = isProspect ? 'none' : '';
   document.getElementById('prospect-frame-block').style.display = isProspect ? 'block' : 'none';
   document.getElementById('prospect-contact-block').style.display = isProspect ? 'block' : 'none';
+  document.getElementById('dob-field').style.display = isProspect ? 'none' : '';
+  document.getElementById('gender-field').style.display = isProspect ? 'none' : '';
   document.getElementById('lbl-email-or-phone-note').style.display = isProspect ? 'block' : 'none';
   updateProspectSmsAvailability();
 
@@ -2002,7 +2032,6 @@ async function handleSubmit() {
     lang: currentLang,
     memberNo: '',
     frameNames: purchasedFrames.join(', '),
-    lensOrder: lensChecked,
     phone: phone,
     postcode: postcode,
     addressStreet: addressStreet,
@@ -2010,6 +2039,8 @@ async function handleSubmit() {
     addressCity: addressCity,
     addressState: addressState,
     customerType: customerType,
+    dob: isProspect ? '' : document.getElementById('f-dob').value,
+    gender: isProspect ? '' : document.getElementById('f-gender').value,
     prospectFrames: isProspect ? collectProspectFrames() : [],
     prospectPhone: isProspect ? document.getElementById('f-prospect-phone').value.trim() : '',
     prospectSmsOptIn: isProspect ? document.getElementById('f-prospect-sms').checked : false,
@@ -2398,11 +2429,6 @@ function toggleSortOrder() {
   renderAdminTable();
 }
 
-function renderLensCell(r) {
-  const isYes = r.lensOrder === 'Yes';
-  return `<span class="${isYes ? 'badge-yes' : 'badge-no'}">${escapeHtml(r.lensOrder || 'No')}</span>`;
-}
-
 function renderAdminTable() {
   const filter = document.getElementById('csv-filter').value;
   let records = [...adminRecords];
@@ -2441,7 +2467,7 @@ function renderAdminTable() {
       <td>${renderFollowupBadge(r)}</td>
       <td><span class="${r.customerType === 'Prospect' ? 'badge-prospect' : 'badge-yes'}">${escapeHtml(r.customerType || 'Purchaser')}</span></td>
       <td style="font-size:11px; color:var(--mid);">${renderFrameCell(r)}</td>
-      <td>${renderLensCell(r)}</td>
+      <td style="font-size:11px; color:var(--mid); white-space:nowrap;">${escapeHtml(r.customerType === 'Prospect' ? '' : (r.dob || ''))}</td>
       <td style="text-transform:uppercase; font-size:11px; color:var(--mid);">${escapeHtml(r.lang)}</td>
       <td style="font-size:11px; color:var(--mid); max-width:140px;">${escapeHtml(r.staffNotes || '')}</td>
       <td><button class="row-delete-btn" onclick="deleteRecord(${r.row})" title="Delete this record" aria-label="Delete this record">&times;</button></td>
