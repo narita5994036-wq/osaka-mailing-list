@@ -230,7 +230,7 @@ function doPost(e) {
   // recover the exact instant with row[0].toISOString().
   var timestampValue = data.timestamp ? new Date(data.timestamp) : '';
 
-  sheet.appendRow([
+  var rowValues = [
     timestampValue,          // A: Timestamp
     isProspect ? (data.confirmToken || '') : (data.memberNo || ''), // B: ID / Confirm Token
     data.name || '',        // C: Name
@@ -252,9 +252,20 @@ function doPost(e) {
     isProspect ? (data.prospectSmsOptIn ? 'Yes' : 'No') : '', // S: SMS Opt-in
     isProspect ? 'Prospect' : 'Purchaser', // T: Customer Type
     ''                                     // U: considerFrameURL (filled in manually by staff)
-  ]);
+  ];
 
-  var newRow = sheet.getLastRow();
+  // Write via getRange().setValues() rather than appendRow(): appendRow()
+  // performs an implicit row-insert, which Sheets rejects with "This
+  // action is not allowed on a filtered range" while a regular Filter
+  // (Data > Create a filter) is active on the sheet — silently dropping
+  // the submission client-side because the POST fetch uses mode:'no-cors'
+  // and can't see the resulting server error. Writing directly to the
+  // next empty row's range is not an insert, so it isn't blocked by an
+  // active filter. (Staff should still prefer Filter views over a plain
+  // Filter on this sheet, since a plain Filter also hides rows for every
+  // other viewer/collaborator, not just the person who applied it.)
+  var newRow = sheet.getLastRow() + 1;
+  sheet.getRange(newRow, 1, 1, rowValues.length).setValues([rowValues]);
   if (timestampValue) {
     sheet.getRange(newRow, 1).setNumberFormat(TIMESTAMP_DISPLAY_FORMAT);
   }

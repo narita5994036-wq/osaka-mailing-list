@@ -2349,6 +2349,7 @@ async function handleSubmit() {
     lastSubmittedEmail = record.email;
     lastSubmittedTimestamp = record.timestamp;
     lastProspectConfirmToken = confirmToken;
+    btn.textContent = i18n[currentLang].submit;
     showThanks();
   } catch (err) {
     btn.disabled = false;
