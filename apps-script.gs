@@ -267,11 +267,42 @@ function doPost(e) {
   var newRow = sheet.getLastRow() + 1;
   sheet.getRange(newRow, 1, 1, rowValues.length).setValues([rowValues]);
   if (timestampValue) {
-    sheet.getRange(newRow, 1).setNumberFormat(TIMESTAMP_DISPLAY_FORMAT);
+    // setNumberFormat(), unlike setValues(), IS blocked by Sheets with
+    // "This action is not allowed on a filtered range" while a regular
+    // Filter is active — same family of restriction as the appendRow()
+    // issue above, but this one can't be worked around by switching to a
+    // different write method. Swallow it: run preFormatTimestampColumn()
+    // once (see below) so column A already carries the right format
+    // ahead of time and this call becomes a no-op in the normal case;
+    // without that, the raw Date still gets stored correctly by
+    // setValues() above and just displays in Sheets' default date
+    // format instead of TIMESTAMP_DISPLAY_FORMAT — never silently lost.
+    try {
+      sheet.getRange(newRow, 1).setNumberFormat(TIMESTAMP_DISPLAY_FORMAT);
+    } catch (err) {
+      // Ignored — see comment above.
+    }
   }
 
   return ContentService.createTextOutput(JSON.stringify({ result: 'success' }))
     .setMimeType(ContentService.MimeType.JSON);
+}
+
+/**
+ * One-time utility: open this script in the Apps Script editor, select
+ * "preFormatTimestampColumn" in the function dropdown next to Run, and
+ * click Run. It applies the Timestamp display format to column A several
+ * thousand rows ahead of the current data, so new submissions display
+ * correctly even when doPost()'s own per-row setNumberFormat() call is
+ * blocked by an active Filter (see the comment in doPost()). Safe to
+ * re-run periodically as the sheet grows.
+ */
+function preFormatTimestampColumn() {
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var sheet = ss.getActiveSheet();
+  var startRow = Math.max(2, sheet.getLastRow() + 1);
+  var rowCount = 5000;
+  sheet.getRange(startRow, 1, rowCount, 1).setNumberFormat(TIMESTAMP_DISPLAY_FORMAT);
 }
 
 /**
