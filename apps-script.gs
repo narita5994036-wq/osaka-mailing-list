@@ -600,7 +600,8 @@ function buildConfirmContentHtml(record) {
     + (hasNeedsCheckFrame(record.considerFrameColor)
         ? '<p class="stock-note">※「要確認」のフレームは、在庫がない可能性がございます。</p>'
         : '')
-    + '<p class="hp-note">上記フレームの画像は<a href="https://mykita.com/en" target="_blank" rel="noopener">MYKITAの公式ホームページ</a>よりご確認いただけます。</p>'
+    + '<p class="hp-note">上記フレームの画像は<a href="https://mykita.com/en" target="_blank" rel="noopener">MYKITAの公式ホームページ</a>よりご確認いただけます。'
+    + '<br>上記フレーム名をタップしていただくとMYKITA公式ホームページ内の商品ページへ移動します。(URLリンク付きは青字で表示されます。)</p>'
     + '<p class="section-label">ご案内</p>'
     + '<p class="info-block">ご検討いただいたフレームの在庫状況につきましても、随時お問い合わせを承っております。<br>また、お取り置きも可能でございますので、お気軽にお問い合わせください。</p>'
     + '<p class="hold-note">※お取り置きは、原則2週間までとさせていただいております。あらかじめご了承ください。</p>'
