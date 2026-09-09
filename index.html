@@ -840,7 +840,7 @@ tr:hover td { background: #f9f9f9; }
     <!-- FORM AREA -->
     <div id="form-area">
 
-      <!-- Frame(s) of interest (prospect only, up to 3; staff enters this) -->
+      <!-- Frame(s) of interest (prospect only, up to 5; staff enters this) -->
       <div class="field" id="prospect-frame-block" style="display:none;">
         <div style="display:flex; gap:8px; margin-bottom:10px;">
           <label id="lbl-prospect-frame-model" style="flex:1; margin:0;">Frame Model of Interest <span style="font-size:10px; text-transform:none; letter-spacing:0;">(optional)</span></label>
@@ -1693,7 +1693,7 @@ function renderProspectFrameRowList() {
 }
 
 function addProspectFrameRow() {
-  if (prospectFrameRows.length >= 3) return;
+  if (prospectFrameRows.length >= 5) return;
   const saved = prospectFrameRows.map(r => ({
     id: r.id,
     model: (document.getElementById('prospect-frame-model-' + r.id) || {}).value || '',

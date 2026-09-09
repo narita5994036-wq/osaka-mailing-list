@@ -27,7 +27,7 @@
  * SMS Opt-in (S) and Customer Type (T) are blank/"Purchaser" for a normal
  * purchaser registration, since they only apply to prospects.
  *
- * Up to 3 considering frames (model + color number) are combined into a
+ * Up to 5 considering frames (model + color number) are combined into a
  * single cell (column R), each formatted as "Frame Name/C###" and joined
  * with ", ", e.g. "Kelly Sun/C301, Aiko/C204". Column U optionally holds
  * one product-page URL per frame, in the same order and also joined with
@@ -213,9 +213,9 @@ function doPost(e) {
 
   var isProspect = data.customerType === 'prospect';
 
-  // Up to 3 candidate frames, each combined into "Model/C###" and joined
+  // Up to 5 candidate frames, each combined into "Model/C###" and joined
   // with ", " into the single considerFrame/Color cell (column R).
-  var prospectFrames = Array.isArray(data.prospectFrames) ? data.prospectFrames.slice(0, 3) : [];
+  var prospectFrames = Array.isArray(data.prospectFrames) ? data.prospectFrames.slice(0, 5) : [];
   var considerFrameColor = prospectFrames.map(function(f) {
     var model = (f && f.model) || '';
     var color = (f && f.color) || '';
