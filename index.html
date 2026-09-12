@@ -1116,6 +1116,24 @@ tr:hover td { background: #f9f9f9; }
   <div class="email-actions-menu" id="link-actions-menu">
     <button class="email-action-btn" onclick="copyConfirmLink()">Copy Link</button>
     <button class="email-action-btn" onclick="openConfirmLink()">Open Link</button>
+    <button class="email-action-btn" onclick="showSmsModal()">SMS Message</button>
+  </div>
+
+  <!-- SMS message preview modal (prospect rows only) -->
+  <div class="mail-modal-overlay" id="sms-modal-overlay" onclick="closeSmsModalOnOverlay(event)">
+    <div class="mail-modal">
+      <p class="section-label" style="border:none; margin:0 0 4px;">SMS Message</p>
+      <p class="mail-modal-recipient" id="sms-modal-recipient"></p>
+      <div class="mail-modal-field">
+        <label>Message</label>
+        <textarea class="mail-textarea" id="sms-modal-textarea" style="min-height:220px;" readonly></textarea>
+      </div>
+      <div class="mail-modal-actions">
+        <button class="refresh-btn" onclick="closeSmsModal()">Close</button>
+        <button class="csv-btn" id="sms-modal-copy-btn" onclick="copySmsModalText()">Copy</button>
+        <button class="mail-open-btn" onclick="openSmsFromModal()">Open SMS</button>
+      </div>
+    </div>
   </div>
 
   <!-- Mail modal -->
@@ -2411,10 +2429,9 @@ function buildConfirmPageUrl(token) {
   return SHEET_WEBHOOK_URL + '?page=confirm&id=' + encodeURIComponent(token);
 }
 
-function buildProspectSmsBody() {
-  const name = document.getElementById('f-name').value.trim();
-  const link = buildConfirmPageUrl(lastProspectConfirmToken);
-
+// Shared with the admin panel's SMS preview modal (getActiveSmsMessage()),
+// so both places send the exact same wording.
+function buildSmsMessageText(name, link) {
   return name + '　様\n\n'
     + 'この度はMYKITA Osakaへご来店いただき、誠にありがとうございます。\n'
     + 'ご検討いただいた内容は以下のページよりご確認いただけます。\n\n'
@@ -2422,13 +2439,17 @@ function buildProspectSmsBody() {
     + link;
 }
 
+function buildProspectSmsBody() {
+  const name = document.getElementById('f-name').value.trim();
+  const link = buildConfirmPageUrl(lastProspectConfirmToken);
+  return buildSmsMessageText(name, link);
+}
+
 function openProspectSms() {
   const phone = document.getElementById('f-prospect-phone').value.trim();
   if (!phone) return;
   const body = buildProspectSmsBody();
-  const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
-  const separator = isIOS ? '&' : '?';
-  window.location.href = 'sms:' + phone + separator + 'body=' + encodeURIComponent(body);
+  window.location.href = 'sms:' + phone + (isIOSDevice() ? '&' : '?') + 'body=' + encodeURIComponent(body);
 }
 
 // ── THANKS-SCREEN FRAME ENTRY ──
@@ -2936,6 +2957,45 @@ function openConfirmLink() {
   document.getElementById('link-actions-menu').style.display = 'none';
   if (!link) return;
   window.open(link, '_blank', 'noopener');
+}
+
+function getActiveSmsMessage() {
+  const record = adminRecords.find(r => r.row === activeLinkRow);
+  if (!record) return '';
+  return buildSmsMessageText(record.name || '', buildConfirmPageUrl(record.memberNo));
+}
+
+function showSmsModal() {
+  document.getElementById('link-actions-menu').style.display = 'none';
+  const record = adminRecords.find(r => r.row === activeLinkRow);
+  if (!record) return;
+  document.getElementById('sms-modal-recipient').textContent = record.phone || record.name || '';
+  document.getElementById('sms-modal-textarea').value = getActiveSmsMessage();
+  document.getElementById('sms-modal-overlay').classList.add('open');
+}
+
+function closeSmsModal() { document.getElementById('sms-modal-overlay').classList.remove('open'); }
+function closeSmsModalOnOverlay(e) { if (e.target === e.currentTarget) closeSmsModal(); }
+
+function copySmsModalText() {
+  const text = document.getElementById('sms-modal-textarea').value;
+  const btn = document.getElementById('sms-modal-copy-btn');
+  navigator.clipboard.writeText(text).then(() => {
+    btn.textContent = 'Copied!';
+    setTimeout(() => { btn.textContent = 'Copy'; }, 1500);
+  });
+}
+
+function isIOSDevice() {
+  return /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+}
+
+function openSmsFromModal() {
+  const record = adminRecords.find(r => r.row === activeLinkRow);
+  const phone = ((record && record.phone) || '').trim();
+  if (!phone) return;
+  const body = document.getElementById('sms-modal-textarea').value;
+  window.location.href = 'sms:' + phone + (isIOSDevice() ? '&' : '?') + 'body=' + encodeURIComponent(body);
 }
 
 function copyEmailAddress() {
