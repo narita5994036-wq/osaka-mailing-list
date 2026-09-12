@@ -1112,6 +1112,12 @@ tr:hover td { background: #f9f9f9; }
     <button class="email-action-btn" id="email-action-compose" onclick="composeFromEmailActions()">Compose Mail</button>
   </div>
 
+  <!-- Confirm-page link actions context menu (prospect rows only) -->
+  <div class="email-actions-menu" id="link-actions-menu">
+    <button class="email-action-btn" onclick="copyConfirmLink()">Copy Link</button>
+    <button class="email-action-btn" onclick="openConfirmLink()">Open Link</button>
+  </div>
+
   <!-- Mail modal -->
   <div class="mail-modal-overlay" id="mail-modal-overlay" onclick="closeMailModalOnOverlay(event)">
     <div class="mail-modal">
@@ -2771,7 +2777,14 @@ function renderAdminTable() {
 function renderFrameCell(r) {
   if (r.customerType === 'Prospect') {
     const combined = r.considerFrameColor || '';
-    return combined ? `<span style="font-style:italic;">${escapeHtml('Considering: ' + combined)}</span>` : '';
+    const frameText = combined ? `<span style="font-style:italic;">${escapeHtml('Considering: ' + combined)}</span>` : '';
+    // memberNo doubles as the prospect's confirm token (column B) — see the
+    // header comment in apps-script.gs — so it's what buildConfirmPageUrl()
+    // needs to reconstruct the same link sent to the customer via SMS.
+    const linkBtn = r.memberNo
+      ? ` <span class="email-link" style="color:#185FA5; cursor:pointer;" onclick="showLinkActions(event, ${r.row})" title="Confirm page link">&#128279;</span>`
+      : '';
+    return frameText + linkBtn;
   }
   return escapeHtml(r.frameNames || '');
 }
@@ -2883,7 +2896,47 @@ document.addEventListener('click', e => {
   if (menu && !menu.contains(e.target) && e.target !== activeEmailEl) {
     menu.style.display = 'none';
   }
+  const linkMenu = document.getElementById('link-actions-menu');
+  if (linkMenu && !linkMenu.contains(e.target) && e.target !== activeLinkEl) {
+    linkMenu.style.display = 'none';
+  }
 });
+
+// ── CONFIRM-PAGE LINK ACTIONS (prospect rows) ──
+let activeLinkRow = null;
+let activeLinkEl = null;
+
+function showLinkActions(e, row) {
+  e.stopPropagation();
+  activeLinkRow = row;
+  activeLinkEl = e.target;
+  const menu = document.getElementById('link-actions-menu');
+  menu.style.display = 'block';
+  const rect = e.target.getBoundingClientRect();
+  menu.style.left = rect.left + 'px';
+  menu.style.top = (rect.bottom + 4 + window.scrollY) + 'px';
+}
+
+function getActiveConfirmLink() {
+  const record = adminRecords.find(r => r.row === activeLinkRow);
+  if (!record || !record.memberNo) return '';
+  return buildConfirmPageUrl(record.memberNo);
+}
+
+function copyConfirmLink() {
+  const link = getActiveConfirmLink();
+  if (!link) return;
+  navigator.clipboard.writeText(link).then(() => {
+    document.getElementById('link-actions-menu').style.display = 'none';
+  });
+}
+
+function openConfirmLink() {
+  const link = getActiveConfirmLink();
+  document.getElementById('link-actions-menu').style.display = 'none';
+  if (!link) return;
+  window.open(link, '_blank', 'noopener');
+}
 
 function copyEmailAddress() {
   const record = adminRecords.find(r => r.row === activeEmailRow);
