@@ -608,13 +608,13 @@ function buildConfirmFrameListHtml(considerFrameColor, considerFrameUrl) {
     var priceHtml = formatYenAmount_(parsed.price);
 
     return '<li class="frame-item">'
-      + '<div class="frame-item-top"><span class="model">' + modelHtml + '</span>'
+      + '<span class="model-line"><span class="model">' + modelHtml + '</span>'
+      + (parsed.color ? '　<span class="color">／C' + escapeHtmlGs(parsed.color) + '</span>' : '')
+      + '</span>'
       + '<span class="item-right">'
       + (parsed.needsCheck ? '<span class="stock-badge">要確認</span>' : '')
-      + (parsed.color ? '<span class="color">C' + escapeHtmlGs(parsed.color) + '</span>' : '')
-      + '</span></div>'
       + (priceHtml ? '<span class="price">' + priceHtml + '</span>' : '')
-      + '</li>';
+      + '</span></li>';
   }).join('');
 }
 
@@ -667,9 +667,8 @@ var CONFIRM_PAGE_CSS = ':root{--bg:#ffffff;--surface:#f5f5f5;--border:#d0d0d0;--
   + '.section-label{font-size:11px;letter-spacing:0.14em;text-transform:uppercase;color:var(--mid);'
   + 'border-bottom:0.5px solid var(--border);padding-bottom:10px;margin-bottom:16px;}'
   + '.frame-list{list-style:none;margin:0 0 32px;padding:0;display:flex;flex-direction:column;gap:10px;}'
-  + '.frame-item{display:flex;flex-direction:column;gap:6px;'
+  + '.frame-item{display:flex;align-items:baseline;justify-content:space-between;gap:12px;'
   + 'border:0.5px solid var(--border);padding:14px 16px;font-size:14px;}'
-  + '.frame-item-top{display:flex;align-items:baseline;justify-content:space-between;gap:12px;}'
   + '.frame-item .model{font-weight:500;}'
   + '.frame-item .model a{color:var(--blue);text-decoration:none;}'
   + '.frame-item .model a:hover,.frame-item .model a:focus-visible{text-decoration:underline;}'
