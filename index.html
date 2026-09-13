@@ -590,7 +590,7 @@ tr:hover td { background: #f9f9f9; }
 .badge-prospect { background: #dbe9fb; color: #1a5fa8; font-size: 11px; padding: 2px 8px; letter-spacing: 0.06em; }
 .row-prospect td { background: #eef5fd; }
 .row-prospect:hover td { background: #e0edfa; }
-.admin-settings-row { margin-bottom: 16px; }
+.admin-settings-row { margin-bottom: 16px; display: flex; flex-direction: column; gap: 8px; }
 .admin-setting-toggle { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--mid); cursor: pointer; }
 .admin-setting-toggle input[type="checkbox"] { accent-color: var(--light); width: 14px; height: 14px; flex-shrink: 0; }
 .row-delete-btn {
@@ -845,6 +845,7 @@ tr:hover td { background: #f9f9f9; }
         <div style="display:flex; gap:8px; margin-bottom:10px;">
           <label id="lbl-prospect-frame-model" style="flex:1; margin:0;">Frame Model of Interest <span style="font-size:10px; text-transform:none; letter-spacing:0;">(optional)</span></label>
           <label id="lbl-prospect-frame-color" style="width:90px; flex-shrink:0; margin:0;">Color</label>
+          <label id="lbl-prospect-frame-price" style="width:110px; flex-shrink:0; margin:0;">Price <span id="lbl-prospect-frame-price-mode" style="font-size:10px; text-transform:none; letter-spacing:0;">(incl. tax)</span></label>
         </div>
         <div id="prospect-frame-row-list"></div>
         <button class="refresh-btn" type="button" onclick="addProspectFrameRow()" id="lbl-prospect-frame-add" style="margin-bottom:1rem;">+ Add Frame</button>
@@ -1077,6 +1078,10 @@ tr:hover td { background: #f9f9f9; }
         <input type="checkbox" id="setting-hide-lens" onchange="updateHideLensSetting()">
         <span>Hide "Lens Purchase" section on registration form</span>
       </label>
+      <label class="admin-setting-toggle" for="setting-price-tax-excluded">
+        <input type="checkbox" id="setting-price-tax-excluded" onchange="updatePriceTaxExcludedSetting()">
+        <span>Enter prospect frame prices tax-excluded (instead of tax-included)</span>
+      </label>
     </div>
     <div class="admin-header-row">
       <div>
@@ -1179,6 +1184,8 @@ let adminPassword = '';
 let adminRecords = [];
 let hideLensSection = false;
 let lensSettingLoaded = false;
+let priceInputTaxExcluded = false;
+const PRICE_TAX_RATE = 1.10; // 10% Japanese consumption tax
 let currentLang = 'en';
 let isAdmin = false;
 const LOGO_TAP_COUNT = 5;
@@ -1247,7 +1254,8 @@ const i18n = {
     customerTypeDesc: 'No frame name was entered. Please select the registration type for this customer.',
     customerTypePurchaser: 'Purchaser', customerTypeProspect: 'Considering',
     customerTypeBack: 'Back', customerTypeContinue: 'Continue',
-    prospectFrameModel: 'Frame Model of Interest', prospectFrameColor: 'Color', prospectFrameAdd: '+ Add Frame',
+    prospectFrameModel: 'Frame Model of Interest', prospectFrameColor: 'Color', prospectFramePrice: 'Price', prospectFrameAdd: '+ Add Frame',
+    taxIncluded: '(incl. tax)', taxExcluded: '(excl. tax)',
     prospectPhone: 'Phone Number', prospectSms: 'I would like to receive SMS notifications.',
     emailOrPhoneNote: 'Please provide either an email address or phone number below.',
     errEmailOrPhone: 'Please enter a valid email address, or a phone number.',
@@ -1300,7 +1308,8 @@ const i18n = {
     customerTypeDesc: 'フレーム名が入力されていません。このお客様の登録タイプを選択してください。',
     customerTypePurchaser: '購入者', customerTypeProspect: '検討中',
     customerTypeBack: '戻る', customerTypeContinue: '次へ',
-    prospectFrameModel: '検討中のフレームモデル名', prospectFrameColor: 'カラー番号', prospectFrameAdd: '+ フレームを追加',
+    prospectFrameModel: '検討中のフレームモデル名', prospectFrameColor: 'カラー番号', prospectFramePrice: '価格', prospectFrameAdd: '+ フレームを追加',
+    taxIncluded: '(税込)', taxExcluded: '(税抜)',
     prospectPhone: '電話番号', prospectSms: 'SMSでの通知を希望する',
     emailOrPhoneNote: '下記のメールアドレス、または電話番号のいずれかをご入力ください。',
     errEmailOrPhone: '有効なメールアドレス、または電話番号を入力してください。',
@@ -1353,7 +1362,8 @@ const i18n = {
     customerTypeDesc: '未输入镜架名称。请为该顾客选择登记类型。',
     customerTypePurchaser: '购买者', customerTypeProspect: '意向顾客（考虑中）',
     customerTypeBack: '返回', customerTypeContinue: '继续',
-    prospectFrameModel: '意向镜架型号', prospectFrameColor: '颜色编号', prospectFrameAdd: '+ 添加镜架',
+    prospectFrameModel: '意向镜架型号', prospectFrameColor: '颜色编号', prospectFramePrice: '价格', prospectFrameAdd: '+ 添加镜架',
+    taxIncluded: '(含税)', taxExcluded: '(不含税)',
     prospectPhone: '电话号码', prospectSms: '希望接收短信通知',
     emailOrPhoneNote: '请填写下方的电子邮箱或电话号码，二者任填其一即可。',
     errEmailOrPhone: '请输入有效的电子邮箱地址或电话号码。',
@@ -1406,7 +1416,8 @@ const i18n = {
     customerTypeDesc: '프레임 이름이 입력되지 않았습니다. 이 고객의 등록 유형을 선택해 주세요.',
     customerTypePurchaser: '구매자', customerTypeProspect: '검토 중（잠재 고객）',
     customerTypeBack: '뒤로', customerTypeContinue: '다음',
-    prospectFrameModel: '검토 중인 프레임 모델명', prospectFrameColor: '컬러 번호', prospectFrameAdd: '+ 프레임 추가',
+    prospectFrameModel: '검토 중인 프레임 모델명', prospectFrameColor: '컬러 번호', prospectFramePrice: '가격', prospectFrameAdd: '+ 프레임 추가',
+    taxIncluded: '(세금 포함)', taxExcluded: '(세금 별도)',
     prospectPhone: '전화번호', prospectSms: 'SMS 알림을 받고 싶습니다.',
     emailOrPhoneNote: '아래의 이메일 주소 또는 전화번호 중 하나를 입력해 주세요.',
     errEmailOrPhone: '유효한 이메일 주소 또는 전화번호를 입력해 주세요.',
@@ -1486,6 +1497,8 @@ function setLang(lang) {
   document.getElementById('customer-type-continue-btn').textContent = t.customerTypeContinue;
   document.getElementById('lbl-prospect-frame-model').childNodes[0].textContent = t.prospectFrameModel + ' ';
   document.getElementById('lbl-prospect-frame-color').textContent = t.prospectFrameColor;
+  document.getElementById('lbl-prospect-frame-price').childNodes[0].textContent = t.prospectFramePrice + ' ';
+  document.getElementById('lbl-prospect-frame-price-mode').textContent = priceInputTaxExcluded ? t.taxExcluded : t.taxIncluded;
   document.getElementById('lbl-prospect-frame-add').textContent = t.prospectFrameAdd;
   document.getElementById('lbl-prospect-phone').textContent = t.prospectPhone;
   document.getElementById('lbl-email-or-phone-note').textContent = t.emailOrPhoneNote;
@@ -1710,54 +1723,69 @@ function renderProspectFrameRowList() {
         <div class="ac-dropdown" id="prospect-frame-dropdown-${row.id}"></div>
       </div>
       <input type="text" class="ac-input" id="prospect-frame-color-${row.id}" inputmode="numeric" pattern="[0-9]*" maxlength="3" style="width:90px; flex-shrink:0;" oninput="this.value = this.value.replace(/\\D/g, '').slice(0, 3)">
+      <input type="text" class="ac-input" id="prospect-frame-price-${row.id}" inputmode="numeric" pattern="[0-9]*" placeholder="¥" style="width:110px; flex-shrink:0;" oninput="this.value = this.value.replace(/\\D/g, '').slice(0, 7)">
       ${prospectFrameRows.length > 1 ? `<button type="button" class="frame-remove-btn" onclick="removeProspectFrameRow(${row.id})" aria-label="Remove">&times;</button>` : ''}
     </div>
   `).join('');
   prospectFrameRows.forEach(row => initProspectFrameAutocomplete(row.id));
 }
 
-function addProspectFrameRow() {
-  if (prospectFrameRows.length >= 5) return;
-  const saved = prospectFrameRows.map(r => ({
+function saveProspectFrameFieldValues() {
+  return prospectFrameRows.map(r => ({
     id: r.id,
     model: (document.getElementById('prospect-frame-model-' + r.id) || {}).value || '',
-    color: (document.getElementById('prospect-frame-color-' + r.id) || {}).value || ''
+    color: (document.getElementById('prospect-frame-color-' + r.id) || {}).value || '',
+    price: (document.getElementById('prospect-frame-price-' + r.id) || {}).value || ''
   }));
-  prospectFrameRows.push({ id: prospectFrameRowSeq++ });
-  renderProspectFrameRowList();
-  saved.forEach(({ id, model, color }) => {
+}
+
+function restoreProspectFrameFieldValues(saved) {
+  saved.forEach(({ id, model, color, price }) => {
     const modelEl = document.getElementById('prospect-frame-model-' + id);
     const colorEl = document.getElementById('prospect-frame-color-' + id);
+    const priceEl = document.getElementById('prospect-frame-price-' + id);
     if (modelEl) modelEl.value = model;
     if (colorEl) colorEl.value = color;
+    if (priceEl) priceEl.value = price;
   });
+}
+
+function addProspectFrameRow() {
+  if (prospectFrameRows.length >= 5) return;
+  const saved = saveProspectFrameFieldValues();
+  prospectFrameRows.push({ id: prospectFrameRowSeq++ });
+  renderProspectFrameRowList();
+  restoreProspectFrameFieldValues(saved);
 }
 
 function removeProspectFrameRow(id) {
   if (prospectFrameRows.length <= 1) return;
-  const saved = prospectFrameRows.map(r => ({
-    id: r.id,
-    model: (document.getElementById('prospect-frame-model-' + r.id) || {}).value || '',
-    color: (document.getElementById('prospect-frame-color-' + r.id) || {}).value || ''
-  }));
+  const saved = saveProspectFrameFieldValues();
   prospectFrameRows = prospectFrameRows.filter(r => r.id !== id);
   renderProspectFrameRowList();
-  saved.filter(s => s.id !== id).forEach(({ id, model, color }) => {
-    const modelEl = document.getElementById('prospect-frame-model-' + id);
-    const colorEl = document.getElementById('prospect-frame-color-' + id);
-    if (modelEl) modelEl.value = model;
-    if (colorEl) colorEl.value = color;
-  });
+  restoreProspectFrameFieldValues(saved.filter(s => s.id !== id));
+}
+
+// Staff enter a tax-included price by default; when the admin
+// "priceInputTaxExcluded" setting is on, what they type is treated as
+// tax-excluded and converted here so the stored/displayed price is
+// always tax-included (per PRICE_TAX_RATE, Japan's 10% consumption tax).
+function normalizeFramePriceInput(raw) {
+  const digits = String(raw || '').replace(/\D/g, '');
+  if (!digits) return '';
+  const entered = parseInt(digits, 10);
+  return String(priceInputTaxExcluded ? Math.round(entered * PRICE_TAX_RATE) : entered);
 }
 
 function collectProspectFrames() {
   return prospectFrameRows
     .map(row => ({
       model: (document.getElementById('prospect-frame-model-' + row.id) || {}).value || '',
-      color: (document.getElementById('prospect-frame-color-' + row.id) || {}).value || ''
+      color: (document.getElementById('prospect-frame-color-' + row.id) || {}).value || '',
+      price: (document.getElementById('prospect-frame-price-' + row.id) || {}).value || ''
     }))
-    .map(f => ({ model: f.model.trim(), color: f.color.trim() }))
-    .filter(f => f.model || f.color);
+    .map(f => ({ model: f.model.trim(), color: f.color.trim(), price: normalizeFramePriceInput(f.price) }))
+    .filter(f => f.model || f.color || f.price);
 }
 
 function resetProspectFrameEntry() {
@@ -2698,14 +2726,20 @@ async function loadLensSectionSetting() {
     const json = await res.json();
     if (json.ok) {
       hideLensSection = !!json.hideLensSection;
+      priceInputTaxExcluded = !!json.priceInputTaxExcluded;
     }
   } catch (err) {
     hideLensSection = false; // can't confirm the setting — fail open (visible)
+    priceInputTaxExcluded = false; // fail open (default tax-included entry)
   } finally {
     lensSettingLoaded = true;
     applyCustomerTypeToForm();
     const cb = document.getElementById('setting-hide-lens');
     if (cb) cb.checked = hideLensSection;
+    const priceCb = document.getElementById('setting-price-tax-excluded');
+    if (priceCb) priceCb.checked = priceInputTaxExcluded;
+    document.getElementById('lbl-prospect-frame-price-mode').textContent =
+      priceInputTaxExcluded ? i18n[currentLang].taxExcluded : i18n[currentLang].taxIncluded;
   }
 }
 
@@ -2718,6 +2752,28 @@ async function updateHideLensSetting() {
     if (json.ok) {
       hideLensSection = value;
       applyCustomerTypeToForm();
+    } else {
+      cb.checked = !value;
+      alert('Failed to update setting: ' + (json.error || 'unknown error'));
+    }
+  } catch (err) {
+    cb.checked = !value;
+    alert('Connection error.');
+  } finally {
+    cb.disabled = false;
+  }
+}
+
+async function updatePriceTaxExcludedSetting() {
+  const cb = document.getElementById('setting-price-tax-excluded');
+  const value = cb.checked;
+  cb.disabled = true;
+  try {
+    const json = await adminRequest({ op: 'setting', key: 'priceInputTaxExcluded', value: String(value) });
+    if (json.ok) {
+      priceInputTaxExcluded = value;
+      document.getElementById('lbl-prospect-frame-price-mode').textContent =
+        priceInputTaxExcluded ? i18n[currentLang].taxExcluded : i18n[currentLang].taxIncluded;
     } else {
       cb.checked = !value;
       alert('Failed to update setting: ' + (json.error || 'unknown error'));
@@ -2795,10 +2851,40 @@ function renderAdminTable() {
   `).join('');
 }
 
+// Parses one "Model/C###/Price" entry from considerFrame/Color (column R).
+// Mirrors parseFrameEntry_() in apps-script.gs — color ("C" + digits) and
+// price (plain digits) segments are both optional and recognized by
+// shape rather than position, so rows saved before price support (just
+// "Model" or "Model/C###") still parse correctly.
+function parseFrameEntry(entry) {
+  const segments = String(entry || '').split('/').map(s => s.trim()).filter(Boolean);
+  let model = segments.length ? segments[0] : '';
+  let color = '', price = '';
+  for (let i = 1; i < segments.length; i++) {
+    if (/^C\d+$/.test(segments[i])) { color = segments[i].slice(1); }
+    else if (/^\d+$/.test(segments[i])) { price = segments[i]; }
+  }
+  const needsCheck = model.endsWith('*');
+  if (needsCheck) { model = model.slice(0, -1).trim(); }
+  return { model, color, price, needsCheck };
+}
+
+function formatYenAmount(price) {
+  const n = parseInt(price, 10);
+  if (!price || isNaN(n)) return '';
+  return '¥' + String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ',') + '(税込)';
+}
+
 function renderFrameCell(r) {
   if (r.customerType === 'Prospect') {
-    const combined = r.considerFrameColor || '';
-    const frameText = combined ? `<span style="font-style:italic;">${escapeHtml('Considering: ' + combined)}</span>` : '';
+    const combined = String(r.considerFrameColor || '').split(',').map(s => s.trim()).filter(Boolean);
+    const frameText = combined.length
+      ? `<span style="font-style:italic;">${escapeHtml('Considering: ' + combined.map(entry => {
+          const { model, color, price, needsCheck } = parseFrameEntry(entry);
+          const priceText = formatYenAmount(price);
+          return [model + (needsCheck ? '*' : ''), color ? 'C' + color : '', priceText].filter(Boolean).join(' ');
+        }).join(', '))}</span>`
+      : '';
     // memberNo doubles as the prospect's confirm token (column B) — see the
     // header comment in apps-script.gs — so it's what buildConfirmPageUrl()
     // needs to reconstruct the same link sent to the customer via SMS.

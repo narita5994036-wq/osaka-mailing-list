@@ -86,12 +86,17 @@ body {
 }
 .frame-item {
   display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 12px;
+  flex-direction: column;
+  gap: 6px;
   border: 0.5px solid var(--border);
   padding: 14px 16px;
   font-size: 14px;
+}
+.frame-item-top {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
 }
 .frame-item .model { font-weight: 500; }
 .frame-item .model a { color: var(--blue); text-decoration: none; }
@@ -105,6 +110,12 @@ body {
   font-size: 12px;
   letter-spacing: 0.04em;
   color: var(--mid);
+  font-variant-numeric: tabular-nums;
+}
+.frame-item .price {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--light);
   font-variant-numeric: tabular-nums;
 }
 .frame-item .stock-badge {
@@ -250,6 +261,31 @@ function escapeHtml(str) {
   return div.innerHTML;
 }
 
+// Parses one "Model/C###/Price" entry from considerFrame/Color. Color
+// ("C" + digits) and price (plain digits) segments are both optional and
+// recognized by shape rather than position, so rows saved before price
+// support (just "Model" or "Model/C###") still parse correctly.
+function parseFrameEntry(entry) {
+  const segments = String(entry || '').split('/').map(s => s.trim()).filter(Boolean);
+  let model = segments.length ? segments[0] : '';
+  let color = '', price = '';
+  for (let i = 1; i < segments.length; i++) {
+    if (/^C\d+$/.test(segments[i])) { color = segments[i].slice(1); }
+    else if (/^\d+$/.test(segments[i])) { price = segments[i]; }
+  }
+  // Staff mark a frame out of stock by appending "*" right after the
+  // model name in the sheet cell (e.g. "LAGON*/C222").
+  const needsCheck = model.endsWith('*');
+  if (needsCheck) { model = model.slice(0, -1).trim(); }
+  return { model, color, price, needsCheck };
+}
+
+function formatYenAmount(price) {
+  const n = parseInt(price, 10);
+  if (!price || isNaN(n)) return '';
+  return '¥' + String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ',') + '(税込)';
+}
+
 function renderFrames(considerFrameColor, considerFrameUrl) {
   const list = document.getElementById('cf-frame-list');
   const frames = String(considerFrameColor || '')
@@ -265,14 +301,8 @@ function renderFrames(considerFrameColor, considerFrameUrl) {
   let anyNeedsCheck = false;
 
   frames.forEach((frame, i) => {
-    const parts = frame.split('/C');
-    let model = (parts[0] || '').trim();
-    const color = parts.length > 1 ? 'C' + parts[1].trim() : '';
-
-    // Staff mark a frame out of stock by appending "*" right after the
-    // model name in the sheet cell (e.g. "LAGON*/C222").
-    const needsCheck = model.endsWith('*');
-    if (needsCheck) { model = model.slice(0, -1).trim(); anyNeedsCheck = true; }
+    const { model, color, price, needsCheck } = parseFrameEntry(frame);
+    if (needsCheck) anyNeedsCheck = true;
 
     const url = urls[i] || '';
     let modelHtml = escapeHtml(model);
@@ -280,13 +310,16 @@ function renderFrames(considerFrameColor, considerFrameUrl) {
       modelHtml = '<a href="' + escapeHtml(url) + '" target="_blank" rel="noopener">' + modelHtml + '</a>';
     }
 
+    const priceHtml = formatYenAmount(price);
+
     const li = document.createElement('li');
     li.className = 'frame-item';
-    li.innerHTML = '<span class="model">' + modelHtml + '</span>'
+    li.innerHTML = '<div class="frame-item-top"><span class="model">' + modelHtml + '</span>'
       + '<span class="item-right">'
       + (needsCheck ? '<span class="stock-badge">要確認</span>' : '')
-      + (color ? '<span class="color">' + escapeHtml(color) + '</span>' : '')
-      + '</span>';
+      + (color ? '<span class="color">C' + escapeHtml(color) + '</span>' : '')
+      + '</span></div>'
+      + (priceHtml ? '<span class="price">' + priceHtml + '</span>' : '');
     list.appendChild(li);
   });
 
