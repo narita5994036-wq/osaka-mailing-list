@@ -27,10 +27,15 @@
  * SMS Opt-in (S) and Customer Type (T) are blank/"Purchaser" for a normal
  * purchaser registration, since they only apply to prospects.
  *
- * Up to 5 considering frames (model + color number) are combined into a
- * single cell (column R), each formatted as "Frame Name/C###" and joined
- * with ", ", e.g. "Kelly Sun/C301, Aiko/C204". Column U optionally holds
- * one product-page URL per frame, in the same order and also joined with
+ * Up to 5 considering frames (model + color number + price) are combined
+ * into a single cell (column R), each formatted as "Frame Name/C###/Price"
+ * — color and price are both optional and order-independent (parsed by
+ * shape in parseFrameEntry_()) — and joined with ", ", e.g.
+ * "Kelly Sun/C301/15400, Aiko/C204". Price is always tax-included yen, a
+ * plain integer with no currency symbol or separators; the registration
+ * form converts a tax-excluded entry (per the priceInputTaxExcluded
+ * setting) before it ever reaches here. Column U optionally holds one
+ * product-page URL per frame, in the same order and also joined with
  * ", " (e.g. "https://.../kelly-sun, https://.../aiko") — staff type these
  * in directly; a blank entry for a given position just leaves that frame
  * unlinked. buildConfirmFrameListHtml() matches them to frames by index.
@@ -213,16 +218,20 @@ function doPost(e) {
 
   var isProspect = data.customerType === 'prospect';
 
-  // Up to 5 candidate frames, each combined into "Model/C###" and joined
-  // with ", " into the single considerFrame/Color cell (column R).
+  // Up to 5 candidate frames, each combined into "Model/C###/Price" (color
+  // and price segments both optional) and joined with ", " into the single
+  // considerFrame/Color cell (column R). Price is always stored tax-included
+  // yen, as a plain integer — see normalizeFramePriceInput() in index.html
+  // for the tax-excluded-input conversion — so buildConfirmFrameListHtml()
+  // can format it consistently regardless of how staff entered it.
   var prospectFrames = Array.isArray(data.prospectFrames) ? data.prospectFrames.slice(0, 5) : [];
   var considerFrameColor = prospectFrames.map(function(f) {
     var model = (f && f.model) || '';
     var color = (f && f.color) || '';
-    if (model && color) { return model + '/C' + color; }
-    if (model) { return model; }
-    if (color) { return 'C' + color; }
-    return '';
+    var price = (f && f.price) || '';
+    return [model, color ? 'C' + color : '', price]
+      .filter(function(s) { return s; })
+      .join('/');
   }).filter(function(s) { return s; }).join(', ');
 
   // Store a real Date (not a string) so the sheet can render it in Japan
@@ -434,7 +443,7 @@ function handleAdminRequest(params) {
   }
 
   if (op === 'setting') {
-    var settingKeys = { hideLensSection: 'HIDE_LENS_SECTION' };
+    var settingKeys = { hideLensSection: 'HIDE_LENS_SECTION', priceInputTaxExcluded: 'PRICE_INPUT_TAX_EXCLUDED' };
     var propKey = settingKeys[params.key];
     if (!propKey) {
       return { ok: false, error: 'unknown setting key' };
@@ -454,7 +463,8 @@ function handleGetSettings() {
   var props = PropertiesService.getScriptProperties();
   return {
     ok: true,
-    hideLensSection: props.getProperty('HIDE_LENS_SECTION') === 'true'
+    hideLensSection: props.getProperty('HIDE_LENS_SECTION') === 'true',
+    priceInputTaxExcluded: props.getProperty('PRICE_INPUT_TAX_EXCLUDED') === 'true'
   };
 }
 
@@ -546,6 +556,35 @@ function isSafeHttpUrl_(url) {
   return /^https?:\/\//i.test(url);
 }
 
+/**
+ * Parses one "Model/C###/Price" entry from considerFrame/Color (column R).
+ * Color ("C" followed by digits) and price (plain digits) segments are
+ * both optional and recognized by shape rather than position, so rows
+ * saved before price support (just "Model" or "Model/C###") still parse
+ * correctly. Also strips and reports the "*" out-of-stock marker staff
+ * append directly to the model name (e.g. a "LAGON*" model paired with
+ * color "C222").
+ */
+function parseFrameEntry_(entry) {
+  var segments = String(entry || '').split('/').map(function(s) { return s.trim(); }).filter(function(s) { return s; });
+  var model = segments.length ? segments[0] : '';
+  var color = '';
+  var price = '';
+  for (var i = 1; i < segments.length; i++) {
+    if (/^C\d+$/.test(segments[i])) { color = segments[i].slice(1); }
+    else if (/^\d+$/.test(segments[i])) { price = segments[i]; }
+  }
+  var needsCheck = model.slice(-1) === '*';
+  if (needsCheck) { model = model.slice(0, -1).trim(); }
+  return { model: model, color: color, price: price, needsCheck: needsCheck };
+}
+
+function formatYenAmount_(price) {
+  var n = parseInt(price, 10);
+  if (!price || isNaN(n)) return '';
+  return '¥' + String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ',') + '(税込)';
+}
+
 function buildConfirmFrameListHtml(considerFrameColor, considerFrameUrl) {
   var frames = String(considerFrameColor || '')
     .split(',')
@@ -558,26 +597,24 @@ function buildConfirmFrameListHtml(considerFrameColor, considerFrameUrl) {
   var urls = String(considerFrameUrl || '').split(',').map(function(s) { return s.trim(); });
 
   return frames.map(function(frame, i) {
-    var parts = frame.split('/C');
-    var model = (parts[0] || '').trim();
-    var color = parts.length > 1 ? 'C' + parts[1].trim() : '';
-
-    // Staff mark a frame out of stock by appending "*" right after the
-    // model name in the sheet cell (e.g. "LAGON*/C222").
-    var needsCheck = model.slice(-1) === '*';
-    if (needsCheck) { model = model.slice(0, -1).trim(); }
+    var parsed = parseFrameEntry_(frame);
 
     var url = urls[i] || '';
-    var modelHtml = escapeHtmlGs(model);
+    var modelHtml = escapeHtmlGs(parsed.model);
     if (isSafeHttpUrl_(url)) {
       modelHtml = '<a href="' + escapeHtmlGs(url) + '" target="_blank" rel="noopener">' + modelHtml + '</a>';
     }
 
-    return '<li class="frame-item"><span class="model">' + modelHtml + '</span>'
+    var priceHtml = formatYenAmount_(parsed.price);
+
+    return '<li class="frame-item">'
+      + '<div class="frame-item-top"><span class="model">' + modelHtml + '</span>'
       + '<span class="item-right">'
-      + (needsCheck ? '<span class="stock-badge">要確認</span>' : '')
-      + (color ? '<span class="color">' + escapeHtmlGs(color) + '</span>' : '')
-      + '</span></li>';
+      + (parsed.needsCheck ? '<span class="stock-badge">要確認</span>' : '')
+      + (parsed.color ? '<span class="color">C' + escapeHtmlGs(parsed.color) + '</span>' : '')
+      + '</span></div>'
+      + (priceHtml ? '<span class="price">' + priceHtml + '</span>' : '')
+      + '</li>';
   }).join('');
 }
 
@@ -585,10 +622,7 @@ function hasNeedsCheckFrame(considerFrameColor) {
   return String(considerFrameColor || '')
     .split(',')
     .map(function(s) { return s.trim(); })
-    .some(function(frame) {
-      var model = (frame.split('/C')[0] || '').trim();
-      return model.slice(-1) === '*';
-    });
+    .some(function(frame) { return parseFrameEntry_(frame).needsCheck; });
 }
 
 function buildConfirmContentHtml(record) {
@@ -633,13 +667,15 @@ var CONFIRM_PAGE_CSS = ':root{--bg:#ffffff;--surface:#f5f5f5;--border:#d0d0d0;--
   + '.section-label{font-size:11px;letter-spacing:0.14em;text-transform:uppercase;color:var(--mid);'
   + 'border-bottom:0.5px solid var(--border);padding-bottom:10px;margin-bottom:16px;}'
   + '.frame-list{list-style:none;margin:0 0 32px;padding:0;display:flex;flex-direction:column;gap:10px;}'
-  + '.frame-item{display:flex;align-items:baseline;justify-content:space-between;gap:12px;'
+  + '.frame-item{display:flex;flex-direction:column;gap:6px;'
   + 'border:0.5px solid var(--border);padding:14px 16px;font-size:14px;}'
+  + '.frame-item-top{display:flex;align-items:baseline;justify-content:space-between;gap:12px;}'
   + '.frame-item .model{font-weight:500;}'
   + '.frame-item .model a{color:var(--blue);text-decoration:none;}'
   + '.frame-item .model a:hover,.frame-item .model a:focus-visible{text-decoration:underline;}'
   + '.frame-item .item-right{display:flex;align-items:baseline;gap:8px;}'
   + '.frame-item .color{font-size:12px;letter-spacing:0.04em;color:var(--mid);font-variant-numeric:tabular-nums;}'
+  + '.frame-item .price{font-size:13px;font-weight:600;color:var(--light);font-variant-numeric:tabular-nums;}'
   + '.frame-item .stock-badge{font-size:11px;letter-spacing:0.04em;color:var(--orange);background:var(--orange-bg);'
   + 'padding:3px 8px;border-radius:3px;white-space:nowrap;}'
   + '.stock-note{font-size:12px;line-height:1.8;color:var(--orange);border-left:2px solid var(--orange);'
