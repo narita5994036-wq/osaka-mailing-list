@@ -2882,7 +2882,7 @@ function renderFrameCell(r) {
       ? `<span style="font-style:italic;">${escapeHtml('Considering: ' + combined.map(entry => {
           const { model, color, price, needsCheck } = parseFrameEntry(entry);
           const priceText = formatYenAmount(price);
-          return [model + (needsCheck ? '*' : ''), color ? 'C' + color : '', priceText].filter(Boolean).join(' ');
+          return [model + (needsCheck ? '*' : '') + (color ? '　／C' + color : ''), priceText].filter(Boolean).join('　');
         }).join(', '))}</span>`
       : '';
     // memberNo doubles as the prospect's confirm token (column B) — see the
