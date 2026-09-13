@@ -845,7 +845,7 @@ tr:hover td { background: #f9f9f9; }
         <div style="display:flex; gap:8px; margin-bottom:10px;">
           <label id="lbl-prospect-frame-model" style="flex:1; margin:0;">Frame Model of Interest <span style="font-size:10px; text-transform:none; letter-spacing:0;">(optional)</span></label>
           <label id="lbl-prospect-frame-color" style="width:90px; flex-shrink:0; margin:0;">Color</label>
-          <label id="lbl-prospect-frame-price" style="width:110px; flex-shrink:0; margin:0;">Price <span id="lbl-prospect-frame-price-mode" style="font-size:10px; text-transform:none; letter-spacing:0;">(incl. tax)</span></label>
+          <label id="lbl-prospect-frame-price" style="width:85px; flex-shrink:0; margin:0;">Price <span id="lbl-prospect-frame-price-mode" style="font-size:10px; text-transform:none; letter-spacing:0;">(incl. tax)</span></label>
         </div>
         <div id="prospect-frame-row-list"></div>
         <button class="refresh-btn" type="button" onclick="addProspectFrameRow()" id="lbl-prospect-frame-add" style="margin-bottom:1rem;">+ Add Frame</button>
@@ -1723,7 +1723,7 @@ function renderProspectFrameRowList() {
         <div class="ac-dropdown" id="prospect-frame-dropdown-${row.id}"></div>
       </div>
       <input type="text" class="ac-input" id="prospect-frame-color-${row.id}" inputmode="numeric" pattern="[0-9]*" maxlength="3" style="width:90px; flex-shrink:0;" oninput="this.value = this.value.replace(/\\D/g, '').slice(0, 3)">
-      <input type="text" class="ac-input" id="prospect-frame-price-${row.id}" inputmode="numeric" pattern="[0-9]*" placeholder="¥" style="width:110px; flex-shrink:0;" oninput="this.value = this.value.replace(/\\D/g, '').slice(0, 7)">
+      <input type="text" class="ac-input" id="prospect-frame-price-${row.id}" inputmode="numeric" pattern="[0-9]*" placeholder="¥" style="width:85px; flex-shrink:0;" oninput="this.value = this.value.replace(/\\D/g, '').slice(0, 7)">
       ${prospectFrameRows.length > 1 ? `<button type="button" class="frame-remove-btn" onclick="removeProspectFrameRow(${row.id})" aria-label="Remove">&times;</button>` : ''}
     </div>
   `).join('');
