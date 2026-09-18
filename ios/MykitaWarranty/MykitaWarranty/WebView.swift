@@ -11,6 +11,11 @@ import WebKit
 /// as "open externally" (target="_blank", window.open), and file
 /// downloads (the admin panel's CSV export).
 struct WebView: UIViewRepresentable {
+    /// This store's Apps Script Web App URL, or nil to use index.html's own
+    /// default. Injected as window.MYKITA_STORE_WEBHOOK_URL before the
+    /// page's script runs — see index.html's SHEET_WEBHOOK_URL line.
+    let webhookURL: String?
+
     func makeUIView(context: Context) -> WKWebView {
         let webView = WKWebView(frame: .zero, configuration: WKWebViewConfiguration())
         webView.navigationDelegate = context.coordinator
@@ -19,17 +24,18 @@ struct WebView: UIViewRepresentable {
         if #available(iOS 16.4, *) {
             webView.isInspectable = true // Safari > Develop menu, for debugging on-device; harmless for internal-only builds.
         }
-
-        if let indexURL = Bundle.main.url(forResource: "index", withExtension: "html", subdirectory: "Resources") {
-            // Grant read access to the whole Resources folder (not just the
-            // file itself) so relative references like assets/*.gif and
-            // icons/*.png resolve.
-            webView.loadFileURL(indexURL, allowingReadAccessTo: indexURL.deletingLastPathComponent())
-        }
+        context.coordinator.load(webhookURL: webhookURL, into: webView)
         return webView
     }
 
-    func updateUIView(_ uiView: WKWebView, context: Context) {}
+    /// Re-injects and reloads only when the store actually changed (e.g.
+    /// after StorePickerView reassigns this device) — not on every SwiftUI
+    /// body re-evaluation, which would otherwise wipe in-progress form
+    /// input on unrelated view updates.
+    func updateUIView(_ webView: WKWebView, context: Context) {
+        guard context.coordinator.loadedWebhookURL != webhookURL else { return }
+        context.coordinator.load(webhookURL: webhookURL, into: webView)
+    }
 
     func makeCoordinator() -> Coordinator { Coordinator() }
 
@@ -38,6 +44,36 @@ struct WebView: UIViewRepresentable {
         /// download object's identity — set in decideDestination, read
         /// back in downloadDidFinish to present the share sheet.
         private var downloadDestinations: [ObjectIdentifier: URL] = [:]
+
+        /// The webhookURL last passed to load(webhookURL:into:), so
+        /// updateUIView can tell a real store change from an unrelated
+        /// SwiftUI body re-evaluation.
+        private(set) var loadedWebhookURL: String?
+
+        func load(webhookURL: String?, into webView: WKWebView) {
+            loadedWebhookURL = webhookURL
+
+            let controller = webView.configuration.userContentController
+            controller.removeAllUserScripts()
+            if let webhookURL {
+                // JSONSerialization gives a safely-quoted/escaped JS string
+                // literal regardless of what's in the URL.
+                let encoded = (try? JSONSerialization.data(withJSONObject: [webhookURL]))
+                    .flatMap { String(data: $0, encoding: .utf8) }
+                    .map { String($0.dropFirst().dropLast()) } // unwrap the [ ] the array added
+                    ?? "null"
+                let source = "window.MYKITA_STORE_WEBHOOK_URL = \(encoded);"
+                controller.addUserScript(WKUserScript(source: source, injectionTime: .atDocumentStart, forMainFrameOnly: true))
+            }
+
+            guard let indexURL = Bundle.main.url(forResource: "index", withExtension: "html", subdirectory: "Resources") else {
+                return
+            }
+            // Grant read access to the whole Resources folder (not just the
+            // file itself) so relative references like assets/*.gif and
+            // icons/*.png resolve.
+            webView.loadFileURL(indexURL, allowingReadAccessTo: indexURL.deletingLastPathComponent())
+        }
 
         // MARK: Outbound links (tel:, sms:, mailto:, and http(s) navigations
         // the page intends to open outside itself)

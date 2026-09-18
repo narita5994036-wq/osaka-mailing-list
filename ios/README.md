@@ -29,13 +29,50 @@ and then drop these files in.
 
 Xcode's template already created `MykitaWarrantyApp.swift` and
 `ContentView.swift` — delete those two (Move to Trash) and drag in these
-three files from this repo instead (check "Copy items if needed" is **off**
+five files from this repo instead (check "Copy items if needed" is **off**
 if you want them to stay tracked at their current path, or **on** if you'd
 rather Xcode own a copy — either works, just be consistent with git):
 
 - `MykitaWarranty/MykitaWarrantyApp.swift`
 - `MykitaWarranty/ContentView.swift`
 - `MykitaWarranty/WebView.swift`
+- `MykitaWarranty/Store.swift`
+- `MykitaWarranty/StorePickerView.swift`
+
+### Multi-store setup (Tokyo / Osaka / Fukuoka)
+
+One app build serves all three stores. On first launch (no store saved
+yet), `StorePickerView` asks which store the device belongs to and saves
+the choice (`StoreSettings`, backed by `UserDefaults`) — from then on the
+app opens straight to that store's form. Tapping the small store-name
+badge in the top-right corner reopens the picker, for reassigning a device
+later without reinstalling.
+
+Each store needs its **own Google Sheet + Apps Script deployment**, same
+as the existing single-store setup: copy the spreadsheet, paste
+`apps-script.gs` into its Apps Script project, deploy as a Web App, and
+get that store's `/exec` URL. Then fill in `Store.swift`'s `webhookURL`
+for each case:
+
+```swift
+var webhookURL: String? {
+    switch self {
+    case .tokyo: return "https://script.google.com/macros/s/AKfycb.../exec"
+    case .osaka: return "https://script.google.com/macros/s/AKfycb.../exec"
+    case .fukuoka: return "https://script.google.com/macros/s/AKfycb.../exec"
+    }
+}
+```
+
+Mechanically: `WebView.swift` injects `window.MYKITA_STORE_WEBHOOK_URL` as
+a `WKUserScript` (runs before the page's own script) using whichever
+store's `webhookURL` `ContentView` passes it, and `index.html`'s
+`SHEET_WEBHOOK_URL` line reads that global if present, falling back to its
+own hardcoded default otherwise. The **web version** (GitHub Pages) never
+sets that global, so nothing changes there — it always uses the default
+URL regardless of this app's per-store config. A store left as `nil` in
+`Store.swift` just falls back to that same default too, so you can fill
+these in one at a time without breaking the others.
 
 ## 3. Add the bundled web content
 
@@ -106,6 +143,21 @@ actually been built or run. Please build it on your Mac and check:
    Compose Mail's Copy Image) — `navigator.clipboard` calls from JS should
    work since `file://` is treated as a secure context, but worth
    confirming on-device, especially the image copy (Compose Mail modal).
+5. **Store picker / badge** — first launch should show the picker
+   full-screen with no way to skip it; after picking a store, the badge in
+   the top-right corner should reopen the picker and switching stores
+   there should actually reload the page against the new store's URL
+   (check a test submission lands in the right spreadsheet). Also confirm
+   the badge doesn't visually collide with the page's own language
+   switcher (EN/JA/ZH/KO) in the top-left — I couldn't check this on a
+   real screen size/notch.
+6. **Submit timeout** — `SUBMIT_TIMEOUT_MS` (index.html, 15 seconds) aborts
+   a hung submission and shows "Submission timed out…" instead of leaving
+   the button stuck on "…" indefinitely. Tested against a browser with a
+   simulated hung request (confirmed it fires at ~15s with the right
+   message and re-enables the button); worth a real spot-check on-device
+   with poor connectivity if you get the chance, but this part is shared
+   with the web version so it's lower-risk than the iOS-only items above.
 
 If any of these misbehave, the `isInspectable = true` line in
 `WebView.swift` lets you attach Safari's Web Inspector to the running app
