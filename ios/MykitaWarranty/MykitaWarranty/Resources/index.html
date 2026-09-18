@@ -1,0 +1,3222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MYKITA JAPAN — Frame Warranty Registration</title>
+
+<!-- PWA / Add to Home Screen -->
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#ffffff">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="MYKITA JAPAN">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<link rel="icon" href="icons/icon-192.png">
+<style>
+:root {
+  --bg: #ffffff;
+  --surface: #f5f5f5;
+  --border: #d0d0d0;
+  --light: #1a1a1a;
+  --mid: #666666;
+  --red: #c0392b;
+  --green: #1e7e44;
+  --orange: #b85c00;
+  --blue: #185FA5;
+  --font: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { font-size: 17px; }
+body {
+  background: var(--bg);
+  color: var(--light);
+  font-family: var(--font);
+  -webkit-font-smoothing: antialiased;
+  min-height: 100vh;
+}
+
+/* ── LANG BAR ── */
+.lang-bar {
+  display: flex;
+  gap: 8px;
+  padding: 12px 20px;
+  border-bottom: 0.5px solid var(--border);
+  align-items: center;
+}
+.lang-btn {
+  background: none;
+  border: none;
+  color: var(--mid);
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  cursor: pointer;
+  padding: 4px 6px;
+  transition: color 0.15s;
+}
+.lang-btn.active, .lang-btn:hover { color: var(--light); }
+
+/* ── HEADER ── */
+.header {
+  padding: 52px 20px 32px;
+  text-align: center;
+  border-bottom: 0.5px solid var(--border);
+}
+.logo {
+  font-size: 21px;
+  letter-spacing: 0.25em;
+  font-weight: 300;
+  color: #1a1a1a;
+  cursor: pointer;
+  user-select: none;
+}
+.logo.shine {
+  background-image: linear-gradient(120deg, #1a1a1a 40%, #ffffff 50%, #1a1a1a 60%);
+  background-size: 200% 100%;
+  background-position: 200% 0;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+  animation: logoShine 2.6s ease-in-out;
+}
+@keyframes logoShine {
+  0% { background-position: 200% 0; }
+  100% { background-position: -100% 0; }
+}
+.logo-sub {
+  margin-top: 4px;
+  font-size: 11px;
+  letter-spacing: 0.15em;
+  color: var(--mid);
+  text-transform: uppercase;
+}
+
+/* ── MAIN ── */
+.main {
+  max-width: 520px;
+  margin: 0 auto;
+  padding: 44px 24px 96px;
+}
+
+/* ── SECTION LABEL ── */
+.section-label {
+  font-size: 11px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--mid);
+  border-bottom: 0.5px solid var(--border);
+  padding-bottom: 12px;
+  margin-bottom: 28px;
+}
+
+/* ── WARRANTY INFO BOX ── */
+.warranty-info {
+  border: 0.5px solid var(--border);
+  padding: 24px 26px;
+  margin-bottom: 36px;
+  font-size: 13px;
+  line-height: 1.8;
+  color: var(--mid);
+}
+.warranty-info strong { color: var(--light); display: block; margin-bottom: 10px; font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; }
+
+/* ── FORM FIELDS ── */
+.field { margin-bottom: 28px; }
+.field label {
+  display: block;
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--mid);
+  margin-bottom: 10px;
+}
+.required::after { content: " *"; color: var(--red); }
+.required-before::before { content: "* "; color: var(--red); }
+.field input[type="text"],
+.field input[type="email"] {
+  width: 100%;
+  background: var(--surface);
+  border: 0.5px solid var(--border);
+  color: var(--light);
+  font-family: var(--font);
+  font-size: 16px;
+  padding: 15px 16px;
+  outline: none;
+  transition: border-color 0.15s;
+  -webkit-appearance: none;
+  border-radius: 0;
+}
+.field input:focus { border-color: var(--light); }
+.field input.err { border-color: var(--red); }
+.field select {
+  width: 100%;
+  background: var(--surface);
+  border: 0.5px solid var(--border);
+  color: var(--light);
+  font-family: var(--font);
+  font-size: 16px;
+  padding: 15px 16px;
+  outline: none;
+  transition: border-color 0.15s;
+  -webkit-appearance: none;
+  border-radius: 0;
+  box-sizing: border-box;
+}
+.field select:focus { border-color: var(--light); }
+.dob-display {
+  display: block;
+  width: 100%;
+  background: var(--surface);
+  border: 0.5px solid var(--border);
+  color: var(--light);
+  font-family: var(--font);
+  font-size: 16px;
+  padding: 15px 16px;
+  text-align: left;
+  outline: none;
+  cursor: pointer;
+  transition: border-color 0.15s;
+  border-radius: 0;
+  box-sizing: border-box;
+}
+.dob-display.placeholder { color: var(--mid); }
+.dob-display:focus { border-color: var(--light); }
+
+/* ── DOB PICKER ── */
+.dob-picker-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.4);
+  z-index: 300;
+  align-items: flex-end;
+  justify-content: center;
+}
+.dob-picker-overlay.open { display: flex; }
+.dob-picker-sheet {
+  background: var(--bg);
+  width: 100%;
+  max-width: 500px;
+  border-top: 0.5px solid var(--border);
+}
+.dob-picker-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px;
+  border-bottom: 0.5px solid var(--border);
+  font-size: 13px;
+  color: var(--light);
+}
+.dob-picker-btn {
+  background: none;
+  border: none;
+  font-family: var(--font);
+  font-size: 14px;
+  color: var(--mid);
+  cursor: pointer;
+  padding: 4px;
+}
+.dob-picker-done { color: var(--blue); font-weight: 600; }
+.dob-picker-labels {
+  display: flex;
+}
+.dob-picker-labels span {
+  flex: 1;
+  text-align: center;
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--mid);
+}
+.dob-picker-labels-footer {
+  padding: 12px 16px 22px;
+}
+.dob-picker-wheels {
+  position: relative;
+  display: flex;
+  height: 220px;
+  padding: 14px 16px 0;
+}
+.dob-wheel {
+  flex: 1;
+  overflow-y: scroll;
+  scroll-snap-type: y mandatory;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+  padding: 88px 0;
+  box-sizing: border-box;
+}
+.dob-wheel::-webkit-scrollbar { display: none; }
+.dob-wheel-item {
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  scroll-snap-align: center;
+  font-size: 21px;
+  color: #c7c7c7;
+  font-variant-numeric: tabular-nums;
+  transition: color 0.1s;
+}
+.dob-wheel-item.selected { color: var(--light); font-weight: 500; }
+.dob-wheel-fade-top,
+.dob-wheel-fade-bottom {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 88px;
+  pointer-events: none;
+}
+.dob-wheel-fade-top {
+  top: 0;
+  background: linear-gradient(to bottom, rgba(255,255,255,1) 0%, rgba(255,255,255,0) 100%);
+}
+.dob-wheel-fade-bottom {
+  bottom: 0;
+  background: linear-gradient(to top, rgba(255,255,255,1) 0%, rgba(255,255,255,0) 100%);
+}
+.err-msg {
+  font-size: 12px;
+  color: var(--red);
+  margin-top: 6px;
+  display: none;
+}
+
+/* ── OPTIN ── */
+.optin-label {
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--mid);
+  margin-bottom: 10px;
+  display: block;
+}
+.optin-desc {
+  font-size: 12px;
+  color: var(--mid);
+  line-height: 1.8;
+  margin-bottom: 18px;
+}
+.radio-group { display: flex; gap: 12px; margin-bottom: 28px; }
+.radio-btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border: 0.5px solid var(--border);
+  padding: 15px;
+  cursor: pointer;
+  font-size: 14px;
+  color: var(--light);
+  transition: border-color 0.15s;
+}
+.radio-btn input[type="radio"] { accent-color: var(--light); }
+.radio-btn:has(input:checked) { border-color: var(--light); }
+
+/* ── LENS SECTION ── */
+.lens-toggle-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 28px;
+  padding: 17px;
+  border: 0.5px solid var(--border);
+  cursor: pointer;
+}
+.lens-toggle-row input[type="checkbox"] { accent-color: var(--light); flex-shrink: 0; width: 16px; height: 16px; }
+.lens-toggle-row:has(input:disabled) { cursor: not-allowed; opacity: 0.5; }
+.lens-toggle-label { font-size: 13px; color: var(--light); }
+#lens-fields { display: none; margin-bottom: 12px; }
+#lens-fields.open { display: block; }
+.phone-row { display: flex; gap: 8px; }
+.phone-code-select {
+  width: 110px;
+  flex-shrink: 0;
+  background: var(--surface);
+  border: 0.5px solid var(--border);
+  color: var(--light);
+  font-family: var(--font);
+  font-size: 14px;
+  padding: 15px 8px;
+  outline: none;
+  border-radius: 0;
+  -webkit-appearance: none;
+}
+.phone-code-select:focus { border-color: var(--light); }
+.postcode-row { display: flex; gap: 8px; align-items: flex-start; }
+.postcode-row input { flex: 1; }
+.postcode-lookup-btn {
+  flex-shrink: 0;
+  background: var(--surface);
+  border: 0.5px solid var(--border);
+  color: var(--light);
+  font-family: var(--font);
+  font-size: 12px;
+  padding: 15px 16px;
+  cursor: pointer;
+  letter-spacing: 0.06em;
+  white-space: nowrap;
+}
+.postcode-lookup-btn:hover { background: var(--border); }
+.field textarea {
+  width: 100%;
+  background: var(--surface);
+  border: 0.5px solid var(--border);
+  color: var(--light);
+  font-family: var(--font);
+  font-size: 16px;
+  padding: 15px 16px;
+  outline: none;
+  resize: vertical;
+  min-height: 90px;
+  line-height: 1.6;
+  border-radius: 0;
+  box-sizing: border-box;
+}
+.field textarea:focus { border-color: var(--light); }
+.field input[type="tel"] {
+  width: 100%;
+  background: var(--surface);
+  border: 0.5px solid var(--border);
+  color: var(--light);
+  font-family: var(--font);
+  font-size: 16px;
+  padding: 15px 16px;
+  outline: none;
+  -webkit-appearance: none;
+  border-radius: 0;
+  box-sizing: border-box;
+}
+.field input[type="tel"]:focus { border-color: var(--light); }
+
+/* ── AGREE ── */
+.agree-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  margin-bottom: 32px;
+}
+.agree-row input[type="checkbox"] { margin-top: 2px; accent-color: var(--light); flex-shrink: 0; }
+.agree-text {
+  font-size: 12px;
+  color: var(--mid);
+  line-height: 1.7;
+}
+.agree-text a { color: var(--light); }
+
+/* ── PRIVACY NOTE ── */
+.privacy-note {
+  font-size: 12px;
+  color: var(--mid);
+  line-height: 1.8;
+  margin-bottom: 28px;
+  border-top: 0.5px solid var(--border);
+  padding-top: 22px;
+}
+
+/* ── SUBMIT BTN ── */
+.submit-btn {
+  width: 100%;
+  background: #1a1a1a;
+  color: #ffffff;
+  border: none;
+  font-family: var(--font);
+  font-size: 13px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  padding: 19px;
+  cursor: pointer;
+  transition: background 0.15s;
+  margin-top: 8px;
+}
+.submit-btn:hover { background: #333333; }
+.submit-btn:disabled { background: var(--border); color: var(--mid); cursor: not-allowed; }
+
+/* ── THANKS ── */
+#thanks-area {
+  display: none;
+  text-align: center;
+  padding: 60px 20px;
+}
+.thanks-icon { font-size: 33px; margin-bottom: 20px; }
+.thanks-title { font-size: 15px; letter-spacing: 0.2em; text-transform: uppercase; margin-bottom: 12px; }
+.thanks-sub { font-size: 13px; color: var(--mid); line-height: 1.7; margin-bottom: 20px; }
+.refresh-btn {
+  background: none;
+  border: 0.5px solid #aaaaaa;
+  color: #1a1a1a;
+  font-family: var(--font);
+  font-size: 12px;
+  letter-spacing: 0.12em;
+  padding: 13px 20px;
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s;
+}
+.refresh-btn:hover { border-color: #1a1a1a; }
+
+/* ── AUTOCOMPLETE ── */
+.ac-wrap { position: relative; }
+.ac-input {
+  width: 100%;
+  background: var(--surface);
+  border: 0.5px solid var(--border);
+  color: var(--light);
+  font-family: var(--font);
+  font-size: 16px;
+  padding: 15px 16px;
+  outline: none;
+  transition: border-color 0.15s;
+  -webkit-appearance: none;
+  border-radius: 0;
+}
+.ac-input:focus { border-color: var(--light); }
+.ac-input.err { border-color: var(--red); }
+.ac-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0; right: 0;
+  background: #f0f0f0;
+  border: 0.5px solid var(--border);
+  border-top: none;
+  max-height: 200px;
+  overflow-y: auto;
+  z-index: 100;
+  display: none;
+}
+.ac-wrap.open .ac-dropdown { display: block; }
+.ac-item {
+  padding: 10px 14px;
+  font-size: 14px;
+  color: var(--light);
+  cursor: pointer;
+  transition: background 0.1s;
+}
+.ac-item:hover, .ac-item.highlight { background: #e8e8e8; }
+.ac-empty {
+  padding: 10px 14px;
+  font-size: 13px;
+  color: var(--mid);
+}
+
+/* ── FRAME ENTRY SCREEN ── */
+#form-area { display: none; }
+.frame-row { display: flex; gap: 8px; margin-bottom: 16px; }
+.frame-row .ac-wrap { flex: 1; }
+.frame-remove-btn {
+  width: 50px; height: 50px; flex-shrink: 0;
+  background: none; border: 0.5px solid var(--border);
+  color: var(--light); font-size: 17px; cursor: pointer;
+  transition: color 0.15s, border-color 0.15s;
+}
+.frame-remove-btn:hover { color: var(--red); border-color: var(--red); }
+.prospect-frame-row { display: flex; gap: 8px; margin-bottom: 16px; }
+.prospect-frame-row .ac-wrap { flex: 1; }
+
+/* ── ADMIN PANEL ── */
+#admin-panel { display: none; }
+.logout-btn {
+  background: none;
+  border: 0.5px solid var(--border);
+  color: var(--mid);
+  font-family: var(--font);
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  padding: 6px 14px;
+  cursor: pointer;
+  transition: color 0.15s, border-color 0.15s;
+}
+.logout-btn:hover { color: var(--light); border-color: var(--light); }
+.admin-header-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.admin-controls { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+.count-badge {
+  font-size: 11px;
+  color: var(--mid);
+  letter-spacing: 0.06em;
+}
+.csv-btn {
+  background: #1a1a1a;
+  color: #ffffff;
+  border: none;
+  font-family: var(--font);
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  padding: 8px 14px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.csv-btn:hover { background: #333333; }
+.csv-filter {
+  background: var(--surface);
+  border: 0.5px solid var(--border);
+  color: var(--light);
+  font-family: var(--font);
+  font-size: 12px;
+  padding: 6px 10px;
+  outline: none;
+  cursor: pointer;
+}
+.table-wrap { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; font-size: 13px; min-width: 700px; }
+th {
+  text-align: left;
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--mid);
+  border-bottom: 0.5px solid var(--border);
+  padding: 8px 10px;
+  white-space: nowrap;
+}
+td {
+  padding: 10px 10px;
+  border-bottom: 0.5px solid #e0e0e0;
+  vertical-align: middle;
+  font-size: 13px;
+}
+tr:hover td { background: #f9f9f9; }
+.badge-yes { background: #e8f5e9; color: #1e7e44; font-size: 11px; padding: 2px 8px; letter-spacing: 0.06em; }
+.badge-no  { background: #fdecea; color: #666; font-size: 11px; padding: 2px 8px; letter-spacing: 0.06em; }
+.badge-prospect { background: #dbe9fb; color: #1a5fa8; font-size: 11px; padding: 2px 8px; letter-spacing: 0.06em; }
+.row-prospect td { background: #eef5fd; }
+.row-prospect:hover td { background: #e0edfa; }
+.admin-settings-row { margin-bottom: 16px; display: flex; flex-direction: column; gap: 8px; }
+.admin-setting-toggle { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--mid); cursor: pointer; }
+.admin-setting-toggle input[type="checkbox"] { accent-color: var(--light); width: 14px; height: 14px; flex-shrink: 0; }
+.row-delete-btn {
+  background: none;
+  border: none;
+  color: var(--mid);
+  font-size: 17px;
+  cursor: pointer;
+  padding: 4px 8px;
+  transition: color 0.15s;
+}
+.row-delete-btn:hover { color: var(--red); }
+.empty-state { text-align: center; padding: 40px; color: var(--mid); font-size: 13px; }
+
+/* ── FOLLOW-UP BADGES ── */
+.followup-badge {
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  padding: 3px 8px;
+  border: none;
+  cursor: pointer;
+  font-family: var(--font);
+  text-transform: uppercase;
+  white-space: nowrap;
+  transition: opacity 0.15s;
+}
+.followup-badge:hover { opacity: 0.75; }
+.followup-na      { background: transparent; color: var(--mid); cursor: default; }
+.followup-na:hover { opacity: 1; }
+.followup-pending  { background: #f0f0f0; color: var(--mid); border: 0.5px solid var(--border); }
+.followup-due      { background: #fff3e0; color: var(--orange); }
+.followup-overdue  { background: #fdecea; color: var(--red); }
+.followup-done     { background: #e6f4ea; color: var(--green); }
+
+/* ── ADMIN GATE ── */
+#admin-gate {
+  display: none;
+  max-width: 400px;
+  margin: 80px auto;
+  padding: 0 20px;
+}
+.gate-title {
+  font-size: 13px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  margin-bottom: 24px;
+  text-align: center;
+}
+.gate-field { margin-bottom: 20px; }
+.gate-field label {
+  display: block;
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--mid);
+  margin-bottom: 8px;
+}
+.gate-field input[type="password"] {
+  width: 100%;
+  background: var(--surface);
+  border: 0.5px solid var(--border);
+  color: var(--light);
+  font-family: var(--font);
+  font-size: 16px;
+  padding: 12px 14px;
+  outline: none;
+  transition: border-color 0.15s;
+  border-radius: 0;
+}
+.gate-field input:focus { border-color: var(--light); }
+
+/* ── EMAIL ACTIONS MENU ── */
+.email-actions-menu {
+  display: none;
+  position: fixed;
+  background: #f0f0f0;
+  border: 0.5px solid var(--border);
+  z-index: 200;
+  min-width: 160px;
+  padding: 4px 0;
+}
+.email-action-btn {
+  display: block;
+  width: 100%;
+  background: none;
+  border: none;
+  color: var(--light);
+  font-family: var(--font);
+  font-size: 13px;
+  padding: 10px 16px;
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.1s;
+}
+.email-action-btn:hover { background: #e8e8e8; }
+
+/* ── MAIL MODAL ── */
+.mail-modal-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.4);
+  z-index: 300;
+  align-items: center;
+  justify-content: center;
+}
+.mail-modal-overlay.open { display: flex; }
+.mail-modal {
+  background: var(--surface);
+  border: 0.5px solid var(--border);
+  padding: 28px;
+  width: 90%;
+  max-width: 500px;
+  max-height: 80vh;
+  overflow-y: auto;
+}
+.mail-modal-recipient { font-size: 12px; color: var(--blue); margin-bottom: 20px; word-break: break-all; }
+.mail-modal-field { margin-bottom: 16px; }
+.mail-modal-field label {
+  display: block;
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--mid);
+  margin-bottom: 6px;
+}
+.mail-banner-img {
+  display: block;
+  width: 100%;
+  border: 0.5px solid var(--border);
+}
+.mail-template-select {
+  width: 100%;
+  background: var(--bg);
+  border: 0.5px solid var(--border);
+  color: var(--light);
+  font-family: var(--font);
+  font-size: 13px;
+  padding: 8px 10px;
+  outline: none;
+}
+.mail-textarea {
+  width: 100%;
+  background: var(--bg);
+  border: 0.5px solid var(--border);
+  color: var(--light);
+  font-family: var(--font);
+  font-size: 16px;
+  padding: 10px 12px;
+  outline: none;
+  resize: vertical;
+  min-height: 160px;
+  line-height: 1.6;
+}
+.mail-subject-input {
+  width: 100%;
+  background: var(--bg);
+  border: 0.5px solid var(--border);
+  color: var(--light);
+  font-family: var(--font);
+  font-size: 16px;
+  padding: 8px 10px;
+  outline: none;
+  box-sizing: border-box;
+}
+.mail-subject-input:focus { border-color: #888; }
+.mail-modal-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 16px; flex-wrap: wrap; }
+.mail-open-btn {
+  background: #185FA5;
+  color: #fff;
+  border: none;
+  padding: 8px 18px;
+  font-family: var(--font);
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+}
+.mail-open-btn:hover { background: #1050a0; }
+</style>
+</head>
+<body>
+
+<!-- ════════════════════════════════════
+     CUSTOMER REGISTRATION APP
+════════════════════════════════════ -->
+<div id="app">
+
+  <!-- LANG BAR -->
+  <div class="lang-bar">
+    <button class="lang-btn active" onclick="setLang('en')">EN</button>
+    <button class="lang-btn" onclick="setLang('ja')">JA</button>
+    <button class="lang-btn" onclick="setLang('zh')">ZH</button>
+    <button class="lang-btn" onclick="setLang('ko')">KO</button>
+    <button class="lang-btn top-btn" id="back-to-top-btn" style="display:none; margin-left:auto;" onclick="goToTopScreen()">TOP</button>
+  </div>
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="logo" id="logo-tap">MYKITA JAPAN</div>
+    <div class="logo-sub" id="lbl-subtitle">Frame Warranty Registration</div>
+  </div>
+
+  <div class="main">
+
+    <!-- FRAME ENTRY AREA -->
+    <div id="frame-entry-area">
+      <p class="section-label" id="lbl-frame-info">Purchased Frame(s)</p>
+      <p class="optin-desc" id="lbl-frame-desc" style="margin-bottom:1.5rem;">Please enter the name(s) of the MYKITA frame(s) the customer purchased. You may add multiple frames, or skip this step.</p>
+      <div id="frame-row-list"></div>
+      <button class="refresh-btn" type="button" onclick="addFrameRow()" id="lbl-frame-add" style="margin-bottom:2rem;">+ Add Frame</button>
+
+      <!-- Lens Purchase -->
+      <div id="lens-purchase-block" style="display:none;">
+        <p class="section-label" id="lbl-lens-section">Lens Purchase</p>
+        <label class="lens-toggle-row" for="f-lens">
+          <input type="checkbox" id="f-lens" onchange="toggleLensFields()">
+          <span class="lens-toggle-label" id="lbl-lens-toggle">Customer also purchased lenses.</span>
+        </label>
+      </div>
+
+      <div style="display:flex; gap:10px;">
+        <button class="refresh-btn" style="flex:1; height:48px;" onclick="skipFrameEntry()" id="lbl-frame-skip">Skip</button>
+        <button class="submit-btn" style="flex:1; margin-top:0; height:48px; padding:13px 20px;" onclick="continueFrameEntry()" id="lbl-frame-continue">Continue</button>
+      </div>
+    </div>
+
+    <!-- CUSTOMER TYPE SELECTION (shown when Continue is pressed with no frame name entered) -->
+    <div id="customer-type-area" style="display:none;">
+      <p class="section-label" id="lbl-customer-type-title">Registration Type</p>
+      <p class="optin-desc" id="lbl-customer-type-desc" style="margin-bottom:1.5rem;">No frame name was entered. Please select the registration type for this customer.</p>
+      <div class="radio-group">
+        <label class="radio-btn">
+          <input type="radio" name="customer-type" id="f-customer-type-purchaser" value="purchaser" onchange="updateCustomerTypeContinueState()">
+          <span id="lbl-customer-type-purchaser">Purchaser</span>
+        </label>
+        <label class="radio-btn">
+          <input type="radio" name="customer-type" id="f-customer-type-prospect" value="prospect" onchange="updateCustomerTypeContinueState()">
+          <span id="lbl-customer-type-prospect">Considering</span>
+        </label>
+      </div>
+      <div style="display:flex; gap:10px;">
+        <button class="refresh-btn" style="flex:1; height:48px;" onclick="goToTopScreen()" id="lbl-customer-type-back">Back</button>
+        <button class="submit-btn" style="flex:1; margin-top:0; height:48px; padding:13px 20px;" onclick="continueCustomerType()" id="customer-type-continue-btn" disabled>Continue</button>
+      </div>
+    </div>
+
+    <!-- FORM AREA -->
+    <div id="form-area">
+
+      <!-- Frame(s) of interest (prospect only, up to 5; staff enters this) -->
+      <div class="field" id="prospect-frame-block" style="display:none;">
+        <div style="display:flex; gap:8px; margin-bottom:10px;">
+          <label id="lbl-prospect-frame-model" style="flex:1; margin:0;">Frame Model of Interest <span style="font-size:10px; text-transform:none; letter-spacing:0;">(optional)</span></label>
+          <label id="lbl-prospect-frame-color" style="width:90px; flex-shrink:0; margin:0;">Color</label>
+          <label id="lbl-prospect-frame-price" style="width:85px; flex-shrink:0; margin:0;">Price <span id="lbl-prospect-frame-price-mode" style="font-size:10px; text-transform:none; letter-spacing:0;">(incl. tax)</span></label>
+        </div>
+        <div id="prospect-frame-row-list"></div>
+        <button class="refresh-btn" type="button" onclick="addProspectFrameRow()" id="lbl-prospect-frame-add" style="margin-bottom:1rem;">+ Add Frame</button>
+      </div>
+
+      <!-- Warranty info -->
+      <div id="warranty-block">
+        <div class="warranty-info">
+          <strong id="lbl-warranty-title">Warranty Information</strong>
+          <div id="lbl-warranty-body"></div>
+        </div>
+        <p class="optin-desc" id="lbl-warranty-footer"></p>
+      </div>
+
+      <p class="section-label" id="lbl-personal">Personal Information</p>
+
+      <!-- Name -->
+      <div class="field">
+        <label id="lbl-name" class="required">Full Name</label>
+        <input type="text" id="f-name" autocomplete="name" oninput="updateSubmitState()">
+        <div class="err-msg" id="e-name">Please enter your name.</div>
+      </div>
+
+      <!-- Country -->
+      <div class="field" id="country-field">
+        <label id="lbl-country">Country / Region</label>
+        <div class="ac-wrap" id="country-ac-wrap">
+          <input type="text" class="ac-input" id="f-country-input" autocomplete="off" oninput="updateSubmitState()">
+          <input type="hidden" id="f-country">
+          <div class="ac-dropdown" id="country-dropdown"></div>
+        </div>
+        <div class="err-msg" id="e-country">Please select your country.</div>
+      </div>
+
+      <!-- Date of Birth (purchaser only, optional) -->
+      <div class="field" id="dob-field">
+        <label id="lbl-dob">Date of Birth</label>
+        <button type="button" class="dob-display placeholder" id="dob-display" onclick="openDobPicker()">Select date</button>
+        <input type="hidden" id="f-dob">
+      </div>
+
+      <!-- Gender (purchaser only, optional) -->
+      <div class="field" id="gender-field">
+        <label id="lbl-gender">Gender</label>
+        <select id="f-gender">
+          <option value=""></option>
+          <option value="Male" id="opt-gender-male">Male</option>
+          <option value="Female" id="opt-gender-female">Female</option>
+          <option value="Prefer not to say" id="opt-gender-na">Prefer not to say</option>
+        </select>
+      </div>
+
+      <p class="optin-desc" id="lbl-email-or-phone-note" style="display:none;">Please provide either an email address or phone number below.</p>
+
+      <!-- Phone + SMS opt-in (prospect only) -->
+      <div id="prospect-contact-block" style="display:none;">
+        <div class="field">
+          <label id="lbl-prospect-phone">Phone Number</label>
+          <input type="tel" id="f-prospect-phone" oninput="updateProspectSmsAvailability(); updateSubmitState();">
+        </div>
+        <label class="lens-toggle-row" for="f-prospect-sms">
+          <input type="checkbox" id="f-prospect-sms">
+          <span class="lens-toggle-label" id="lbl-prospect-sms">I would like to receive SMS notifications.</span>
+        </label>
+      </div>
+
+      <!-- Email -->
+      <div class="field">
+        <label id="lbl-email" class="required">Email Address</label>
+        <div class="ac-wrap" id="email-ac-wrap">
+          <input type="email" class="ac-input" id="f-email" autocomplete="email" oninput="updateSubmitState()">
+          <div class="ac-dropdown" id="email-dropdown"></div>
+        </div>
+        <div class="err-msg" id="e-email">Please enter a valid email address.</div>
+      </div>
+
+      <div id="lens-fields">
+        <!-- Phone -->
+        <div class="field">
+          <label id="lbl-phone" class="required">Phone Number</label>
+          <div class="phone-row" id="phone-row-intl">
+            <select class="phone-code-select" id="f-phone-code"></select>
+            <input type="tel" id="f-phone-intl" style="flex:1;" oninput="updateSubmitState()">
+          </div>
+          <input type="tel" id="f-phone-ja" style="display:none;" oninput="updateSubmitState()">
+        </div>
+        <!-- Postcode -->
+        <div class="field">
+          <label id="lbl-postcode">Postcode</label>
+          <div class="postcode-row" id="postcode-row-ja" style="display:none;">
+            <input type="text" id="f-postcode-ja" inputmode="numeric" placeholder="000-0000" maxlength="8" oninput="onPostcodeInput(this.value); updateSubmitState()">
+            <button type="button" class="postcode-lookup-btn" onclick="lookupPostcode()" id="lbl-postcode-lookup">Search</button>
+          </div>
+          <input type="text" id="f-postcode-intl" placeholder="Postcode / ZIP" oninput="updateSubmitState()">
+        </div>
+        <!-- Address -->
+        <div class="field" id="address-ja-fields" style="display:none;">
+          <label id="lbl-address-pref">Prefecture</label>
+          <div class="ac-wrap" id="address-pref-ac-wrap">
+            <input type="text" class="ac-input" id="f-address-pref" autocomplete="off">
+            <div class="ac-dropdown" id="address-pref-dropdown"></div>
+          </div>
+          <label id="lbl-address-city" style="margin-top:12px;">City / Town</label>
+          <input type="text" id="f-address-city" oninput="updateSubmitState()">
+          <label id="lbl-address-line" style="margin-top:12px;">Street / Building</label>
+          <textarea id="f-address-line" oninput="updateSubmitState()"></textarea>
+        </div>
+        <div class="field" id="address-intl-fields">
+          <label id="lbl-address-line1">Address Line 1</label>
+          <input type="text" id="f-address-line1" placeholder="Street number, street name" oninput="updateSubmitState()">
+          <label id="lbl-address-line2" style="margin-top:12px;">Address Line 2 <span style="font-size:10px; text-transform:none; letter-spacing:0;">(optional)</span></label>
+          <input type="text" id="f-address-line2" placeholder="Building, apartment, suite">
+          <label id="lbl-address-city-intl" style="margin-top:12px;">City / Town</label>
+          <input type="text" id="f-address-city-intl" oninput="updateSubmitState()">
+          <label id="lbl-address-state" style="margin-top:12px;">State / Province <span style="font-size:10px; text-transform:none; letter-spacing:0;">(optional)</span></label>
+          <input type="text" id="f-address-state">
+        </div>
+      </div>
+
+      <!-- Opt-in -->
+      <div id="optin-block">
+        <p class="section-label required" id="lbl-optin-section" style="margin-top:8px;">Email Opt-in</p>
+        <p class="optin-desc" id="lbl-optin-desc">Would you like to receive exclusive offers, news, and updates from MYKITA JAPAN?</p>
+        <div class="radio-group">
+          <label class="radio-btn">
+            <input type="radio" name="optin" id="f-optin-yes" value="yes" onchange="updateSubmitState()">
+            <span id="lbl-yes">Yes</span>
+          </label>
+          <label class="radio-btn">
+            <input type="radio" name="optin" id="f-optin-no" value="no" onchange="updateSubmitState()">
+            <span id="lbl-no">No</span>
+          </label>
+        </div>
+        <p class="optin-desc" id="lbl-optin-note" style="margin-top:-8px; font-size:11px;"></p>
+      </div>
+
+      <!-- Privacy note -->
+      <div class="privacy-note" id="lbl-privacy">
+        Your personal information will be used solely for warranty registration and, if you opted in, to send you relevant communications from MYKITA JAPAN. We will never share your data with third parties.
+      </div>
+
+      <!-- Agree -->
+      <div class="agree-row">
+        <input type="checkbox" id="f-agree" onchange="updateSubmitState()">
+        <span class="agree-text required-before" id="lbl-agree">I agree to the <a href="#" onclick="return false;">Privacy Policy</a> and consent to the processing of my personal data for warranty registration purposes.</span>
+      </div>
+
+      <button class="submit-btn" id="submit-btn" onclick="handleSubmit()" disabled id="lbl-submit">Register</button>
+    </div>
+
+    <!-- THANKS AREA -->
+    <div id="thanks-area">
+      <div class="thanks-icon">✓</div>
+      <div class="thanks-title" id="lbl-thanks-title">Registration Complete</div>
+      <div class="thanks-sub" id="lbl-thanks-sub">Thank you for registering your MYKITA frame. Your warranty is now active.</div>
+      <div id="thanks-add-frame-wrap" style="display:none; margin-bottom:20px;">
+        <button class="refresh-btn" style="width:100%; margin-bottom:0;" onclick="showThanksFrameEntry()" id="lbl-add-frame-btn">+ Add Frame Name(s)</button>
+      </div>
+      <div id="thanks-frame-entry" style="display:none; margin-bottom:24px; text-align:left;">
+        <p class="section-label" style="margin-top:0;" id="lbl-thanks-frame-info">Purchased Frame(s)</p>
+        <div id="thanks-frame-row-list"></div>
+        <button class="refresh-btn" type="button" onclick="addThanksFrameRow()" id="lbl-thanks-frame-add" style="margin-bottom:16px;">+ Add Frame</button>
+        <div style="display:flex; gap:10px;">
+          <button class="refresh-btn" style="flex:1; height:44px;" onclick="cancelThanksFrameEntry()" id="lbl-thanks-frame-cancel">Cancel</button>
+          <button class="submit-btn" style="flex:1; margin-top:0;" onclick="submitThanksFrames()" id="lbl-thanks-frame-submit">Save</button>
+        </div>
+        <div id="thanks-frame-status" style="font-size:12px; color:var(--mid); margin-top:10px; text-align:center;"></div>
+      </div>
+      <div id="thanks-sms-wrap" style="display:none; margin-bottom:20px;">
+        <button class="submit-btn" style="width:100%; margin-top:0;" onclick="openProspectSms()" id="lbl-thanks-sms">Send SMS</button>
+      </div>
+      <button class="refresh-btn" onclick="resetForm()" id="lbl-register-another">Register Another Frame</button>
+    </div>
+
+  </div>
+</div>
+
+<!-- Date of Birth wheel picker (top-level so it isn't nested inside a
+     display:none ancestor like #admin-panel, or the wheels get built
+     with zero height and scrollTop assignments silently no-op) -->
+<div class="dob-picker-overlay" id="dob-picker-overlay" onclick="closeDobPickerOnOverlay(event)">
+  <div class="dob-picker-sheet">
+    <div class="dob-picker-header">
+      <button type="button" class="dob-picker-btn" onclick="closeDobPicker()" id="lbl-dob-cancel">Cancel</button>
+      <span id="lbl-dob-picker-title">Date of Birth</span>
+      <button type="button" class="dob-picker-btn dob-picker-done" onclick="confirmDobPicker()" id="lbl-dob-done">Done</button>
+    </div>
+    <div class="dob-picker-wheels">
+      <div class="dob-wheel-fade-top"></div>
+      <div class="dob-wheel-fade-bottom"></div>
+      <div class="dob-wheel" id="dob-wheel-year"></div>
+      <div class="dob-wheel" id="dob-wheel-month"></div>
+      <div class="dob-wheel" id="dob-wheel-day"></div>
+    </div>
+    <div class="dob-picker-labels dob-picker-labels-footer">
+      <span id="lbl-dob-year">Year</span>
+      <span id="lbl-dob-month">Month</span>
+      <span id="lbl-dob-day">Day</span>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════
+     ADMIN GATE
+════════════════════════════════════ -->
+<div id="admin-gate">
+  <p class="gate-title">Admin Access</p>
+  <div class="gate-field">
+    <label>Password</label>
+    <input type="password" id="admin-pw" placeholder="••••••••" onkeydown="if(event.key==='Enter')checkPw()">
+    <div class="err-msg" id="e-pw" style="display:block; visibility:hidden;">Incorrect password.</div>
+  </div>
+  <button class="submit-btn" onclick="checkPw()">Enter</button>
+</div>
+
+<!-- ════════════════════════════════════
+     ADMIN PANEL
+════════════════════════════════════ -->
+<div id="admin-panel">
+  <div class="lang-bar">
+    <button class="logout-btn" style="margin-left:auto;" onclick="logout()">Logout</button>
+  </div>
+  <div class="header">
+    <div class="logo">MYKITA JAPAN</div>
+    <div class="logo-sub">Admin — Warranty Registrations</div>
+  </div>
+  <div class="main" style="max-width:none; padding:24px 20px 60px;">
+    <div class="admin-settings-row">
+      <label class="admin-setting-toggle" for="setting-hide-lens">
+        <input type="checkbox" id="setting-hide-lens" onchange="updateHideLensSetting()">
+        <span>Hide "Lens Purchase" section on registration form</span>
+      </label>
+      <label class="admin-setting-toggle" for="setting-price-tax-excluded">
+        <input type="checkbox" id="setting-price-tax-excluded" onchange="updatePriceTaxExcludedSetting()">
+        <span>Enter prospect frame prices tax-excluded (instead of tax-included)</span>
+      </label>
+    </div>
+    <div class="admin-header-row">
+      <div>
+        <p class="section-label" style="border:none; margin:0 0 4px;">Registration List</p>
+        <span class="count-badge" id="admin-count">0 records</span>
+      </div>
+      <div class="admin-controls">
+        <button class="refresh-btn" id="refresh-btn" onclick="refreshRecords()">&#8635; Refresh</button>
+        <button class="refresh-btn" id="sort-btn" onclick="toggleSortOrder()">Newest First &#8595;</button>
+        <select class="csv-filter" id="csv-filter" onchange="renderAdminTable()">
+          <option value="all">All Opt-ins</option>
+          <option value="yes">Yes Only</option>
+          <option value="no">No Only</option>
+        </select>
+        <button class="csv-btn" onclick="downloadCSV()">&#8595; Download CSV</button>
+      </div>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr>
+          <th>#</th><th>Timestamp</th><th>ID</th><th>Name</th><th>Country</th>
+          <th>Email</th><th>Phone</th><th>Opt-in</th><th>Follow-up</th><th>Type</th><th>Purchased</th><th>DOB</th><th>Lang</th><th>Staff Notes</th><th></th>
+        </tr></thead>
+        <tbody id="admin-tbody"></tbody>
+      </table>
+      <div class="empty-state" id="empty-state" style="display:none;">No registrations yet.</div>
+    </div>
+  </div>
+
+  <!-- Email actions context menu -->
+  <div class="email-actions-menu" id="email-actions-menu">
+    <button class="email-action-btn" onclick="copyEmailAddress()">Copy Email</button>
+    <button class="email-action-btn" id="email-action-compose" onclick="composeFromEmailActions()">Compose Mail</button>
+  </div>
+
+  <!-- Confirm-page link actions context menu (prospect rows only) -->
+  <div class="email-actions-menu" id="link-actions-menu">
+    <button class="email-action-btn" onclick="copyConfirmLink()">Copy Link</button>
+    <button class="email-action-btn" onclick="openConfirmLink()">Open Link</button>
+    <button class="email-action-btn" onclick="showSmsModal()">SMS Message</button>
+  </div>
+
+  <!-- SMS message preview modal (prospect rows only) -->
+  <div class="mail-modal-overlay" id="sms-modal-overlay" onclick="closeSmsModalOnOverlay(event)">
+    <div class="mail-modal">
+      <p class="section-label" style="border:none; margin:0 0 4px;">SMS Message</p>
+      <p class="mail-modal-recipient" id="sms-modal-recipient"></p>
+      <div class="mail-modal-field">
+        <label>Message</label>
+        <textarea class="mail-textarea" id="sms-modal-textarea" style="min-height:220px;" readonly></textarea>
+      </div>
+      <div class="mail-modal-actions">
+        <button class="refresh-btn" onclick="closeSmsModal()">Close</button>
+        <button class="csv-btn" id="sms-modal-copy-btn" onclick="copySmsModalText()">Copy</button>
+        <button class="mail-open-btn" onclick="openSmsFromModal()">Open SMS</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Mail modal -->
+  <div class="mail-modal-overlay" id="mail-modal-overlay" onclick="closeMailModalOnOverlay(event)">
+    <div class="mail-modal">
+      <p class="section-label" style="border:none; margin:0 0 4px;">Compose Follow-up Email</p>
+      <p class="mail-modal-recipient" id="mail-recipient"></p>
+      <select class="mail-template-select" id="mail-template-select" style="display:none;"></select>
+      <div class="mail-modal-field">
+        <label>Staff Name</label>
+        <input type="text" class="mail-subject-input" id="mail-staff-name" placeholder="Your name" oninput="saveStaffName(); applyMailTemplate()">
+      </div>
+      <div class="mail-modal-field">
+        <label>Subject</label>
+        <input type="text" class="mail-subject-input" id="mail-subject">
+      </div>
+      <div class="mail-modal-field">
+        <label>Message</label>
+        <textarea class="mail-textarea" id="mail-textarea" style="min-height:220px;"></textarea>
+      </div>
+      <div class="mail-modal-field">
+        <label>Signature Image</label>
+        <img src="assets/251014_MYKITA_Mail_Signatur.gif" alt="MYKITA signature banner" class="mail-banner-img" id="mail-banner-img">
+        <button type="button" class="refresh-btn" style="margin-top:10px; width:100%;" id="mail-image-copy-btn" onclick="copyMailImage()">Copy Image</button>
+      </div>
+      <div class="mail-modal-actions">
+        <button class="refresh-btn" onclick="closeMailModal()">Close</button>
+        <button class="csv-btn" id="mail-copy-btn" onclick="copyMailText()">Copy</button>
+        <button class="mail-open-btn" onclick="openInMailClient()">Open in Mail</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+'use strict';
+
+// ── CONFIG ──
+const SHEET_WEBHOOK_URL = 'https://script.google.com/macros/s/AKfycbxuF4cSDHeRsQtniiur5EYHKAzmOYc_4VMpbxbjz2PdVXCTrqHwPA90OeEpd_FM2YpOWg/exec';
+
+// ── GLOBALS ──
+let adminPassword = '';
+let adminRecords = [];
+let hideLensSection = false;
+let lensSettingLoaded = false;
+let priceInputTaxExcluded = false;
+const PRICE_TAX_RATE = 1.10; // 10% Japanese consumption tax
+let currentLang = 'en';
+let isAdmin = false;
+const LOGO_TAP_COUNT = 5;
+const LOGO_TAP_WINDOW_MS = 2000;
+let logoTapCount = 0;
+let logoTapTimer = null;
+let acHighlight = -1;
+let emailHighlight = -1;
+let sortNewest = true;
+let activeEmailRow = null;
+let activeEmailEl = null;
+let purchasedFrames = [];
+let customerType = 'purchaser';
+
+// ── FOLLOW-UP TIMING ──
+const FOLLOWUP_WINDOW_MS = 7 * 24 * 60 * 60 * 1000;
+const FOLLOWUP_DUE_SOON_MS = 3 * 24 * 60 * 60 * 1000;
+
+// ── I18N ──
+const i18n = {
+  en: {
+    subtitle: 'Frame Warranty Registration',
+    warrantyTitle: 'Warranty Information',
+    warrantyBody: '・This warranty is valid only at MYKITA JAPAN stores.<br>・MYKITA frames are covered by a 2-year product warranty from the date of purchase.<br>・The warranty covers product defects under normal use, excluding initial defects. (Damage from dropping or crushing, and lens damage, are not covered.)',
+    warrantyFooter: 'Please complete this registration to activate your warranty.',
+    personal: 'Personal Information',
+    name: 'Full Name', country: 'Country / Region', email: 'Email Address', dob: 'Date of Birth',
+    gender: 'Gender', genderMale: 'Male', genderFemale: 'Female', genderNA: 'Prefer not to say',
+    dobSelect: 'Select date', dobPickerTitle: 'Date of Birth', dobCancel: 'Cancel', dobDone: 'Done',
+    dobYear: 'Year', dobMonth: 'Month', dobDay: 'Day',
+    optinSection: 'Email Opt-in',
+    optinDesc: 'Would you like to receive exclusive offers, news, and updates from MYKITA JAPAN?',
+    optinNote: '＊Even if you select No, we will send you a thank-you email to confirm your registration.',
+    yes: 'Yes', no: 'No',
+    privacy: 'Your personal information will be used solely for warranty registration and, if you opted in, to send you relevant communications from MYKITA JAPAN. We will never share your data with third parties.',
+    agree: 'I agree to the Privacy Policy and consent to the processing of my personal data for warranty registration purposes.',
+    privacyProspect: 'Your personal information will be used solely to follow up on your inquiry. We will never share your data with third parties.',
+    agreeProspect: 'I agree to the Privacy Policy and consent to the processing of my personal data for this inquiry.',
+    submit: 'Register',
+    thanksTitle: 'Registration Complete',
+    thanksSub: 'Thank you for registering your MYKITA frame. Your warranty is now active.',
+    prospectThanksTitle: 'Thank You',
+    prospectThanksSub: "Thank you for your interest in MYKITA. We'll be happy to follow up with more information about the frame you're considering.",
+    prospectRegisterAnother: 'New Registration',
+    thanksSms: 'Send SMS',
+    registerAnother: 'Register Another Frame',
+    addFrameBtn: '+ Add Frame Name(s)',
+    thanksFrameInfo: 'Purchased Frame(s)',
+    thanksFrameAdd: '+ Add Frame',
+    thanksFrameCancel: 'Cancel',
+    thanksFrameSubmit: 'Save',
+    errName: 'Please enter your name.',
+    errCountry: 'Please select your country.',
+    errEmail: 'Please enter a valid email address.',
+    errOptin: 'Please select an option.',
+    errAgree: 'Please agree to the privacy policy.',
+    lblFrameInfo: 'Purchased Frame(s)',
+    lblFrameDesc: 'Please enter the name(s) of the MYKITA frame(s) the customer purchased. You may add multiple frames, or skip this step.',
+    lblFrameAdd: '+ Add Frame', lblFrameSkip: 'Skip', lblFrameContinue: 'Continue', framePlaceholder: 'Frame name',
+    lensSection: 'Lens Purchase', lensToggle: 'Customer also purchased lenses.',
+    topBtn: 'Top',
+    phone: 'Phone Number', postcode: 'Postcode', postcodeLookup: 'Search',
+    addressPref: 'Prefecture', addressCity: 'City / Town', addressLine: 'Street / Building', address: 'Address',
+    addressLine1: 'Address Line 1', addressLine2: 'Address Line 2', addressCityIntl: 'City / Town', addressState: 'State / Province',
+    customerTypeTitle: 'Registration Type',
+    customerTypeDesc: 'No frame name was entered. Please select the registration type for this customer.',
+    customerTypePurchaser: 'Purchaser', customerTypeProspect: 'Considering',
+    customerTypeBack: 'Back', customerTypeContinue: 'Continue',
+    prospectFrameModel: 'Frame Model of Interest', prospectFrameColor: 'Color', prospectFramePrice: 'Price', prospectFrameAdd: '+ Add Frame',
+    taxIncluded: '(incl. tax)', taxExcluded: '(excl. tax)',
+    prospectPhone: 'Phone Number', prospectSms: 'I would like to receive SMS notifications.',
+    emailOrPhoneNote: 'Please provide either an email address or phone number below.',
+    errEmailOrPhone: 'Please enter a valid email address, or a phone number.',
+  },
+  ja: {
+    subtitle: 'フレーム保証登録',
+    warrantyTitle: '保証について',
+    warrantyBody: '・本保証はMYKITA JAPAN店舗でのみ有効です。<br>・MYKITAフレームには、ご購入日より2年間の製品保証が適用されます。<br>・保証範囲は、初期不良を除く通常使用下での製品トラブルに限ります。（落下や踏みつけによる損傷・破損、また、レンズ破損は対象外）',
+    warrantyFooter: '保証を有効にするために、以下の登録を完了してください。',
+    personal: 'お客様情報',
+    name: 'お名前', country: '都道府県', email: 'メールアドレス', dob: '生年月日',
+    gender: '性別', genderMale: '男性', genderFemale: '女性', genderNA: '回答しない',
+    dobSelect: '日付を選択', dobPickerTitle: '生年月日', dobCancel: 'キャンセル', dobDone: '完了',
+    dobYear: '年', dobMonth: '月', dobDay: '日',
+    optinSection: 'メール配信',
+    optinDesc: 'MYKITA JAPANからの最新情報・限定オファーをお受け取りになりますか？',
+    optinNote: '＊Noを選択した場合でもご登録確認を兼ねたサンキューメールをお送りさせていただきます。',
+    yes: 'はい', no: 'いいえ',
+    privacy: 'ご提供いただいた個人情報は、保証登録および（同意された場合）MYKITA JAPANからのご案内送付のみに使用します。第三者への提供は一切行いません。',
+    agree: 'プライバシーポリシーに同意し、保証登録のための個人情報の取り扱いに同意します。',
+    privacyProspect: 'ご提供いただいた個人情報は、お問い合わせへの対応のみに使用します。第三者への提供は一切行いません。',
+    agreeProspect: 'プライバシーポリシーに同意し、本お問い合わせのための個人情報の取り扱いに同意します。',
+    submit: '登録する',
+    thanksTitle: '登録完了',
+    thanksSub: 'MYKITAフレームをご登録いただきありがとうございます。保証が有効になりました。',
+    prospectThanksTitle: 'ご登録ありがとうございます',
+    prospectThanksSub: 'MYKITAへのご関心をお寄せいただきありがとうございます。検討中のフレームについて、改めてご案内させていただきます。',
+    prospectRegisterAnother: '新規登録へ戻る',
+    thanksSms: 'SMSを送る',
+    registerAnother: '別のフレームを登録する',
+    addFrameBtn: '+ フレーム名を追加する',
+    thanksFrameInfo: 'ご購入フレーム',
+    thanksFrameAdd: '+ フレームを追加',
+    thanksFrameCancel: 'キャンセル',
+    thanksFrameSubmit: '保存',
+    errName: 'お名前を入力してください。',
+    errCountry: '都道府県を選択してください。',
+    errEmail: '有効なメールアドレスを入力してください。',
+    errOptin: '選択してください。',
+    errAgree: 'プライバシーポリシーに同意してください。',
+    lblFrameInfo: 'ご購入フレーム',
+    lblFrameDesc: 'お客様がご購入されたMYKITAフレームの名前を入力してください。複数点ある場合は追加できます。スキップも可能です。',
+    lblFrameAdd: '+ フレームを追加', lblFrameSkip: 'スキップ', lblFrameContinue: '次へ', framePlaceholder: 'フレーム名',
+    lensSection: 'レンズ購入', lensToggle: 'レンズ購入あり',
+    topBtn: 'トップへ',
+    phone: '電話番号', postcode: '郵便番号', postcodeLookup: '住所検索',
+    addressPref: '都道府県', addressCity: '市区町村', addressLine: '番地・建物名', address: '住所',
+    addressLine1: '住所①', addressLine2: '住所②', addressCityIntl: '市区郡', addressState: '州・省',
+    customerTypeTitle: '登録タイプ',
+    customerTypeDesc: 'フレーム名が入力されていません。このお客様の登録タイプを選択してください。',
+    customerTypePurchaser: '購入者', customerTypeProspect: '検討中',
+    customerTypeBack: '戻る', customerTypeContinue: '次へ',
+    prospectFrameModel: '検討中のフレームモデル名', prospectFrameColor: 'カラー番号', prospectFramePrice: '価格', prospectFrameAdd: '+ フレームを追加',
+    taxIncluded: '(税込)', taxExcluded: '(税抜)',
+    prospectPhone: '電話番号', prospectSms: 'SMSでの通知を希望する',
+    emailOrPhoneNote: '下記のメールアドレス、または電話番号のいずれかをご入力ください。',
+    errEmailOrPhone: '有効なメールアドレス、または電話番号を入力してください。',
+  },
+  zh: {
+    subtitle: '镜架保修登记',
+    warrantyTitle: '保修信息',
+    warrantyBody: '・本保修仅在MYKITA JAPAN门店有效。<br>・MYKITA镜架自购买之日起享有2年产品保修。<br>・保修范围仅限正常使用下的产品故障（初期不良除外）。（因跌落或踩踏造成的损伤、破损及镜片破损不在保修范围内。）',
+    warrantyFooter: '请完成以下登记以激活您的保修。',
+    personal: '个人信息',
+    name: '姓名', country: '国家 / 地区', email: '电子邮箱', dob: '出生日期',
+    gender: '性别', genderMale: '男', genderFemale: '女', genderNA: '不愿透露',
+    dobSelect: '选择日期', dobPickerTitle: '出生日期', dobCancel: '取消', dobDone: '完成',
+    dobYear: '年', dobMonth: '月', dobDay: '日',
+    optinSection: '邮件订阅',
+    optinDesc: '您是否希望收到来自MYKITA JAPAN的独家优惠、资讯和最新动态？',
+    optinNote: '＊即使选择"否"，我们也会向您发送一封感谢邮件以确认您的注册。',
+    yes: '是', no: '否',
+    privacy: '您的个人信息仅用于保修登记，以及（如您同意）向您发送MYKITA JAPAN的相关通讯。我们绝不会将您的数据分享给第三方。',
+    agree: '我同意隐私政策，并同意为保修登记目的处理我的个人数据。',
+    privacyProspect: '您的个人信息仅用于跟进您的咨询。我们绝不会将您的数据分享给第三方。',
+    agreeProspect: '我同意隐私政策，并同意为本次咨询处理我的个人数据。',
+    submit: '登记',
+    thanksTitle: '登记完成',
+    thanksSub: '感谢您登记您的MYKITA镜架。您的保修现已生效。',
+    prospectThanksTitle: '感谢您的登记',
+    prospectThanksSub: '感谢您对MYKITA的关注。我们会就您意向的镜架为您提供进一步信息。',
+    prospectRegisterAnother: '新登记',
+    thanksSms: '发送短信',
+    registerAnother: '登记另一副镜架',
+    addFrameBtn: '+ 添加镜架名称',
+    thanksFrameInfo: '购买的镜架',
+    thanksFrameAdd: '+ 添加镜架',
+    thanksFrameCancel: '取消',
+    thanksFrameSubmit: '保存',
+    errName: '请输入您的姓名。',
+    errCountry: '请选择您的国家。',
+    errEmail: '请输入有效的电子邮箱地址。',
+    errOptin: '请选择一项。',
+    errAgree: '请同意隐私政策。',
+    lblFrameInfo: '购买的镜架',
+    lblFrameDesc: '请输入顾客购买的MYKITA镜架名称。如有多件可点击添加，也可跳过此步骤。',
+    lblFrameAdd: '+ 添加镜架', lblFrameSkip: '跳过', lblFrameContinue: '继续', framePlaceholder: '镜架名称',
+    lensSection: '镜片购买', lensToggle: '顾客也购买了镜片。',
+    topBtn: '返回顶部',
+    phone: '电话号码', postcode: '邮政编码', postcodeLookup: '查询',
+    addressPref: '都道府县', addressCity: '市区町村', addressLine: '街道・楼号', address: '地址',
+    addressLine1: '地址①', addressLine2: '地址②', addressCityIntl: '城市/乡镇', addressState: '州/省',
+    customerTypeTitle: '登记类型',
+    customerTypeDesc: '未输入镜架名称。请为该顾客选择登记类型。',
+    customerTypePurchaser: '购买者', customerTypeProspect: '意向顾客（考虑中）',
+    customerTypeBack: '返回', customerTypeContinue: '继续',
+    prospectFrameModel: '意向镜架型号', prospectFrameColor: '颜色编号', prospectFramePrice: '价格', prospectFrameAdd: '+ 添加镜架',
+    taxIncluded: '(含税)', taxExcluded: '(不含税)',
+    prospectPhone: '电话号码', prospectSms: '希望接收短信通知',
+    emailOrPhoneNote: '请填写下方的电子邮箱或电话号码，二者任填其一即可。',
+    errEmailOrPhone: '请输入有效的电子邮箱地址或电话号码。',
+  },
+  ko: {
+    subtitle: '프레임 보증 등록',
+    warrantyTitle: '보증 안내',
+    warrantyBody: '・본 보증은 MYKITA JAPAN 매장에서만 유효합니다.<br>・MYKITA 프레임은 구매일로부터 2년간 제품 보증이 적용됩니다.<br>・보증 범위는 초기 불량을 제외한 정상 사용 중 발생한 제품 문제에 한합니다. （낙하 또는 밟힘으로 인한 손상·파손, 렌즈 파손은 대상 외）',
+    warrantyFooter: '보증을 활성화하려면 아래 등록을 완료해 주세요.',
+    personal: '개인 정보',
+    name: '성명', country: '국가 / 지역', email: '이메일 주소', dob: '생년월일',
+    gender: '성별', genderMale: '남성', genderFemale: '여성', genderNA: '응답하지 않음',
+    dobSelect: '날짜 선택', dobPickerTitle: '생년월일', dobCancel: '취소', dobDone: '완료',
+    dobYear: '년', dobMonth: '월', dobDay: '일',
+    optinSection: '이메일 수신 동의',
+    optinDesc: 'MYKITA JAPAN의 독점 혜택, 소식, 최신 정보를 받아보시겠습니까?',
+    optinNote: '＊아니요를 선택하시더라도 등록 확인을 겸한 감사 메일을 보내드립니다。',
+    yes: '예', no: '아니요',
+    privacy: '제공하신 개인 정보는 보증 등록 및 (동의하신 경우) MYKITA JAPAN의 관련 통신 발송에만 사용됩니다. 제3자에게 데이터를 공유하지 않습니다.',
+    agree: '개인정보 처리방침에 동의하며, 보증 등록 목적으로 개인 정보 처리에 동의합니다.',
+    privacyProspect: '제공하신 개인 정보는 문의 대응 목적으로만 사용됩니다. 제3자에게 데이터를 공유하지 않습니다.',
+    agreeProspect: '개인정보 처리방침에 동의하며, 본 문의 목적으로 개인 정보 처리에 동의합니다.',
+    submit: '등록하기',
+    thanksTitle: '등록 완료',
+    thanksSub: 'MYKITA 프레임을 등록해 주셔서 감사합니다. 보증이 활성화되었습니다.',
+    prospectThanksTitle: '등록해 주셔서 감사합니다',
+    prospectThanksSub: 'MYKITA에 관심을 가져주셔서 감사합니다. 검토 중이신 프레임에 대해 추후 안내해 드리겠습니다.',
+    prospectRegisterAnother: '새 등록 시작',
+    thanksSms: 'SMS 보내기',
+    registerAnother: '다른 프레임 등록',
+    addFrameBtn: '+ 프레임 이름 추가',
+    thanksFrameInfo: '구매하신 프레임',
+    thanksFrameAdd: '+ 프레임 추가',
+    thanksFrameCancel: '취소',
+    thanksFrameSubmit: '저장',
+    errName: '이름을 입력해 주세요.',
+    errCountry: '국가를 선택해 주세요.',
+    errEmail: '유효한 이메일 주소를 입력해 주세요.',
+    errOptin: '옵션을 선택해 주세요.',
+    errAgree: '개인정보 처리방침에 동의해 주세요.',
+    lblFrameInfo: '구매하신 프레임',
+    lblFrameDesc: '고객님이 구매하신 MYKITA 프레임의 이름을 입력해 주세요. 여러 개인 경우 추가할 수 있으며, 건너뛰기도 가능합니다.',
+    lblFrameAdd: '+ 프레임 추가', lblFrameSkip: '건너뛰기', lblFrameContinue: '다음', framePlaceholder: '프레임 이름',
+    lensSection: '렌즈 구매', lensToggle: '고객님도 렌즈를 구매하셨습니다.',
+    topBtn: '처음으로',
+    phone: '전화번호', postcode: '우편번호', postcodeLookup: '검색',
+    addressPref: '도도부현', addressCity: '시구정촌', addressLine: '번지・건물명', address: '주소',
+    addressLine1: '주소①', addressLine2: '주소②', addressCityIntl: '시/읍/면', addressState: '주/성',
+    customerTypeTitle: '등록 유형',
+    customerTypeDesc: '프레임 이름이 입력되지 않았습니다. 이 고객의 등록 유형을 선택해 주세요.',
+    customerTypePurchaser: '구매자', customerTypeProspect: '검토 중（잠재 고객）',
+    customerTypeBack: '뒤로', customerTypeContinue: '다음',
+    prospectFrameModel: '검토 중인 프레임 모델명', prospectFrameColor: '컬러 번호', prospectFramePrice: '가격', prospectFrameAdd: '+ 프레임 추가',
+    taxIncluded: '(세금 포함)', taxExcluded: '(세금 별도)',
+    prospectPhone: '전화번호', prospectSms: 'SMS 알림을 받고 싶습니다.',
+    emailOrPhoneNote: '아래의 이메일 주소 또는 전화번호 중 하나를 입력해 주세요.',
+    errEmailOrPhone: '유효한 이메일 주소 또는 전화번호를 입력해 주세요.',
+  }
+};
+
+function setLang(lang) {
+  currentLang = lang;
+  const t = i18n[lang];
+  document.querySelectorAll('.lang-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.textContent === lang.toUpperCase());
+  });
+  document.getElementById('lbl-subtitle').textContent = t.subtitle;
+  document.getElementById('lbl-warranty-title').textContent = t.warrantyTitle;
+  document.getElementById('lbl-warranty-body').innerHTML = t.warrantyBody;
+  document.getElementById('lbl-warranty-footer').textContent = t.warrantyFooter;
+  document.getElementById('lbl-personal').textContent = t.personal;
+  document.getElementById('lbl-name').textContent = t.name;
+  document.getElementById('lbl-country').textContent = t.country;
+  document.getElementById('lbl-dob').textContent = t.dob;
+  document.getElementById('lbl-gender').textContent = t.gender;
+  document.getElementById('opt-gender-male').textContent = t.genderMale;
+  document.getElementById('opt-gender-female').textContent = t.genderFemale;
+  document.getElementById('opt-gender-na').textContent = t.genderNA;
+  const dobDisplay = document.getElementById('dob-display');
+  if (dobDisplay.classList.contains('placeholder')) { dobDisplay.textContent = t.dobSelect; }
+  document.getElementById('lbl-dob-picker-title').textContent = t.dobPickerTitle;
+  document.getElementById('lbl-dob-cancel').textContent = t.dobCancel;
+  document.getElementById('lbl-dob-done').textContent = t.dobDone;
+  document.getElementById('lbl-dob-year').textContent = t.dobYear;
+  document.getElementById('lbl-dob-month').textContent = t.dobMonth;
+  document.getElementById('lbl-dob-day').textContent = t.dobDay;
+  document.getElementById('lbl-email').textContent = t.email;
+  document.getElementById('lbl-optin-section').textContent = t.optinSection;
+  document.getElementById('lbl-optin-desc').textContent = t.optinDesc;
+  document.getElementById('lbl-optin-note').textContent = t.optinNote;
+  document.getElementById('lbl-yes').textContent = t.yes;
+  document.getElementById('lbl-no').textContent = t.no;
+  document.getElementById('submit-btn').textContent = t.submit;
+  updateThanksLabels();
+  document.getElementById('lbl-add-frame-btn').textContent = t.addFrameBtn;
+  document.getElementById('lbl-thanks-frame-info').textContent = t.thanksFrameInfo;
+  document.getElementById('lbl-thanks-frame-add').textContent = t.thanksFrameAdd;
+  document.getElementById('lbl-thanks-frame-cancel').textContent = t.thanksFrameCancel;
+  document.getElementById('lbl-thanks-frame-submit').textContent = t.thanksFrameSubmit;
+  document.getElementById('e-name').textContent = t.errName;
+  document.getElementById('e-country').textContent = t.errCountry;
+  document.getElementById('e-email').textContent = t.errEmail;
+  document.getElementById('lbl-frame-info').textContent = t.lblFrameInfo;
+  document.getElementById('lbl-frame-desc').textContent = t.lblFrameDesc;
+  document.getElementById('lbl-frame-add').textContent = t.lblFrameAdd;
+  document.getElementById('lbl-frame-skip').textContent = t.lblFrameSkip;
+  document.getElementById('lbl-frame-continue').textContent = t.lblFrameContinue;
+  document.querySelectorAll('.frame-input').forEach(el => { el.placeholder = t.framePlaceholder; });
+  const countryInput = document.getElementById('f-country-input');
+  if (countryInput) countryInput.placeholder = '';
+  // Lens section labels
+  document.getElementById('back-to-top-btn').textContent = t.topBtn;
+  document.getElementById('lbl-lens-section').textContent = t.lensSection;
+  document.getElementById('lbl-lens-toggle').textContent = t.lensToggle;
+  document.getElementById('lbl-phone').textContent = t.phone;
+  document.getElementById('lbl-postcode').textContent = t.postcode;
+  document.getElementById('lbl-postcode-lookup').textContent = t.postcodeLookup;
+  document.getElementById('lbl-address-pref').textContent = t.addressPref;
+  document.getElementById('lbl-address-city').textContent = t.addressCity;
+  document.getElementById('lbl-address-line').textContent = t.addressLine;
+  document.getElementById('lbl-address-line1').textContent = t.addressLine1;
+  document.getElementById('lbl-address-line2').childNodes[0].textContent = t.addressLine2 + ' ';
+  document.getElementById('lbl-address-city-intl').textContent = t.addressCityIntl;
+  document.getElementById('lbl-address-state').childNodes[0].textContent = t.addressState + ' ';
+  // Customer type selection labels
+  document.getElementById('lbl-customer-type-title').textContent = t.customerTypeTitle;
+  document.getElementById('lbl-customer-type-desc').textContent = t.customerTypeDesc;
+  document.getElementById('lbl-customer-type-purchaser').textContent = t.customerTypePurchaser;
+  document.getElementById('lbl-customer-type-prospect').textContent = t.customerTypeProspect;
+  document.getElementById('lbl-customer-type-back').textContent = t.customerTypeBack;
+  document.getElementById('customer-type-continue-btn').textContent = t.customerTypeContinue;
+  document.getElementById('lbl-prospect-frame-model').childNodes[0].textContent = t.prospectFrameModel + ' ';
+  document.getElementById('lbl-prospect-frame-color').textContent = t.prospectFrameColor;
+  document.getElementById('lbl-prospect-frame-price').childNodes[0].textContent = t.prospectFramePrice + ' ';
+  document.getElementById('lbl-prospect-frame-price-mode').textContent = priceInputTaxExcluded ? t.taxExcluded : t.taxIncluded;
+  document.getElementById('lbl-prospect-frame-add').textContent = t.prospectFrameAdd;
+  document.getElementById('lbl-prospect-phone').textContent = t.prospectPhone;
+  document.getElementById('lbl-email-or-phone-note').textContent = t.emailOrPhoneNote;
+  document.getElementById('lbl-prospect-sms').textContent = t.prospectSms;
+  // Toggle phone/postcode layout based on language
+  updateLensFieldsForLang(lang);
+  applyCustomerTypeToForm();
+}
+
+// ── LENS FIELDS ──
+const PHONE_CODES = [
+  {code:'+81',label:'🇯🇵 +81 Japan'},{code:'+82',label:'🇰🇷 +82 Korea'},
+  {code:'+86',label:'🇨🇳 +86 China'},{code:'+852',label:'🇭🇰 +852 Hong Kong'},
+  {code:'+886',label:'🇹🇼 +886 Taiwan'},{code:'+1',label:'🇺🇸 +1 US/Canada'},
+  {code:'+44',label:'🇬🇧 +44 UK'},{code:'+61',label:'🇦🇺 +61 Australia'},
+  {code:'+64',label:'🇳🇿 +64 New Zealand'},{code:'+65',label:'🇸🇬 +65 Singapore'},
+  {code:'+60',label:'🇲🇾 +60 Malaysia'},{code:'+66',label:'🇹🇭 +66 Thailand'},
+  {code:'+84',label:'🇻🇳 +84 Vietnam'},{code:'+62',label:'🇮🇩 +62 Indonesia'},
+  {code:'+63',label:'🇵🇭 +63 Philippines'},{code:'+91',label:'🇮🇳 +91 India'},
+  {code:'+33',label:'🇫🇷 +33 France'},{code:'+49',label:'🇩🇪 +49 Germany'},
+  {code:'+39',label:'🇮🇹 +39 Italy'},{code:'+34',label:'🇪🇸 +34 Spain'},
+  {code:'+31',label:'🇳🇱 +31 Netherlands'},{code:'+46',label:'🇸🇪 +46 Sweden'},
+  {code:'+47',label:'🇳🇴 +47 Norway'},{code:'+45',label:'🇩🇰 +45 Denmark'},
+  {code:'+358',label:'🇫🇮 +358 Finland'},{code:'+41',label:'🇨🇭 +41 Switzerland'},
+  {code:'+43',label:'🇦🇹 +43 Austria'},{code:'+32',label:'🇧🇪 +32 Belgium'},
+  {code:'+351',label:'🇵🇹 +351 Portugal'},{code:'+48',label:'🇵🇱 +48 Poland'},
+  {code:'+7',label:'🇷🇺 +7 Russia'},{code:'+55',label:'🇧🇷 +55 Brazil'},
+  {code:'+52',label:'🇲🇽 +52 Mexico'},{code:'+54',label:'🇦🇷 +54 Argentina'},
+  {code:'+56',label:'🇨🇱 +56 Chile'},{code:'+57',label:'🇨🇴 +57 Colombia'},
+  {code:'+27',label:'🇿🇦 +27 South Africa'},{code:'+971',label:'🇦🇪 +971 UAE'},
+  {code:'+966',label:'🇸🇦 +966 Saudi Arabia'},{code:'+90',label:'🇹🇷 +90 Turkey'},
+  {code:'+30',label:'🇬🇷 +30 Greece'},{code:'+420',label:'🇨🇿 +420 Czech Republic'},
+  {code:'+36',label:'🇭🇺 +36 Hungary'},{code:'+40',label:'🇷🇴 +40 Romania'},
+  {code:'+380',label:'🇺🇦 +380 Ukraine'},{code:'+972',label:'🇮🇱 +972 Israel'},
+  {code:'+20',label:'🇪🇬 +20 Egypt'},{code:'+92',label:'🇵🇰 +92 Pakistan'},
+  {code:'+880',label:'🇧🇩 +880 Bangladesh'},{code:'+94',label:'🇱🇰 +94 Sri Lanka'},
+  {code:'+977',label:'🇳🇵 +977 Nepal'},{code:'+95',label:'🇲🇲 +95 Myanmar'},
+  {code:'+855',label:'🇰🇭 +855 Cambodia'},{code:'+856',label:'🇱🇦 +856 Laos'},
+  {code:'+976',label:'🇲🇳 +976 Mongolia'},{code:'+853',label:'🇲🇴 +853 Macau'},
+];
+
+function initPhoneCodeSelect() {
+  const sel = document.getElementById('f-phone-code');
+  sel.innerHTML = PHONE_CODES.map(p => `<option value="${p.code}">${p.label}</option>`).join('');
+}
+
+function updateLensFieldsForLang(lang) {
+  const isJa = lang === 'ja';
+  document.getElementById('phone-row-intl').style.display = isJa ? 'none' : 'flex';
+  document.getElementById('f-phone-ja').style.display = isJa ? 'block' : 'none';
+  document.getElementById('postcode-row-ja').style.display = isJa ? 'flex' : 'none';
+  document.getElementById('f-postcode-intl').style.display = isJa ? 'none' : 'block';
+  document.getElementById('address-ja-fields').style.display = isJa ? 'block' : 'none';
+  document.getElementById('address-intl-fields').style.display = isJa ? 'none' : 'block';
+}
+
+function toggleLensFields() {
+  const checked = document.getElementById('f-lens').checked;
+  document.getElementById('lens-fields').classList.toggle('open', checked);
+  updateCountryFieldVisibility();
+  updateSubmitState();
+  if (checked) triggerLogoShine();
+}
+
+function triggerLogoShine() {
+  const logo = document.getElementById('logo-tap');
+  logo.classList.remove('shine');
+  void logo.offsetWidth;
+  logo.classList.add('shine');
+  logo.addEventListener('animationend', () => logo.classList.remove('shine'), { once: true });
+}
+
+function updateCountryFieldVisibility() {
+  const lensChecked = document.getElementById('f-lens').checked;
+  // JA address fields already collect the prefecture, so skip asking twice.
+  document.getElementById('country-field').style.display = (currentLang === 'ja' && lensChecked) ? 'none' : '';
+}
+
+function lensFieldsValid() {
+  if (!document.getElementById('f-lens').checked) return true;
+  if (currentLang === 'ja') {
+    return !!document.getElementById('f-phone-ja').value.trim();
+  }
+  return !!document.getElementById('f-phone-intl').value.trim();
+}
+
+function onPostcodeInput(val) {
+  const digits = val.replace(/\D/g, '');
+  if (digits.length === 7) lookupPostcode();
+}
+
+async function lookupPostcode() {
+  const raw = document.getElementById('f-postcode-ja').value.replace(/\D/g, '');
+  if (raw.length !== 7) return;
+  try {
+    const res = await fetch(`https://zipcloud.ibsnet.co.jp/api/search?zipcode=${raw}`);
+    const data = await res.json();
+    if (data.results && data.results[0]) {
+      const r = data.results[0];
+      document.getElementById('f-address-pref').value = r.address1;
+      document.getElementById('f-address-city').value = r.address2 + r.address3;
+      updateSubmitState();
+    }
+  } catch (e) {}
+}
+
+// ── FRAME NAME ENTRY ──
+const FRAME_NAMES = [
+"EKON","LAMIN","BELLIS_CUSTOMIZED","COLEMAN_CUSTOMIZED","BERTHOLD","ELLUM","BELLIS","HOPPER","LETO","SOTO","HEATH","KAMI_A","KAMI","AYAN","FARAH","ATINE","LAIS","SANG","JADA","NEALE","OCEANE","ELBERT","OLYMPE","TALINI","SESI","JULLA","NUKKA","TAIFA","MONDO","EERO","NIKEN","IMBA","EMMI","PEN","ISLA","LUCIA","ALBA","ARMSTRONG","YOTAM","CARSON","GERHARD","SKYLAR","OLLI","MAREN","SONU","MR006","MR001","MR002","MR003","LANA","MR005","TOMI_CUSTOMIZED","KAYO_CUSTOMIZED","YUCCA","DRIFT","PIO","BIJAN","ARVIN","RENO","NOOMI","LAVAND","KABAL","LILIA","ML19","JANO","CLOVER","BLUE","STUDIO12.1","BRAN","NURIA","DORSA","SELBY","ROSCOE","ARVEL","CHRISTA","MARAL","SENTA","PORTIA","HARRISON","FORT","DORIAN","RIBO","MAHSA","KIANA","TOSCA","SANTO","REMBERT","LOMAX","AITA","DELANCEY","NEVILLE","YUKON","HELICON","NIKEN_CUSTOMIZED","WATARU_CUSTOMIZED","YURA","GRUNT","RAT","SAGA","TRUMAN_CUSTOMIZED","STUDIO7.4_CUSTOMIZED","KAMI_CUSTOMIZED","WIM","JULES","CHIP","ML18","STUDIO15.2","STUDIO15.1","PANA","NANOOK","TUKTU","KEOMA","DESTA","TRULES","YOLA","PAULSON","KAIMAR","RHYS","HAMISH","REVA","LAVEN","INDIRA","BEAM","ASPEN","TEVEL","RAIDER","HAWI","NANNA","MOSHA","JASMI","GYLFI","AHTI","MIO","XANDER","THEODORE","GARTH","KIMBER","NYARA","KAIS","KIVA","SOMA","SERUM","TELMA","ASGER","LOVA","RAIM_CUSTOMIZED","PAL","SATU","KARSTEN_CUSTOMIZED","JULIAN","STANLEY","DESNA","LAHTI","HOLM","DELANO","WALLY","TUFF","KAL","NIAM","MABEL","SOLEA","EILISH","SINCLAIR","XANDER_CUSTOMIZED","SIWA_PLUS","FLEMMING","FIR","PHIL","LORENZO","HENNING","CORMAC","ROSEMARY","ROCKWELL","CLIVE","BUD","ALLEN","NAAMA","BADU","AMOS","ML16","BEAR","SAWYER","ML17","ML05","ANDERS","ML09","NEETU_CUSTOMIZED","MR004","PERRY","ALIN","EMBERS","ROWAN","CAT","LOOMIS","TESHI","TOTO","MARELLE","MEL","BIRCH","MAUREEN","SOLENE","AMARE","SANTERI","SIERRA","MAVON","WALKER","SAUL","LAIMI","INCHEON","DAKAR","ML15","ML13","SAMAR","SAGA_A","LEON","DADA","KELSEY","JUSTUS","DELFINA","COLTON","BORGA","ML11","ARTURO","TIWA","KENJA","JEPPE","HILLA","TAAVI","MATIS","SAIMA_A","HAWKING","1 OF 0 SBP03 CHARCOAL","1 OF 0 SBP02 GOLDEN OLIVE","1 OF 0 SBP01 MATTE MAPLE LEAF","TEEMA","ML10","DALUR","DIA_CUSTOMIZED","DUSK_CUSTOMIZED","TARO_CUSTOMIZED","NIMA","LOME","UNA","PAVI","LEELAND","GIA","AVERY","ALISTER","LAURI","ISE","HALVAR","EDISON","CILIAN","JANAN","SUVI","SELVA","SALVADOR","REEVES","GETZ","GARLAND","CAVEN","CANTARA","PEARL","VAASA","JARA_CUSTOMIZED","WATERS","JOJO_A","COLEMAN","SOLO","KNUT","ALPINE","ML03","ARMIN","ALCOR","TULOK","ALYA","LAMIN_M","ELBA","STUDIO14.2","STUDIO13.1","JELVA","ELVE","KILENDA","MOJAVE","JEFFERSON","MARTIN","CYPRESS","STUDIO14.1","ELI","HOLLIS","KNOX","DAVU_A","TIWA_A","KIENE","MERVI","ARVO","STEEN","IDRIS","HOWLIN","BEACH","WILL","PARIS","STUDIO7.5","KYLAN","ARIELLE","JARI","MONROE","VANILLA","SURI","032c SILK SCARF","032c LEATHER TRAY","032c KEY FOB","FERLO","HELMI","SATIN","SANTANA","NORFOLK","TOBI","NUKKA_A","SINDAL","MARFA","MOTT","STUDIO6.8","KENTON","JALO","ALDER","ML05_DEMO LENSES","LAVRA","VIOLA","RUE","BADU_PLUS","NIAM_PLUS","CAVEN_PLUS","NEVEN","SAIMA","ALICIA","RIKU","KOLDING","LAHTI_A","LERATO","LAGON","MEJA","SESI_A","DIA","ELISA","FINVID_CUSTOMIZED","AKI_CUSTOMIZED","ALESSIA","VELMA","SPRUCE","LENNON","MISAKO","JARA","CANNA","ARLO","SOUDA","BUENO","HANNO","NOR","TATE","ML08","ALCOTT","VISKA","VEN","LALE","SILVER","BADU_PULS","ALFONSO","SERAPHINA","NEELA","DUSK","DON","ML04_DEMO LENSES","KELLY","NAT","KENDALL","LAVRA_A","DAYO_PLUS","MERI","ANANA_A","SAMU","BORGA_A","MOMO","KAITO","PEGGY","IRIS","FELICIA","MINTTU","STUDIO12.2","NALA","MARLOWE","MAHA","NEW","KALLA","EETU","JES","AMKA_A","KISKA","WALT","STUDIO12.5","DEW","KAYO","RYKER","KAORI_CUSTOMIZED","KEOMA_A","EKON_A","LAYANA","MISTY","MIKKEL","HYDRA","KENDO","EITO_CUSTOMIZED","JONAH","JAZ","HOLM_A","PHILLYS","RAYMOND","SCHORSCH","ANIK_A","BERNIE","ANTTI_CUSTOMIZED","NAOKO_CUSTOMIZED","HITI_A","HIMIKO","ANGUS","CLARENCE","KETILL","ACHILLES","STINE","STUDIO13.2","FREDA_A","MAJVI","GIBA","JOLAN","STUDIO5.4","STUDIO5.3","HILDEGARD","SOEREN","THOMAS","AIDEN","LUPITA","ML12","ROLLINS","NESTOR","KIRIMA","TATA","MEGHAN","JORGOS","OLSEN_CUSTOMIZED","DENNIS","TUVA","BIKKI_A","GRIMBART","BOLDEWYN","BELLYN","SIWA","DAYO","TALINI_A","EDE","FARGO","CORINNA","CEDAR","SIRU","ANTTI","SHO","HEGON_A","LEVANTE","AURI","PALOMA","TALVI","KOLMAR","HEMLOCK","CHARLOTTE","SATORI","YASKA","KETILL_A","NIS","BRENDA","STUDIO7.1","RILEY","ML14","SILIA","VERUSCHKA","LEWIS","EITO","CLAAS_CUSTOMIZED","CALLUM","TOMI","HIRO","YUUTO","JONTE","GERO","ESBO","LUMI","ML07","HULDA","ANNIKA","TORBEN","BRODY","MAXIMILIAN","WAVE","ALMETA","ERRKI","MATTI","MERRICK","MMTRANSFER004","MMCRAFT005","MMCRAFT002","MMESSE019","TANNER","BASIL","MMTRANSFER003","AKEMI","ELLINGTON","ML01","MMCRAFT016","STUDIO2.2","STUDIO6.7","MMESSE020","WATARU","TRUMAN","KEELUT_A","KARI","MMRAW007","MMRAW013","KEELUT","COCO","MMRAW021","BUSTER","MMTRANSFER001","MMESSE001","MMESSE013","DEAN","STUDIO4.3","HOLLY","SANNA","JESPER","MMRAW018","AKI","MMCRAFT007","HANSEN","MMRAW011","HELGI","HALDUR_A","TOMOMI","GISELLE","MMCRAFT001","MMRAW020","LARSSON","MMCRAFT006","ML02","DAISUKE","MMRAW002","HESTA_A","MINAKO","RIN","NOBU","ULLA","VANESSA","STUDIO6.6","MMECHO005","MMESSE029","MMESSE028","MMCRAFT014","LISKA","BLU","MMCRAFT013","MMESSE002","HEGON_EU","JIRO","MMCRAFT010","KAUKO","HL002","HL001","STUDIO6.4","STUDIO6.2","JUJUBI_A","BILIMBI_A","BJELLE","MMCRAFT011","MMESSE026","NIBA_A","CLAUDE","DD2.3","RAOUL","NAOKO","GIGI SHADES","ALUKI","JANIS","KARSTEN","STUDIO7.2","ALIO_A_S","MMESSE021","OLGA","ADRIANO","AKSEL","DAGNY","TOMKIN_A","GIORGIO","TOMKIN Shades","MMESSE027","MMRAW017","HOPS","LOUIS","TUKTU_A","KAZU","MADELEINE","MASAO","BAMBI","BRADFIELD","SOLOMON","MMRAW014","HEIKO","PIT","GUNNAR","ROCKET","ISMO","PHILOMENE","QUENBY","KJELL","STUDIO11.1","GAPI","OTTI","BRANDUR_A","YOKO","DD2.2","BELLA","KIKI","REM","STUDIO6.3","ALICE","VABO","FEDOR","MMVIRTUAL001","NEA","ALEXANDER","NIVES","THUNDER","MMRAW005","HAY","DREW","WALSH","KASIMIR","GREGORY","URSULA","GISELLE_S","ALESSIA_S","KASIMIR_S","VITO_S","LENNARD_S","LOVISA","ARLUK_A","LENNARD","NITA","VITO","CLAAS","HIROTO","TAUNO","KAI","ESKID","MMESSE008","JAIS","SCARLETT_S","SEPP_S","BELLYN_S","TONA","OVE","HILLA_A","MAVERICK","MMRAW008","ANNABETH_S","KENDRICK_S","KYO_S","STUDIO9.1","STUDIO9.2","MMESSE016","LILLESOL","SYLVESTER","FEDERICO","LOTUS","CAYENNE","KEELUT Shades","REED","KARMA","JULLA_A","HOUSTON","NATHAN","FERN","STUDIO7.4","JUDE","ROB","TOCLO_A","DAGGOO","JULIUS","MMESSE006","STUDIO6.5","LUAVA_A","NUKKA Shades","MMRAW012","PALM","PRISCILLA","JOVI","MMRAW010","MMRAW009","MMCRAFT004","GINA","CARA","JORDI","APPLE","ADEBAR","GESA","LEMAS","MMESSE009","RYO","TRIBE","CASH","BOOST","HARU","MMCRAFT012","MMRAW016","MMRAW015","MMESSE025","MMESSE024","STUDIO10.2","STUDIO10.1","DALIA","SELLECK","CARLO","GUNDA","ELGARD","COLTRANE","CHARLENE","MERYL","LONNE","JUL","ERI","BEULAH","IVER","FINNA","ZACH_S","JIM_S","DASH_S","PHILOMENE_S","SCHORSCH_S","AGNES_S","SHIFT","JONES","RICCARDO","LANDON","CORALIE","DEMO LENSES","SOS","TRITON","HERKO","STUDIO8.2","STUDIO8.1","STUDIO7.3","STUDIO6.1","STUDIO5.5","STUDIO2.3","STUDIO2.1","STUDIO1.4","ARMIDA_S","LOVELL","MUSK","GUARD ONE / PLUS","GUARD ONE","RIDGE","BOOM","MMCIRCLE002","MMCIRCLE001","CANYON","PEAK","BOND","BLAZE","BALTA","MMECHO001","RIDER","OMEGA","YOSHY","POTI","MARS","CALLIOPE","TITAN","GAMMA","MATO_A","KALLIO_A","ONIKI_A","KENDA_A","MMRAW019","POK","YUMA_A","TORUK_A","LAGON_A","JOVVA_A","ELVE_A","LUAVA","AILO","FRANKLIN","FABIAN","CAPOTE","OKI","YUKA","OLIVE_S","MMDUAL003","GILES","SULLIVAN_S","ELDRIDGE_S","ANNABETH","MMDUAL004","MMDUAL004_S","MMDUAL002","MMDUAL001","GRANT","FABRICE","SIENNA","WARNER_S","ARMIDA","THOMPSON_S","KAYO_DAIKI TSUNETA","LENNARD_DAIKI TSUNETA","OLSEN","KAZUO","TALINI shades","LEX shades","FABIAN shades","ROMINA","STUDIO12.3","ML06","MMESSE030","FOCUS","DEEP","MMCRAFT017","JENSEN","SEIGO","DONOVAN","EMORY","TOTAL","SUPER","FELIX","RIKKE","TARO","YOSHI","KAORI","HL003","NETA","ZELDA","BAKER","PARK","DUANE","MMCRAFT015","TILLA","MAGDA","DALTON","DARCY","STUART","LIVA","LOTTA","GUNNARSON","LORENS","HAMPTON","ASMUND","IAN","CALEB","WILDER","WESTON","EASTON","AL","ZANE","LOST","CYNTHIA","RYOKO","YORIN","INGELS","YNGVE","SOY","JOEL","BASIE","VALDA","TURNER","PAULIN","DURAN","HAGEN","RAFFAELLA","LUND","TAPIO","SID","MMESSE007","MMESSE023","MMESSE022","MMCRAFT009","MMCRAFT008","PORTER","JETTE","FRANCESCO","MANUEL","MIRO","MONOGRAM","RAIDON","BJAKE","ANDERSSON","MMCRAFT003","SELINA","KITT","EARTHA E10","YUMI","KUMIKO","TAKEO","JUN","MIZUHO","NILSSON","HELKA","AGAVA","MMESSE018","MMESSE017","ERLING","JONI F69","JONI F10","METTE","ARTO","BIRK","JARMO","ANDO","MALTE","KENT","DD2.2 A25","VERBAL","EARTHA E25","WOODROW","BEVERLY","VERUCHKA","MMESSE010","VILDE","MACY","DUSTY F65","EARTHA E65","ISAAC","DEMI","SLOE","TORGE","AIRA","CELESTE","ENNIO","BRENT","ANYU","ENRICO","MMTRANS001","MMTRANS003","MMESSE011","MMESSE005","MMESSE012","FINVID","OWL","DAVIS","PERNILLA","ESBJOERN","WULF","PEACH","LUPINE","FLAX","VERUCHKA F10","ADEBAR_S","PETZ_S","PETZ","RANI","JOSEPPA","JUNIS","ERIN","VALTO","EJVIND","ELON","ELDER","CLOVE","MMTRANS002","DOUG","CROSBY","THELONIUS","EDDA","BENNY","ELLERY","SCHORSCH F65","JORG","RAGNAR","TIMOTHY","PEYTON","DD2.2 A6","DD2.2 A2","JOOST","FLIP","ROOPE","ZACH","ERWIN F65","MMESSE006_S","MMESSE005_S","MMESSE001_S","GERRIT","CARTER","MADITA","MMESSE003_S","URSULA_S","URSULA F61","ERLAND","LUELLA","BUGSY","ERWIN F61","ERWIN F25","ERWIN F10","ERWIN F9","PRISKA","RASMUS","PIA","EINAR","MAILA","SLY","NORA_S","TARJE","JOHN","YUKI_S","AKIRA_S","MAREIKE","JANIS F10","FRANZ F9","BECKY","TAULANT","BONNIE","RAFAEL","SMILLA","XAVER F10","FRANZ F25","JORDAN","BETTY","NIGEL","JESPER_S","JANIS F9","JAMES","COOPER"
+];
+
+let frameRows = [{ id: 0 }];
+let frameRowSeq = 1;
+let prospectFrameRows = [{ id: 0 }];
+let prospectFrameRowSeq = 1;
+
+function renderFrameRowList() {
+  const list = document.getElementById('frame-row-list');
+  const t = i18n[currentLang];
+  list.innerHTML = frameRows.map(row => `
+    <div class="frame-row" data-id="${row.id}">
+      <div class="ac-wrap" id="frame-ac-wrap-${row.id}">
+        <input type="text" class="ac-input frame-input" id="frame-input-${row.id}" autocomplete="off" placeholder="${t.framePlaceholder || 'Frame name'}">
+        <div class="ac-dropdown" id="frame-dropdown-${row.id}"></div>
+      </div>
+      ${frameRows.length > 1 ? `<button type="button" class="frame-remove-btn" onclick="removeFrameRow(${row.id})" aria-label="Remove">&times;</button>` : ''}
+    </div>
+  `).join('');
+  frameRows.forEach(row => initFrameAutocomplete(row.id));
+}
+
+function addFrameRow() {
+  if (frameRows.length >= 3) return;
+  // preserve existing input values before re-render
+  const saved = frameRows.map(r => {
+    const el = document.getElementById('frame-input-' + r.id);
+    return { id: r.id, value: el ? el.value : '' };
+  });
+  frameRows.push({ id: frameRowSeq++ });
+  renderFrameRowList();
+  saved.forEach(({ id, value }) => {
+    const el = document.getElementById('frame-input-' + id);
+    if (el) el.value = value;
+  });
+}
+
+function removeFrameRow(id) {
+  if (frameRows.length <= 1) return;
+  const saved = frameRows.map(r => {
+    const el = document.getElementById('frame-input-' + r.id);
+    return { id: r.id, value: el ? el.value : '' };
+  });
+  frameRows = frameRows.filter(r => r.id !== id);
+  renderFrameRowList();
+  saved.filter(s => s.id !== id).forEach(({ id, value }) => {
+    const el = document.getElementById('frame-input-' + id);
+    if (el) el.value = value;
+  });
+}
+
+function resetFrameEntry() {
+  frameRows = [{ id: 0 }]; frameRowSeq = 1; purchasedFrames = [];
+  renderFrameRowList();
+  document.getElementById('f-lens').checked = false;
+  document.getElementById('f-phone-intl').value = '';
+  document.getElementById('f-phone-ja').value = '';
+  document.getElementById('f-postcode-intl').value = '';
+  document.getElementById('f-postcode-ja').value = '';
+  document.getElementById('f-address-pref').value = '';
+  document.getElementById('f-address-city').value = '';
+  document.getElementById('f-address-line').value = '';
+  document.getElementById('f-address-line1').value = '';
+  document.getElementById('f-address-line2').value = '';
+  document.getElementById('f-address-city-intl').value = '';
+  document.getElementById('f-address-state').value = '';
+  document.getElementById('f-dob').value = '';
+  resetDobDisplay();
+  document.getElementById('f-gender').value = '';
+  document.getElementById('f-customer-type-purchaser').checked = false;
+  document.getElementById('f-customer-type-prospect').checked = false;
+  document.getElementById('customer-type-continue-btn').disabled = true;
+  resetProspectFrameEntry();
+  document.getElementById('f-prospect-phone').value = '';
+  document.getElementById('f-prospect-sms').checked = false;
+  updateProspectSmsAvailability();
+  customerType = 'purchaser';
+  applyCustomerTypeToForm();
+  toggleLensFields();
+}
+
+function initFrameAutocomplete(id) {
+  const wrap = document.getElementById('frame-ac-wrap-' + id);
+  const input = document.getElementById('frame-input-' + id);
+  const dropdown = document.getElementById('frame-dropdown-' + id);
+  if (!wrap || !input || !dropdown) return;
+
+  function renderList(query) {
+    const q = query.trim().toLowerCase();
+    const base = q ? FRAME_NAMES.filter(n => n.toLowerCase().startsWith(q)) : FRAME_NAMES.slice(0, 200);
+    const filtered = [...base].sort((a, b) => a.localeCompare(b));
+    if (filtered.length === 0) { closeDropdown(); return; }
+    dropdown.innerHTML = filtered.slice(0, 100).map(n => `<div class="ac-item" data-value="${escapeHtml(n)}">${escapeHtml(n)}</div>`).join('');
+    wrap.classList.add('open');
+    dropdown.querySelectorAll('.ac-item').forEach(item => {
+      item.addEventListener('mousedown', e => { e.preventDefault(); input.value = item.dataset.value; closeDropdown(); });
+    });
+  }
+  function closeDropdown() { wrap.classList.remove('open'); dropdown.innerHTML = ''; }
+  input.addEventListener('input', () => renderList(input.value));
+  input.addEventListener('focus', () => { if (input.value) renderList(input.value); });
+  input.addEventListener('keydown', e => { if (e.key === 'Escape') { closeDropdown(); input.blur(); } });
+  document.addEventListener('click', e => { if (!wrap.contains(e.target)) closeDropdown(); });
+}
+
+function renderProspectFrameRowList() {
+  const list = document.getElementById('prospect-frame-row-list');
+  if (!list) return;
+  list.innerHTML = prospectFrameRows.map(row => `
+    <div class="prospect-frame-row" data-id="${row.id}">
+      <div class="ac-wrap" id="prospect-frame-ac-wrap-${row.id}">
+        <input type="text" class="ac-input" id="prospect-frame-model-${row.id}" autocomplete="off">
+        <div class="ac-dropdown" id="prospect-frame-dropdown-${row.id}"></div>
+      </div>
+      <input type="text" class="ac-input" id="prospect-frame-color-${row.id}" inputmode="numeric" pattern="[0-9]*" maxlength="3" style="width:90px; flex-shrink:0;" oninput="this.value = this.value.replace(/\\D/g, '').slice(0, 3)">
+      <input type="text" class="ac-input" id="prospect-frame-price-${row.id}" inputmode="numeric" pattern="[0-9]*" placeholder="¥" style="width:85px; flex-shrink:0;" oninput="this.value = this.value.replace(/\\D/g, '').slice(0, 7)">
+      ${prospectFrameRows.length > 1 ? `<button type="button" class="frame-remove-btn" onclick="removeProspectFrameRow(${row.id})" aria-label="Remove">&times;</button>` : ''}
+    </div>
+  `).join('');
+  prospectFrameRows.forEach(row => initProspectFrameAutocomplete(row.id));
+}
+
+function saveProspectFrameFieldValues() {
+  return prospectFrameRows.map(r => ({
+    id: r.id,
+    model: (document.getElementById('prospect-frame-model-' + r.id) || {}).value || '',
+    color: (document.getElementById('prospect-frame-color-' + r.id) || {}).value || '',
+    price: (document.getElementById('prospect-frame-price-' + r.id) || {}).value || ''
+  }));
+}
+
+function restoreProspectFrameFieldValues(saved) {
+  saved.forEach(({ id, model, color, price }) => {
+    const modelEl = document.getElementById('prospect-frame-model-' + id);
+    const colorEl = document.getElementById('prospect-frame-color-' + id);
+    const priceEl = document.getElementById('prospect-frame-price-' + id);
+    if (modelEl) modelEl.value = model;
+    if (colorEl) colorEl.value = color;
+    if (priceEl) priceEl.value = price;
+  });
+}
+
+function addProspectFrameRow() {
+  if (prospectFrameRows.length >= 5) return;
+  const saved = saveProspectFrameFieldValues();
+  prospectFrameRows.push({ id: prospectFrameRowSeq++ });
+  renderProspectFrameRowList();
+  restoreProspectFrameFieldValues(saved);
+}
+
+function removeProspectFrameRow(id) {
+  if (prospectFrameRows.length <= 1) return;
+  const saved = saveProspectFrameFieldValues();
+  prospectFrameRows = prospectFrameRows.filter(r => r.id !== id);
+  renderProspectFrameRowList();
+  restoreProspectFrameFieldValues(saved.filter(s => s.id !== id));
+}
+
+// Staff enter a tax-included price by default; when the admin
+// "priceInputTaxExcluded" setting is on, what they type is treated as
+// tax-excluded and converted here so the stored/displayed price is
+// always tax-included (per PRICE_TAX_RATE, Japan's 10% consumption tax).
+function normalizeFramePriceInput(raw) {
+  const digits = String(raw || '').replace(/\D/g, '');
+  if (!digits) return '';
+  const entered = parseInt(digits, 10);
+  return String(priceInputTaxExcluded ? Math.round(entered * PRICE_TAX_RATE) : entered);
+}
+
+function collectProspectFrames() {
+  return prospectFrameRows
+    .map(row => ({
+      model: (document.getElementById('prospect-frame-model-' + row.id) || {}).value || '',
+      color: (document.getElementById('prospect-frame-color-' + row.id) || {}).value || '',
+      price: (document.getElementById('prospect-frame-price-' + row.id) || {}).value || ''
+    }))
+    .map(f => ({ model: f.model.trim(), color: f.color.trim(), price: normalizeFramePriceInput(f.price) }))
+    .filter(f => f.model || f.color || f.price);
+}
+
+function resetProspectFrameEntry() {
+  prospectFrameRows = [{ id: 0 }];
+  prospectFrameRowSeq = 1;
+  renderProspectFrameRowList();
+}
+
+function initProspectFrameAutocomplete(id) {
+  const wrap = document.getElementById('prospect-frame-ac-wrap-' + id);
+  const input = document.getElementById('prospect-frame-model-' + id);
+  const dropdown = document.getElementById('prospect-frame-dropdown-' + id);
+  if (!wrap || !input || !dropdown) return;
+
+  function renderList(query) {
+    const q = query.trim().toLowerCase();
+    const base = q ? FRAME_NAMES.filter(n => n.toLowerCase().startsWith(q)) : FRAME_NAMES.slice(0, 200);
+    const filtered = [...base].sort((a, b) => a.localeCompare(b));
+    if (filtered.length === 0) { closeDropdown(); return; }
+    dropdown.innerHTML = filtered.slice(0, 100).map(n => `<div class="ac-item" data-value="${escapeHtml(n)}">${escapeHtml(n)}</div>`).join('');
+    wrap.classList.add('open');
+    dropdown.querySelectorAll('.ac-item').forEach(item => {
+      item.addEventListener('mousedown', e => { e.preventDefault(); input.value = item.dataset.value; closeDropdown(); });
+    });
+  }
+  function closeDropdown() { wrap.classList.remove('open'); dropdown.innerHTML = ''; }
+  input.addEventListener('input', () => renderList(input.value));
+  input.addEventListener('focus', () => { if (input.value) renderList(input.value); });
+  input.addEventListener('keydown', e => { if (e.key === 'Escape') { closeDropdown(); input.blur(); } });
+  document.addEventListener('click', e => { if (!wrap.contains(e.target)) closeDropdown(); });
+}
+
+function collectFrameNames() {
+  return frameRows.map(row => document.getElementById('frame-input-' + row.id))
+    .filter(input => input && input.value.trim()).map(input => input.value.trim());
+}
+
+function showFormArea() {
+  document.getElementById('frame-entry-area').style.display = 'none';
+  document.getElementById('customer-type-area').style.display = 'none';
+  document.getElementById('form-area').style.display = 'block';
+  document.getElementById('back-to-top-btn').style.display = '';
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function goToTopScreen() {
+  document.querySelectorAll('.ac-wrap').forEach(w => w.classList.remove('open'));
+  document.getElementById('form-area').style.display = 'none';
+  document.getElementById('customer-type-area').style.display = 'none';
+  document.getElementById('frame-entry-area').style.display = 'block';
+  document.getElementById('back-to-top-btn').style.display = 'none';
+  customerType = 'purchaser';
+  applyCustomerTypeToForm();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function skipFrameEntry() {
+  purchasedFrames = [];
+  customerType = 'purchaser';
+  applyCustomerTypeToForm();
+  showFormArea();
+}
+
+function continueFrameEntry() {
+  document.querySelectorAll('.ac-wrap').forEach(w => w.classList.remove('open'));
+  purchasedFrames = collectFrameNames();
+  if (purchasedFrames.length === 0) {
+    showCustomerTypeArea();
+  } else {
+    customerType = 'purchaser';
+    applyCustomerTypeToForm();
+    showFormArea();
+  }
+}
+
+// ── CUSTOMER TYPE (purchaser vs. prospective customer) ──
+function showCustomerTypeArea() {
+  document.getElementById('f-customer-type-purchaser').checked = false;
+  document.getElementById('f-customer-type-prospect').checked = false;
+  document.getElementById('customer-type-continue-btn').disabled = true;
+  document.getElementById('frame-entry-area').style.display = 'none';
+  document.getElementById('customer-type-area').style.display = 'block';
+  document.getElementById('back-to-top-btn').style.display = '';
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function updateCustomerTypeContinueState() {
+  const purchaser = document.getElementById('f-customer-type-purchaser');
+  const prospect = document.getElementById('f-customer-type-prospect');
+  document.getElementById('customer-type-continue-btn').disabled = !(purchaser.checked || prospect.checked);
+}
+
+function continueCustomerType() {
+  const prospect = document.getElementById('f-customer-type-prospect');
+  customerType = prospect.checked ? 'prospect' : 'purchaser';
+  applyCustomerTypeToForm();
+  showFormArea();
+}
+
+function applyCustomerTypeToForm() {
+  const isProspect = customerType === 'prospect';
+  // Until the admin's hideLensSection setting has actually loaded, keep the
+  // section hidden rather than briefly showing it and then hiding it (or
+  // vice versa) once the fetch resolves.
+  const hideLens = isProspect || !lensSettingLoaded || hideLensSection;
+
+  document.getElementById('lbl-subtitle').style.display = isProspect ? 'none' : '';
+  document.getElementById('warranty-block').style.display = isProspect ? 'none' : '';
+  document.getElementById('lens-purchase-block').style.display = hideLens ? 'none' : '';
+  document.getElementById('optin-block').style.display = isProspect ? 'none' : '';
+  document.getElementById('prospect-frame-block').style.display = isProspect ? 'block' : 'none';
+  document.getElementById('prospect-contact-block').style.display = isProspect ? 'block' : 'none';
+  document.getElementById('dob-field').style.display = isProspect ? 'none' : '';
+  document.getElementById('gender-field').style.display = isProspect ? 'none' : '';
+  document.getElementById('lbl-email-or-phone-note').style.display = isProspect ? 'block' : 'none';
+  updateProspectSmsAvailability();
+
+  const t = i18n[currentLang];
+  document.getElementById('lbl-privacy').textContent = isProspect ? t.privacyProspect : t.privacy;
+  document.getElementById('lbl-agree').innerHTML = isProspect ? t.agreeProspect : t.agree;
+  document.getElementById('lbl-email').classList.toggle('required', !isProspect);
+  document.getElementById('e-email').textContent = isProspect ? t.errEmailOrPhone : t.errEmail;
+
+  if (hideLens) {
+    const lensCheckbox = document.getElementById('f-lens');
+    if (lensCheckbox.checked) { lensCheckbox.checked = false; }
+    document.getElementById('lens-fields').classList.remove('open');
+  }
+
+  if (isProspect) {
+    document.getElementById('country-field').style.display = 'none';
+  } else {
+    updateCountryFieldVisibility();
+  }
+  updateSubmitState();
+}
+
+// ── DOB WHEEL PICKER ──
+const DOB_ITEM_HEIGHT = 44;
+const DOB_DEFAULT = { year: 2000, month: 1, day: 1 };
+let dobWheelState = { year: DOB_DEFAULT.year, month: DOB_DEFAULT.month, day: DOB_DEFAULT.day };
+
+function daysInMonth(year, month) {
+  return new Date(year, month, 0).getDate();
+}
+
+function buildDobWheel(el, values, selectedValue) {
+  el.innerHTML = values.map(v => `<div class="dob-wheel-item">${v}</div>`).join('');
+  const index = Math.max(0, values.indexOf(selectedValue));
+  el.scrollTop = index * DOB_ITEM_HEIGHT;
+  updateDobWheelDimming(el);
+}
+
+function getDobWheelIndex(el) {
+  return Math.round(el.scrollTop / DOB_ITEM_HEIGHT);
+}
+
+// iOS-style wheel: only the centered row is fully opaque, the rest are
+// dimmed — combined with the fade gradients, this stands in for the
+// depth/curve cue a native UIPickerView gives with plain CSS.
+function updateDobWheelDimming(el) {
+  const index = getDobWheelIndex(el);
+  Array.from(el.children).forEach((item, i) => {
+    item.classList.toggle('selected', i === index);
+  });
+}
+
+function rebuildDobDayWheel(preserveDay) {
+  const el = document.getElementById('dob-wheel-day');
+  const maxDay = daysInMonth(dobWheelState.year, dobWheelState.month);
+  const days = Array.from({ length: maxDay }, (_, i) => i + 1);
+  const day = Math.min(preserveDay, maxDay);
+  buildDobWheel(el, days, day);
+  dobWheelState.day = day;
+}
+
+function onDobYearOrMonthScroll() {
+  const yearEl = document.getElementById('dob-wheel-year');
+  const monthEl = document.getElementById('dob-wheel-month');
+  const years = dobYearList();
+  dobWheelState.year = years[getDobWheelIndex(yearEl)] ?? dobWheelState.year;
+  dobWheelState.month = getDobWheelIndex(monthEl) + 1;
+  updateDobWheelDimming(yearEl);
+  updateDobWheelDimming(monthEl);
+  rebuildDobDayWheel(dobWheelState.day);
+}
+
+function dobYearList() {
+  const currentYear = new Date().getFullYear();
+  return Array.from({ length: currentYear - 1900 + 1 }, (_, i) => 1900 + i);
+}
+
+function openDobPicker() {
+  const existing = document.getElementById('f-dob').value; // "YYYY-MM-DD" or ""
+  const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(existing);
+  dobWheelState = match
+    ? { year: parseInt(match[1], 10), month: parseInt(match[2], 10), day: parseInt(match[3], 10) }
+    : { ...DOB_DEFAULT };
+
+  // Must be visible (not display:none) before setting scrollTop on the
+  // wheels below, or the assignment is silently ignored.
+  document.getElementById('dob-picker-overlay').classList.add('open');
+
+  const yearEl = document.getElementById('dob-wheel-year');
+  const monthEl = document.getElementById('dob-wheel-month');
+  const dayEl = document.getElementById('dob-wheel-day');
+  buildDobWheel(yearEl, dobYearList(), dobWheelState.year);
+  buildDobWheel(monthEl, Array.from({ length: 12 }, (_, i) => i + 1), dobWheelState.month);
+  rebuildDobDayWheel(dobWheelState.day);
+
+  yearEl.onscroll = debounce(onDobYearOrMonthScroll, 100);
+  monthEl.onscroll = debounce(onDobYearOrMonthScroll, 100);
+  dayEl.onscroll = debounce(() => updateDobWheelDimming(dayEl), 100);
+}
+
+function closeDobPicker() {
+  document.getElementById('dob-picker-overlay').classList.remove('open');
+}
+
+function closeDobPickerOnOverlay(e) {
+  if (e.target.id === 'dob-picker-overlay') closeDobPicker();
+}
+
+function confirmDobPicker() {
+  const yearEl = document.getElementById('dob-wheel-year');
+  const monthEl = document.getElementById('dob-wheel-month');
+  const dayEl = document.getElementById('dob-wheel-day');
+  const years = dobYearList();
+  const year = years[getDobWheelIndex(yearEl)] ?? dobWheelState.year;
+  const month = getDobWheelIndex(monthEl) + 1;
+  const maxDay = daysInMonth(year, month);
+  const day = Math.min(getDobWheelIndex(dayEl) + 1, maxDay);
+
+  const pad = n => String(n).padStart(2, '0');
+  const value = `${year}-${pad(month)}-${pad(day)}`;
+  document.getElementById('f-dob').value = value;
+  const display = document.getElementById('dob-display');
+  display.textContent = value;
+  display.classList.remove('placeholder');
+
+  closeDobPicker();
+}
+
+function resetDobDisplay() {
+  const t = i18n[currentLang];
+  const display = document.getElementById('dob-display');
+  display.textContent = t.dobSelect;
+  display.classList.add('placeholder');
+}
+
+function debounce(fn, ms) {
+  let timer;
+  return function() {
+    clearTimeout(timer);
+    timer = setTimeout(fn, ms);
+  };
+}
+
+// ── PREFECTURE AUTOCOMPLETE (JA) ──
+const JAPAN_PREFECTURES = [
+  '北海道','青森県','岩手県','宮城県','秋田県','山形県','福島県','茨城県','栃木県','群馬県',
+  '埼玉県','千葉県','東京都','神奈川県','新潟県','富山県','石川県','福井県','山梨県','長野県',
+  '岐阜県','静岡県','愛知県','三重県','滋賀県','京都府','大阪府','兵庫県','奈良県','和歌山県',
+  '鳥取県','島根県','岡山県','広島県','山口県','徳島県','香川県','愛媛県','高知県','福岡県',
+  '佐賀県','長崎県','熊本県','大分県','宮崎県','鹿児島県','沖縄県'
+].map(name => ({ name, code: 'JP', phoneCode: '+81' }));
+
+// ── COUNTRY AUTOCOMPLETE ──
+const COUNTRIES = [
+  { name: 'Japan', code: 'JP', phoneCode: '+81' },
+  { name: 'United States', code: 'US', phoneCode: '+1' },
+  { name: 'China', code: 'CN', phoneCode: '+86' },
+  { name: 'South Korea', code: 'KR', phoneCode: '+82' },
+  { name: 'Taiwan', code: 'TW', phoneCode: '+886' },
+  { name: 'Hong Kong', code: 'HK', phoneCode: '+852' },
+  { name: 'Singapore', code: 'SG', phoneCode: '+65' },
+  { name: 'Australia', code: 'AU', phoneCode: '+61' },
+  { name: 'United Kingdom', code: 'GB', phoneCode: '+44' },
+  { name: 'Germany', code: 'DE', phoneCode: '+49' },
+  { name: 'France', code: 'FR', phoneCode: '+33' },
+  { name: 'Italy', code: 'IT', phoneCode: '+39' },
+  { name: 'Spain', code: 'ES', phoneCode: '+34' },
+  { name: 'Netherlands', code: 'NL', phoneCode: '+31' },
+  { name: 'Switzerland', code: 'CH', phoneCode: '+41' },
+  { name: 'Canada', code: 'CA', phoneCode: '+1' },
+  { name: 'Brazil', code: 'BR', phoneCode: '+55' },
+  { name: 'India', code: 'IN', phoneCode: '+91' },
+  { name: 'Thailand', code: 'TH', phoneCode: '+66' },
+  { name: 'Vietnam', code: 'VN', phoneCode: '+84' },
+  { name: 'Indonesia', code: 'ID', phoneCode: '+62' },
+  { name: 'Malaysia', code: 'MY', phoneCode: '+60' },
+  { name: 'Philippines', code: 'PH', phoneCode: '+63' },
+  { name: 'New Zealand', code: 'NZ', phoneCode: '+64' },
+  { name: 'Sweden', code: 'SE', phoneCode: '+46' },
+  { name: 'Norway', code: 'NO', phoneCode: '+47' },
+  { name: 'Denmark', code: 'DK', phoneCode: '+45' },
+  { name: 'Finland', code: 'FI', phoneCode: '+358' },
+  { name: 'Belgium', code: 'BE', phoneCode: '+32' },
+  { name: 'Austria', code: 'AT', phoneCode: '+43' },
+  { name: 'Portugal', code: 'PT', phoneCode: '+351' },
+  { name: 'Poland', code: 'PL', phoneCode: '+48' },
+  { name: 'Russia', code: 'RU', phoneCode: '+7' },
+  { name: 'Mexico', code: 'MX', phoneCode: '+52' },
+  { name: 'Argentina', code: 'AR', phoneCode: '+54' },
+  { name: 'Chile', code: 'CL', phoneCode: '+56' },
+  { name: 'Colombia', code: 'CO', phoneCode: '+57' },
+  { name: 'South Africa', code: 'ZA', phoneCode: '+27' },
+  { name: 'UAE', code: 'AE', phoneCode: '+971' },
+  { name: 'Saudi Arabia', code: 'SA', phoneCode: '+966' },
+  { name: 'Turkey', code: 'TR', phoneCode: '+90' },
+  { name: 'Greece', code: 'GR', phoneCode: '+30' },
+  { name: 'Czech Republic', code: 'CZ', phoneCode: '+420' },
+  { name: 'Hungary', code: 'HU', phoneCode: '+36' },
+  { name: 'Romania', code: 'RO', phoneCode: '+40' },
+  { name: 'Ukraine', code: 'UA', phoneCode: '+380' },
+  { name: 'Israel', code: 'IL', phoneCode: '+972' },
+  { name: 'Egypt', code: 'EG', phoneCode: '+20' },
+  { name: 'Pakistan', code: 'PK', phoneCode: '+92' },
+  { name: 'Bangladesh', code: 'BD', phoneCode: '+880' },
+  { name: 'Sri Lanka', code: 'LK', phoneCode: '+94' },
+  { name: 'Nepal', code: 'NP', phoneCode: '+977' },
+  { name: 'Myanmar', code: 'MM', phoneCode: '+95' },
+  { name: 'Cambodia', code: 'KH', phoneCode: '+855' },
+  { name: 'Laos', code: 'LA', phoneCode: '+856' },
+  { name: 'Mongolia', code: 'MN', phoneCode: '+976' },
+  { name: 'Macau', code: 'MO', phoneCode: '+853' },
+  { name: 'Other', code: '', phoneCode: '' }
+];
+
+function initAutocomplete() {
+  const wrap = document.getElementById('country-ac-wrap');
+  const input = document.getElementById('f-country-input');
+  const hidden = document.getElementById('f-country');
+  const dropdown = document.getElementById('country-dropdown');
+
+  function renderList(query) {
+    const source = currentLang === 'ja' ? JAPAN_PREFECTURES : COUNTRIES;
+    const q = query.trim().toLowerCase();
+    const base = q ? source.filter(c => c.name.toLowerCase().startsWith(q)) : source;
+    const filtered = q ? [...base].sort((a, b) => a.name.localeCompare(b.name)) : base;
+    if (filtered.length === 0) {
+      dropdown.innerHTML = '<div class="ac-empty">No results</div>';
+      wrap.classList.add('open');
+      return;
+    }
+    dropdown.innerHTML = filtered.map((c, i) => `<div class="ac-item${i === acHighlight ? ' highlight' : ''}" data-name="${escapeHtml(c.name)}" data-code="${escapeHtml(c.code)}" data-phone="${escapeHtml(c.phoneCode||'')}">${escapeHtml(c.name)}</div>`).join('');
+    wrap.classList.add('open');
+    dropdown.querySelectorAll('.ac-item').forEach(item => {
+      item.addEventListener('mousedown', e => {
+        e.preventDefault();
+        input.value = item.dataset.name;
+        hidden.value = item.dataset.name;
+        wrap.dataset.countryCode = item.dataset.code;
+        wrap.classList.remove('open');
+        dropdown.innerHTML = '';
+        acHighlight = -1;
+        updateSubmitState();
+        // Sync phone country code selector
+        const phoneCode = item.dataset.phone;
+        if (phoneCode) {
+          const sel = document.getElementById('f-phone-code');
+          if (sel) {
+            const opt = [...sel.options].find(o => o.value === phoneCode);
+            if (opt) sel.value = phoneCode;
+          }
+        }
+      });
+    });
+  }
+
+  function closeDropdown() { wrap.classList.remove('open'); dropdown.innerHTML = ''; acHighlight = -1; }
+
+  input.addEventListener('input', () => {
+    hidden.value = '';
+    wrap.dataset.countryCode = '';
+    acHighlight = -1;
+    if (input.value.trim()) renderList(input.value);
+    else closeDropdown();
+    updateSubmitState();
+  });
+
+  input.addEventListener('focus', () => { if (!hidden.value) renderList(input.value); });
+
+  input.addEventListener('keydown', e => {
+    const items = dropdown.querySelectorAll('.ac-item');
+    if (e.key === 'ArrowDown') { e.preventDefault(); acHighlight = Math.min(acHighlight + 1, items.length - 1); renderList(input.value); }
+    else if (e.key === 'ArrowUp') { e.preventDefault(); acHighlight = Math.max(acHighlight - 1, -1); renderList(input.value); }
+    else if (e.key === 'Enter' && acHighlight >= 0) { e.preventDefault(); items[acHighlight].dispatchEvent(new MouseEvent('mousedown')); }
+    else if (e.key === 'Escape') closeDropdown();
+  });
+
+  document.addEventListener('click', e => { if (!wrap.contains(e.target)) closeDropdown(); });
+}
+
+// ── PREFECTURE AUTOCOMPLETE (lens address block) ──
+function initAddressPrefAutocomplete() {
+  const wrap = document.getElementById('address-pref-ac-wrap');
+  const input = document.getElementById('f-address-pref');
+  const dropdown = document.getElementById('address-pref-dropdown');
+  if (!wrap || !input || !dropdown) return;
+
+  function renderList(query) {
+    const q = query.trim();
+    const base = q ? JAPAN_PREFECTURES.filter(p => p.name.startsWith(q)) : JAPAN_PREFECTURES;
+    if (base.length === 0) { closeDropdown(); return; }
+    dropdown.innerHTML = base.map(p => `<div class="ac-item" data-value="${escapeHtml(p.name)}">${escapeHtml(p.name)}</div>`).join('');
+    wrap.classList.add('open');
+    dropdown.querySelectorAll('.ac-item').forEach(item => {
+      item.addEventListener('mousedown', e => {
+        e.preventDefault();
+        input.value = item.dataset.value;
+        closeDropdown();
+        updateSubmitState();
+      });
+    });
+  }
+  function closeDropdown() { wrap.classList.remove('open'); dropdown.innerHTML = ''; }
+
+  input.addEventListener('input', () => { renderList(input.value); updateSubmitState(); });
+  input.addEventListener('focus', () => renderList(input.value));
+  input.addEventListener('keydown', e => { if (e.key === 'Escape') { closeDropdown(); input.blur(); } });
+  document.addEventListener('click', e => { if (!wrap.contains(e.target)) closeDropdown(); });
+}
+
+// ── EMAIL AUTOCOMPLETE ──
+const EMAIL_DOMAINS = ['gmail.com','yahoo.com','yahoo.co.jp','hotmail.com','outlook.com','icloud.com','docomo.ne.jp','ezweb.ne.jp','softbank.ne.jp','au.com','me.com','mac.com','nifty.com','biglobe.ne.jp','excite.co.jp','rakuten.jp','i.softbank.jp','ezweb.ne.jp','ybb.ne.jp','plala.or.jp'];
+
+function initEmailAutocomplete() {
+  const wrap = document.getElementById('email-ac-wrap');
+  const input = document.getElementById('f-email');
+  const dropdown = document.getElementById('email-dropdown');
+  if (!wrap || !input || !dropdown) return;
+
+  function renderList() {
+    const val = input.value;
+    const atIdx = val.indexOf('@');
+    if (atIdx < 1) { closeDropdown(); return; }
+    const local = val.slice(0, atIdx + 1);
+    const domainPart = val.slice(atIdx + 1).toLowerCase();
+    const matches = EMAIL_DOMAINS.filter(d => d.startsWith(domainPart) && d !== domainPart);
+    if (matches.length === 0) { closeDropdown(); return; }
+    dropdown.innerHTML = matches.map((d, i) => `<div class="ac-item${i === emailHighlight ? ' highlight' : ''}" data-value="${escapeHtml(local + d)}">${escapeHtml(local + d)}</div>`).join('');
+    wrap.classList.add('open');
+    dropdown.querySelectorAll('.ac-item').forEach(item => {
+      item.addEventListener('mousedown', e => {
+        e.preventDefault();
+        input.value = item.dataset.value;
+        closeDropdown();
+        updateSubmitState();
+      });
+    });
+  }
+
+  function closeDropdown() { wrap.classList.remove('open'); dropdown.innerHTML = ''; emailHighlight = -1; }
+
+  input.addEventListener('input', () => { emailHighlight = -1; renderList(); updateSubmitState(); });
+  input.addEventListener('keydown', e => {
+    const items = dropdown.querySelectorAll('.ac-item');
+    if (e.key === 'ArrowDown') { e.preventDefault(); emailHighlight = Math.min(emailHighlight + 1, items.length - 1); renderList(); }
+    else if (e.key === 'ArrowUp') { e.preventDefault(); emailHighlight = Math.max(emailHighlight - 1, -1); renderList(); }
+    else if (e.key === 'Enter' && emailHighlight >= 0) { e.preventDefault(); items[emailHighlight].dispatchEvent(new MouseEvent('mousedown')); }
+    else if (e.key === 'Escape') closeDropdown();
+  });
+  document.addEventListener('click', e => { if (!wrap.contains(e.target)) closeDropdown(); });
+}
+
+// ── FORM VALIDATION ──
+function isProspectPhoneValid() {
+  const phone = document.getElementById('f-prospect-phone').value;
+  return phone.replace(/\D/g, '').length === 11;
+}
+
+function updateProspectSmsAvailability() {
+  const cb = document.getElementById('f-prospect-sms');
+  const wasValid = !cb.disabled;
+  const valid = isProspectPhoneValid();
+  cb.disabled = !valid;
+  if (!valid) {
+    cb.checked = false;
+  } else if (!wasValid) {
+    // Just became valid: check it automatically. Once valid, further edits
+    // to the phone number won't re-check a box the user unchecked by hand.
+    cb.checked = true;
+  }
+}
+
+function emailOrPhoneValid() {
+  const emailVal = document.getElementById('f-email').value.trim();
+  if (customerType !== 'prospect') {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailVal);
+  }
+  if (emailVal) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailVal); }
+  return isProspectPhoneValid();
+}
+
+function updateSubmitState() {
+  const name = document.getElementById('f-name');
+  const optinYes = document.getElementById('f-optin-yes');
+  const optinNo = document.getElementById('f-optin-no');
+  const agree = document.getElementById('f-agree');
+  const btn = document.getElementById('submit-btn');
+  if (!btn) return;
+  const isProspect = customerType === 'prospect';
+  const valid = name && name.value.trim() &&
+    emailOrPhoneValid() &&
+    (isProspect || (optinYes && optinYes.checked || optinNo && optinNo.checked)) &&
+    agree && agree.checked &&
+    lensFieldsValid();
+  btn.disabled = !valid;
+}
+
+function validateForm() {
+  let ok = true;
+  const name = document.getElementById('f-name');
+  const eName = document.getElementById('e-name');
+  const email = document.getElementById('f-email');
+  const eEmail = document.getElementById('e-email');
+
+  if (!name.value.trim()) { name.classList.add('err'); eName.style.display = 'block'; ok = false; } else { name.classList.remove('err'); eName.style.display = 'none'; }
+  if (!emailOrPhoneValid()) { email.classList.add('err'); eEmail.style.display = 'block'; ok = false; } else { email.classList.remove('err'); eEmail.style.display = 'none'; }
+
+  return ok;
+}
+
+// ── PHONE FORMATTING ──
+function formatIntlPhone(code, raw) {
+  const trimmed = raw.trim();
+  if (!trimmed) return '';
+  if (/^\d+$/.test(trimmed)) {
+    // plain digits, e.g. "09011111111" — drop the leading 0, then group
+    const digits = trimmed.replace(/^0/, '');
+    if (digits.length === 10) return `(${code}) ${digits.slice(0, 2)}-${digits.slice(2, 6)}-${digits.slice(6)}`;
+    if (digits.length === 9) return `(${code}) ${digits.slice(0, 1)}-${digits.slice(1, 5)}-${digits.slice(5)}`;
+    return `(${code}) ${digits}`;
+  }
+  // already has its own separators — just drop a leading 0
+  return `(${code}) ${trimmed.replace(/^0/, '')}`;
+}
+
+// ── SUBMIT ──
+async function handleSubmit() {
+  if (!validateForm()) return;
+
+  const btn = document.getElementById('submit-btn');
+  btn.disabled = true;
+  btn.textContent = '…';
+
+  const name = document.getElementById('f-name');
+  const country = document.getElementById('f-country');
+  const countryWrap = document.getElementById('country-ac-wrap');
+  const email = document.getElementById('f-email');
+  const optinYes = document.getElementById('f-optin-yes');
+  const countryCode = (countryWrap && countryWrap.dataset.countryCode) || '';
+  const ts = new Date().toISOString();
+
+  // Lens fields
+  const lensChecked = document.getElementById('f-lens').checked;
+  let phone = '', postcode = '', addressStreet = '', addressBuilding = '', addressCity = '', addressState = '';
+  if (lensChecked) {
+    if (currentLang === 'ja') {
+      phone = document.getElementById('f-phone-ja').value.trim();
+      postcode = document.getElementById('f-postcode-ja').value.trim();
+      // The JA form doesn't split street/building, so it all goes into "Street".
+      addressStreet = document.getElementById('f-address-line').value.trim();
+      addressCity = document.getElementById('f-address-city').value.trim();
+      addressState = document.getElementById('f-address-pref').value.trim();
+    } else {
+      const code = document.getElementById('f-phone-code').value;
+      const num = document.getElementById('f-phone-intl').value.trim();
+      phone = formatIntlPhone(code, num);
+      postcode = document.getElementById('f-postcode-intl').value.trim();
+      addressStreet = document.getElementById('f-address-line1').value.trim();
+      addressBuilding = document.getElementById('f-address-line2').value.trim();
+      addressCity = document.getElementById('f-address-city-intl').value.trim();
+      addressState = document.getElementById('f-address-state').value.trim();
+    }
+  }
+
+  const isProspect = customerType === 'prospect';
+  const confirmToken = isProspect ? generateConfirmToken() : '';
+  const record = {
+    timestamp: ts,
+    name: name.value.trim(),
+    email: email.value.trim(),
+    optin: optinYes.checked,
+    country: country.value,
+    countryCode: countryCode,
+    lang: currentLang,
+    memberNo: '',
+    frameNames: purchasedFrames.join(', '),
+    phone: phone,
+    postcode: postcode,
+    addressStreet: addressStreet,
+    addressBuilding: addressBuilding,
+    addressCity: addressCity,
+    addressState: addressState,
+    customerType: customerType,
+    dob: isProspect ? '' : document.getElementById('f-dob').value,
+    gender: isProspect ? '' : document.getElementById('f-gender').value,
+    prospectFrames: isProspect ? collectProspectFrames() : [],
+    prospectPhone: isProspect ? document.getElementById('f-prospect-phone').value.trim() : '',
+    prospectSmsOptIn: isProspect ? document.getElementById('f-prospect-sms').checked : false,
+    confirmToken: confirmToken
+  };
+
+  try {
+    await fetch(SHEET_WEBHOOK_URL, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(record)
+    });
+    lastSubmittedEmail = record.email;
+    lastSubmittedTimestamp = record.timestamp;
+    lastProspectConfirmToken = confirmToken;
+    btn.textContent = i18n[currentLang].submit;
+    showThanks();
+  } catch (err) {
+    btn.disabled = false;
+    btn.textContent = i18n[currentLang].submit;
+    alert('Submission failed. Please check your connection and try again.');
+  }
+}
+
+function updateThanksLabels() {
+  const t = i18n[currentLang];
+  const isProspect = customerType === 'prospect';
+  document.getElementById('lbl-thanks-title').textContent = isProspect ? t.prospectThanksTitle : t.thanksTitle;
+  document.getElementById('lbl-thanks-sub').textContent = isProspect ? t.prospectThanksSub : t.thanksSub;
+  document.getElementById('lbl-register-another').textContent = isProspect ? t.prospectRegisterAnother : t.registerAnother;
+  document.getElementById('lbl-thanks-sms').textContent = t.thanksSms;
+}
+
+function showThanks() {
+  const fa = document.getElementById('form-area');
+  const ta = document.getElementById('thanks-area');
+  fa.style.display = 'none';
+  ta.style.display = 'block';
+  document.getElementById('back-to-top-btn').style.display = 'none';
+  updateThanksLabels();
+  const isProspect = customerType === 'prospect';
+  document.getElementById('thanks-add-frame-wrap').style.display =
+    (!isProspect && purchasedFrames.length === 0) ? 'block' : 'none';
+  document.getElementById('thanks-frame-entry').style.display = 'none';
+  document.getElementById('thanks-frame-status').textContent = '';
+  const smsPhone = isProspect ? document.getElementById('f-prospect-phone').value.trim() : '';
+  const smsWanted = isProspect && document.getElementById('f-prospect-sms').checked;
+  document.getElementById('thanks-sms-wrap').style.display = (smsWanted && smsPhone) ? 'block' : 'none';
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// ── PROSPECT SMS ──
+function generateConfirmToken() {
+  if (window.crypto && typeof crypto.randomUUID === 'function') {
+    return crypto.randomUUID();
+  }
+  // Fallback for contexts without crypto.randomUUID (e.g. very old browsers).
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
+    const r = Math.random() * 16 | 0;
+    const v = c === 'x' ? r : (r & 0x3 | 0x8);
+    return v.toString(16);
+  });
+}
+
+// Rendered by the Apps Script Web App itself (script.google.com), not the
+// GitHub Pages copy of confirm.html — a customer-facing link shouldn't
+// surface the personal GitHub account the Pages site is deployed under.
+function buildConfirmPageUrl(token) {
+  return SHEET_WEBHOOK_URL + '?page=confirm&id=' + encodeURIComponent(token);
+}
+
+// Shared with the admin panel's SMS preview modal (getActiveSmsMessage()),
+// so both places send the exact same wording.
+function buildSmsMessageText(name, link) {
+  return name + '　様\n\n'
+    + 'この度はMYKITA Osakaへご来店いただき、誠にありがとうございます。\n'
+    + 'ご検討いただいた内容は以下のページよりご確認いただけます。\n\n'
+    + 'MYKITA Osaka\n\n'
+    + link;
+}
+
+function buildProspectSmsBody() {
+  const name = document.getElementById('f-name').value.trim();
+  const link = buildConfirmPageUrl(lastProspectConfirmToken);
+  return buildSmsMessageText(name, link);
+}
+
+function openProspectSms() {
+  const phone = document.getElementById('f-prospect-phone').value.trim();
+  if (!phone) return;
+  const body = buildProspectSmsBody();
+  window.location.href = 'sms:' + phone + (isIOSDevice() ? '&' : '?') + 'body=' + encodeURIComponent(body);
+}
+
+// ── THANKS-SCREEN FRAME ENTRY ──
+let thanksFrameRows = [{ id: 0 }];
+let thanksFrameSeq = 1;
+let lastSubmittedEmail = '';
+let lastSubmittedTimestamp = '';
+let lastProspectConfirmToken = '';
+
+function showThanksFrameEntry() {
+  document.getElementById('thanks-add-frame-wrap').style.display = 'none';
+  thanksFrameRows = [{ id: 0 }]; thanksFrameSeq = 1;
+  renderThanksFrameRowList();
+  document.getElementById('thanks-frame-entry').style.display = 'block';
+}
+
+function cancelThanksFrameEntry() {
+  document.getElementById('thanks-frame-entry').style.display = 'none';
+  document.getElementById('thanks-add-frame-wrap').style.display = 'block';
+}
+
+function renderThanksFrameRowList() {
+  const list = document.getElementById('thanks-frame-row-list');
+  const t = i18n[currentLang];
+  list.innerHTML = thanksFrameRows.map(row => `
+    <div class="frame-row" data-id="${row.id}">
+      <div class="ac-wrap" id="tframe-ac-wrap-${row.id}">
+        <input type="text" class="ac-input frame-input" id="tframe-input-${row.id}" autocomplete="off" placeholder="${t.framePlaceholder || 'Frame name'}">
+        <div class="ac-dropdown" id="tframe-dropdown-${row.id}"></div>
+      </div>
+      ${thanksFrameRows.length > 1 ? `<button type="button" class="frame-remove-btn" onclick="removeThanksFrameRow(${row.id})" aria-label="Remove">&times;</button>` : ''}
+    </div>
+  `).join('');
+  thanksFrameRows.forEach(row => initThanksFrameAutocomplete(row.id));
+}
+
+function addThanksFrameRow() {
+  if (thanksFrameRows.length >= 3) return;
+  thanksFrameRows.push({ id: thanksFrameSeq++ });
+  renderThanksFrameRowList();
+}
+
+function removeThanksFrameRow(id) {
+  if (thanksFrameRows.length <= 1) return;
+  thanksFrameRows = thanksFrameRows.filter(r => r.id !== id);
+  renderThanksFrameRowList();
+}
+
+function initThanksFrameAutocomplete(id) {
+  const wrap = document.getElementById('tframe-ac-wrap-' + id);
+  const input = document.getElementById('tframe-input-' + id);
+  const dropdown = document.getElementById('tframe-dropdown-' + id);
+  if (!wrap || !input || !dropdown) return;
+  function renderList(query) {
+    const q = query.trim().toLowerCase();
+    const base = q ? FRAME_NAMES.filter(n => n.toLowerCase().startsWith(q)) : FRAME_NAMES.slice(0, 200);
+    const filtered = [...base].sort((a, b) => a.localeCompare(b));
+    if (filtered.length === 0) { closeDropdown(); return; }
+    dropdown.innerHTML = filtered.slice(0, 100).map(n => `<div class="ac-item" data-value="${escapeHtml(n)}">${escapeHtml(n)}</div>`).join('');
+    wrap.classList.add('open');
+    dropdown.querySelectorAll('.ac-item').forEach(item => {
+      item.addEventListener('mousedown', e => { e.preventDefault(); input.value = item.dataset.value; closeDropdown(); });
+    });
+  }
+  function closeDropdown() { wrap.classList.remove('open'); dropdown.innerHTML = ''; }
+  input.addEventListener('input', () => renderList(input.value));
+  input.addEventListener('focus', () => { if (input.value) renderList(input.value); });
+  input.addEventListener('keydown', e => { if (e.key === 'Escape') { closeDropdown(); input.blur(); } });
+  document.addEventListener('click', e => { if (!wrap.contains(e.target)) closeDropdown(); });
+}
+
+async function submitThanksFrames() {
+  const names = thanksFrameRows.map(row => document.getElementById('tframe-input-' + row.id))
+    .filter(el => el && el.value.trim()).map(el => el.value.trim());
+  if (names.length === 0) return;
+
+  const btn = document.getElementById('lbl-thanks-frame-submit');
+  const status = document.getElementById('thanks-frame-status');
+  btn.disabled = true;
+  status.textContent = '…';
+
+  const qs = new URLSearchParams({
+    action: 'addframes',
+    email: lastSubmittedEmail,
+    timestamp: lastSubmittedTimestamp,
+    frameNames: names.join(', ')
+  });
+
+  try {
+    const res = await fetch(SHEET_WEBHOOK_URL + '?' + qs.toString());
+    const json = await res.json();
+    if (json.ok) {
+      purchasedFrames = names;
+      document.getElementById('thanks-frame-entry').style.display = 'none';
+      status.textContent = '';
+    } else {
+      status.textContent = 'Could not save. Please try again.';
+    }
+  } catch (err) {
+    status.textContent = 'Connection error. Please try again.';
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+function resetForm() {
+  const ta = document.getElementById('thanks-area');
+  const fa = document.getElementById('form-area');
+  const fea = document.getElementById('frame-entry-area');
+  const FADE_MS = 450;
+
+  ta.style.transition = `opacity ${FADE_MS}ms ease`;
+  ta.style.opacity = '0';
+  setTimeout(() => {
+    ta.style.display = 'none';
+    ta.style.transition = '';
+    ta.style.opacity = '';
+    fa.style.display = 'none';
+    resetFrameEntry();
+    fea.style.display = 'block';
+
+    document.getElementById('f-name').value = '';
+    document.getElementById('f-country-input').value = '';
+    document.getElementById('f-country').value = '';
+    const countryWrap = document.getElementById('country-ac-wrap');
+    if (countryWrap) countryWrap.dataset.countryCode = '';
+
+    const oldEmail = document.getElementById('f-email');
+    const newEmail = oldEmail.cloneNode(true);
+    newEmail.value = '';
+    oldEmail.parentNode.replaceChild(newEmail, oldEmail);
+    newEmail.addEventListener('input', updateSubmitState);
+    initEmailAutocomplete();
+
+    document.getElementById('f-optin-yes').checked = false;
+    document.getElementById('f-optin-no').checked = false;
+    document.getElementById('f-agree').checked = false;
+
+    ['f-name', 'f-country-input', 'f-email'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.classList.remove('err');
+    });
+    document.querySelectorAll('.err-msg').forEach(el => el.style.display = 'none');
+    updateSubmitState();
+
+    fea.style.transition = 'none';
+    fea.style.opacity = '0';
+    void fea.offsetWidth;
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    fea.style.transition = `opacity ${FADE_MS}ms ease`;
+    fea.style.opacity = '1';
+    setTimeout(() => { fea.style.transition = ''; fea.style.opacity = ''; }, FADE_MS);
+  }, FADE_MS);
+}
+
+// ── TEXT SCALE ──
+function initTextScale() {
+  const vw = window.innerWidth;
+  if (vw < 360) {
+    document.documentElement.style.fontSize = (vw / 360 * 16) + 'px';
+  }
+}
+window.addEventListener('resize', initTextScale);
+
+// ── LOGO TAP (admin access) ──
+function initLogoTap() {
+  const logo = document.getElementById('logo-tap');
+  logo.addEventListener('click', () => {
+    logoTapCount++;
+    clearTimeout(logoTapTimer);
+    if (logoTapCount >= LOGO_TAP_COUNT) {
+      logoTapCount = 0;
+      enterAdminMode();
+    } else {
+      logoTapTimer = setTimeout(() => { logoTapCount = 0; }, LOGO_TAP_WINDOW_MS);
+    }
+  });
+}
+
+// ── ADMIN MODE ──
+function checkAdminMode() {
+  const hash = window.location.hash;
+  const search = window.location.search;
+  if (hash === '#admin' || search.includes('mode=admin')) {
+    enterAdminMode();
+  }
+  initLogoTap();
+}
+
+function enterAdminMode() {
+  document.getElementById('app').style.display = 'none';
+  document.getElementById('admin-gate').style.display = 'block';
+  document.getElementById('admin-pw').focus();
+}
+
+async function checkPw() {
+  const pw = document.getElementById('admin-pw').value;
+  const eMsg = document.getElementById('e-pw');
+  if (!pw) { eMsg.style.visibility = 'visible'; return; }
+
+  const url = `${SHEET_WEBHOOK_URL}?action=admin&password=${encodeURIComponent(pw)}`;
+  try {
+    const res = await fetch(url);
+    const json = await res.json();
+    if (json.ok) {
+      adminPassword = pw;
+      adminRecords = json.records || [];
+      eMsg.style.visibility = 'hidden';
+      document.getElementById('admin-gate').style.display = 'none';
+      document.getElementById('admin-panel').style.display = 'block';
+      isAdmin = true;
+      populateMailTemplates();
+      renderAdminTable();
+      loadLensSectionSetting();
+    } else {
+      eMsg.style.visibility = 'visible';
+    }
+  } catch (err) {
+    eMsg.textContent = 'Connection error.';
+    eMsg.style.visibility = 'visible';
+  }
+}
+
+function logout() {
+  adminPassword = '';
+  adminRecords = [];
+  isAdmin = false;
+  document.getElementById('admin-panel').style.display = 'none';
+  document.getElementById('app').style.display = 'block';
+  document.getElementById('admin-pw').value = '';
+  document.getElementById('e-pw').style.visibility = 'hidden';
+  window.location.hash = '';
+}
+
+async function adminRequest(params) {
+  const qs = Object.entries({ action: 'admin', password: adminPassword, ...params })
+    .map(([k, v]) => `${encodeURIComponent(k)}=${encodeURIComponent(v)}`).join('&');
+  const res = await fetch(`${SHEET_WEBHOOK_URL}?${qs}`);
+  return res.json();
+}
+
+// ── LENS SECTION VISIBILITY SETTING ──
+async function loadLensSectionSetting() {
+  try {
+    const res = await fetch(`${SHEET_WEBHOOK_URL}?action=settings`);
+    const json = await res.json();
+    if (json.ok) {
+      hideLensSection = !!json.hideLensSection;
+      priceInputTaxExcluded = !!json.priceInputTaxExcluded;
+    }
+  } catch (err) {
+    hideLensSection = false; // can't confirm the setting — fail open (visible)
+    priceInputTaxExcluded = false; // fail open (default tax-included entry)
+  } finally {
+    lensSettingLoaded = true;
+    applyCustomerTypeToForm();
+    const cb = document.getElementById('setting-hide-lens');
+    if (cb) cb.checked = hideLensSection;
+    const priceCb = document.getElementById('setting-price-tax-excluded');
+    if (priceCb) priceCb.checked = priceInputTaxExcluded;
+    document.getElementById('lbl-prospect-frame-price-mode').textContent =
+      priceInputTaxExcluded ? i18n[currentLang].taxExcluded : i18n[currentLang].taxIncluded;
+  }
+}
+
+async function updateHideLensSetting() {
+  const cb = document.getElementById('setting-hide-lens');
+  const value = cb.checked;
+  cb.disabled = true;
+  try {
+    const json = await adminRequest({ op: 'setting', key: 'hideLensSection', value: String(value) });
+    if (json.ok) {
+      hideLensSection = value;
+      applyCustomerTypeToForm();
+    } else {
+      cb.checked = !value;
+      alert('Failed to update setting: ' + (json.error || 'unknown error'));
+    }
+  } catch (err) {
+    cb.checked = !value;
+    alert('Connection error.');
+  } finally {
+    cb.disabled = false;
+  }
+}
+
+async function updatePriceTaxExcludedSetting() {
+  const cb = document.getElementById('setting-price-tax-excluded');
+  const value = cb.checked;
+  cb.disabled = true;
+  try {
+    const json = await adminRequest({ op: 'setting', key: 'priceInputTaxExcluded', value: String(value) });
+    if (json.ok) {
+      priceInputTaxExcluded = value;
+      document.getElementById('lbl-prospect-frame-price-mode').textContent =
+        priceInputTaxExcluded ? i18n[currentLang].taxExcluded : i18n[currentLang].taxIncluded;
+    } else {
+      cb.checked = !value;
+      alert('Failed to update setting: ' + (json.error || 'unknown error'));
+    }
+  } catch (err) {
+    cb.checked = !value;
+    alert('Connection error.');
+  } finally {
+    cb.disabled = false;
+  }
+}
+
+async function refreshRecords() {
+  const btn = document.getElementById('refresh-btn');
+  btn.textContent = '…';
+  btn.disabled = true;
+  try {
+    const json = await adminRequest({ op: 'list' });
+    if (json.ok) { adminRecords = json.records || []; renderAdminTable(); }
+    else alert('Refresh failed: ' + json.error);
+  } catch (err) { alert('Connection error.'); }
+  finally { btn.textContent = '⟳ Refresh'; btn.disabled = false; }
+}
+
+function toggleSortOrder() {
+  sortNewest = !sortNewest;
+  const btn = document.getElementById('sort-btn');
+  btn.textContent = sortNewest ? 'Newest First ↓' : 'Oldest First ↑';
+  renderAdminTable();
+}
+
+function renderAdminTable() {
+  const filter = document.getElementById('csv-filter').value;
+  let records = [...adminRecords];
+  if (filter === 'yes') records = records.filter(r => r.optin === 'Yes');
+  if (filter === 'no') records = records.filter(r => r.optin !== 'Yes');
+
+  if (sortNewest) records.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+  else records.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
+
+  const rankMap = new Map();
+  records.forEach((r, i) => rankMap.set(r.row, i + 1));
+
+  const count = document.getElementById('admin-count');
+  count.textContent = `${records.length} record${records.length !== 1 ? 's' : ''}`;
+
+  const tbody = document.getElementById('admin-tbody');
+  const empty = document.getElementById('empty-state');
+
+  if (records.length === 0) {
+    tbody.innerHTML = '';
+    empty.style.display = 'block';
+    return;
+  }
+  empty.style.display = 'none';
+
+  tbody.innerHTML = records.map((r, i) => `
+    <tr data-row="${r.row}" class="${r.customerType === 'Prospect' ? 'row-prospect' : ''}">
+      <td style="color:var(--light); font-size:11px;">${rankMap.get(r.row)}</td>
+      <td style="font-size:11px; color:var(--mid);">${escapeHtml(formatTimestamp(r.timestamp))}</td>
+      <td style="font-size:11px; color:var(--mid);">${escapeHtml(r.customerType === 'Prospect' ? '' : (r.memberNo || ''))}</td>
+      <td>${escapeHtml(r.name)}</td>
+      <td>${escapeHtml(r.country)}</td>
+      <td><span class="email-link" style="color:#185FA5; cursor:pointer;" onclick="showEmailActions(event, ${r.row})">${escapeHtml(r.email)}</span></td>
+      <td style="font-size:11px; color:var(--mid); white-space:nowrap;">${escapeHtml(r.phone || '')}</td>
+      <td><span class="${r.optin === 'Yes' ? 'badge-yes' : 'badge-no'}">${escapeHtml(r.optin)}</span></td>
+      <td>${renderFollowupBadge(r)}</td>
+      <td><span class="${r.customerType === 'Prospect' ? 'badge-prospect' : 'badge-yes'}">${escapeHtml(r.customerType || 'Purchaser')}</span></td>
+      <td style="font-size:11px; color:var(--mid);">${renderFrameCell(r)}</td>
+      <td style="font-size:11px; color:var(--mid); white-space:nowrap;">${escapeHtml(r.customerType === 'Prospect' ? '' : (r.dob || ''))}</td>
+      <td style="text-transform:uppercase; font-size:11px; color:var(--mid);">${escapeHtml(r.lang)}</td>
+      <td style="font-size:11px; color:var(--mid); max-width:140px;">${escapeHtml(r.staffNotes || '')}</td>
+      <td><button class="row-delete-btn" onclick="deleteRecord(${r.row})" title="Delete this record" aria-label="Delete this record">&times;</button></td>
+    </tr>
+  `).join('');
+}
+
+// Parses one "Model/C###/Price" entry from considerFrame/Color (column R).
+// Mirrors parseFrameEntry_() in apps-script.gs — color ("C" + digits) and
+// price (plain digits) segments are both optional and recognized by
+// shape rather than position, so rows saved before price support (just
+// "Model" or "Model/C###") still parse correctly.
+function parseFrameEntry(entry) {
+  const segments = String(entry || '').split('/').map(s => s.trim()).filter(Boolean);
+  let model = segments.length ? segments[0] : '';
+  let color = '', price = '';
+  for (let i = 1; i < segments.length; i++) {
+    if (/^C\d+$/.test(segments[i])) { color = segments[i].slice(1); }
+    else if (/^\d+$/.test(segments[i])) { price = segments[i]; }
+  }
+  const needsCheck = model.endsWith('*');
+  if (needsCheck) { model = model.slice(0, -1).trim(); }
+  return { model, color, price, needsCheck };
+}
+
+function formatYenAmount(price) {
+  const n = parseInt(price, 10);
+  if (!price || isNaN(n)) return '';
+  return '¥' + String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ',') + '(税込)';
+}
+
+function renderFrameCell(r) {
+  if (r.customerType === 'Prospect') {
+    const combined = String(r.considerFrameColor || '').split(',').map(s => s.trim()).filter(Boolean);
+    const frameText = combined.length
+      ? `<span style="font-style:italic;">${escapeHtml('Considering: ' + combined.map(entry => {
+          const { model, color, price, needsCheck } = parseFrameEntry(entry);
+          const priceText = formatYenAmount(price);
+          return [model + (needsCheck ? '*' : '') + (color ? '　／C' + color : ''), priceText].filter(Boolean).join('　');
+        }).join(', '))}</span>`
+      : '';
+    // memberNo doubles as the prospect's confirm token (column B) — see the
+    // header comment in apps-script.gs — so it's what buildConfirmPageUrl()
+    // needs to reconstruct the same link sent to the customer via SMS.
+    const linkBtn = r.memberNo
+      ? ` <span class="email-link" style="color:#185FA5; cursor:pointer;" onclick="showLinkActions(event, ${r.row})" title="Confirm page link">&#128279;</span>`
+      : '';
+    return frameText + linkBtn;
+  }
+  return escapeHtml(r.frameNames || '');
+}
+
+function formatTimestamp(ts) {
+  if (!ts) return '';
+  const d = new Date(ts);
+  if (isNaN(d)) return ts;
+  // e.g. "Fri Jun 12 2026 18:15"
+  return d.toString().replace(/:\d{2}\s+GMT.*$/, '');
+}
+
+// ── FOLLOW-UP ──
+function renderFollowupBadge(r) {
+  if (r.optin !== 'Yes') return '<span class="followup-badge followup-na">&mdash;</span>';
+  if (r.followupSent) return `<button class="followup-badge followup-done" onclick="toggleFollowupSent(${r.row})" title="Mark as not sent">&#10003; Sent</button>`;
+  const sentAt = new Date(r.timestamp).getTime();
+  let label, cls;
+  if (isNaN(sentAt)) { label = 'Pending'; cls = 'followup-pending'; }
+  else {
+    const elapsed = Date.now() - sentAt;
+    if (elapsed >= FOLLOWUP_WINDOW_MS) { label = 'Overdue'; cls = 'followup-overdue'; }
+    else if (elapsed >= FOLLOWUP_WINDOW_MS - FOLLOWUP_DUE_SOON_MS) { label = 'Due Soon'; cls = 'followup-due'; }
+    else { label = 'Pending'; cls = 'followup-pending'; }
+  }
+  return `<button class="followup-badge ${cls}" onclick="toggleFollowupSent(${r.row})" title="Mark as sent">${label}</button>`;
+}
+
+async function toggleFollowupSent(row) {
+  const record = adminRecords.find(r => r.row === row);
+  if (!record) return;
+  const newSent = !record.followupSent;
+  record.followupSent = newSent;
+  renderAdminTable();
+  try {
+    const json = await adminRequest({ op: 'followup', row: row, sent: String(newSent) });
+    if (!json.ok) {
+      record.followupSent = !newSent;
+      renderAdminTable();
+      alert('Failed to update follow-up status. Please try again.');
+    }
+  } catch (err) {
+    record.followupSent = !newSent;
+    renderAdminTable();
+    alert('Connection error. Please try again.');
+  }
+}
+
+// ── DELETE ──
+async function deleteRecord(row) {
+  if (!confirm('Delete this registration? This cannot be undone.')) return;
+  try {
+    const json = await adminRequest({ op: 'delete', row: row });
+    if (json.ok) {
+      adminRecords = adminRecords.filter(r => r.row !== row);
+      renderAdminTable();
+    } else {
+      alert('Delete failed: ' + json.error);
+    }
+  } catch (err) { alert('Connection error.'); }
+}
+
+// ── CSV ──
+function downloadCSV() {
+  const filter = document.getElementById('csv-filter').value;
+  let records = [...adminRecords];
+  if (filter === 'yes') records = records.filter(r => r.optin === 'Yes');
+  if (filter === 'no') records = records.filter(r => r.optin !== 'Yes');
+
+  const header = ['No.', 'Timestamp', 'ID', 'Name', 'Country', 'Email', 'Email Opt-in', 'Language', 'Type', 'Purchased', 'Staff Notes'];
+  const rows = records.map((r, i) => [
+    i + 1,
+    r.timestamp,
+    `"${String(r.customerType === 'Prospect' ? '' : (r.memberNo || '')).replace(/"/g, '""')}"`,
+    `"${String(r.name).replace(/"/g, '""')}"`,
+    `"${String(r.country).replace(/"/g, '""')}"`,
+    r.email,
+    r.optin,
+    String(r.lang).toUpperCase(),
+    r.customerType || 'Purchaser',
+    `"${String(r.customerType === 'Prospect' ? (r.considerFrameColor || '') : (r.frameNames || '')).replace(/"/g, '""')}"`,
+    `"${String(r.staffNotes || '').replace(/"/g, '""')}"`
+  ]);
+
+  const csv = [header, ...rows].map(r => r.join(',')).join('\n');
+  const blob = new Blob(['﻿' + csv], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `mykita-registrations-${new Date().toISOString().slice(0,10)}.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+// ── EMAIL ACTIONS ──
+function showEmailActions(e, row) {
+  e.stopPropagation();
+  activeEmailRow = row;
+  activeEmailEl = e.target;
+  const menu = document.getElementById('email-actions-menu');
+  menu.style.display = 'block';
+  const rect = e.target.getBoundingClientRect();
+  menu.style.left = rect.left + 'px';
+  menu.style.top = (rect.bottom + 4 + window.scrollY) + 'px';
+}
+
+document.addEventListener('click', e => {
+  const menu = document.getElementById('email-actions-menu');
+  if (menu && !menu.contains(e.target) && e.target !== activeEmailEl) {
+    menu.style.display = 'none';
+  }
+  const linkMenu = document.getElementById('link-actions-menu');
+  if (linkMenu && !linkMenu.contains(e.target) && e.target !== activeLinkEl) {
+    linkMenu.style.display = 'none';
+  }
+});
+
+// ── CONFIRM-PAGE LINK ACTIONS (prospect rows) ──
+let activeLinkRow = null;
+let activeLinkEl = null;
+
+function showLinkActions(e, row) {
+  e.stopPropagation();
+  activeLinkRow = row;
+  activeLinkEl = e.target;
+  const menu = document.getElementById('link-actions-menu');
+  menu.style.display = 'block';
+  const rect = e.target.getBoundingClientRect();
+  menu.style.left = rect.left + 'px';
+  menu.style.top = (rect.bottom + 4 + window.scrollY) + 'px';
+}
+
+function getActiveConfirmLink() {
+  const record = adminRecords.find(r => r.row === activeLinkRow);
+  if (!record || !record.memberNo) return '';
+  return buildConfirmPageUrl(record.memberNo);
+}
+
+function copyConfirmLink() {
+  const link = getActiveConfirmLink();
+  if (!link) return;
+  navigator.clipboard.writeText(link).then(() => {
+    document.getElementById('link-actions-menu').style.display = 'none';
+  });
+}
+
+function openConfirmLink() {
+  const link = getActiveConfirmLink();
+  document.getElementById('link-actions-menu').style.display = 'none';
+  if (!link) return;
+  window.open(link, '_blank', 'noopener');
+}
+
+function getActiveSmsMessage() {
+  const record = adminRecords.find(r => r.row === activeLinkRow);
+  if (!record) return '';
+  return buildSmsMessageText(record.name || '', buildConfirmPageUrl(record.memberNo));
+}
+
+function showSmsModal() {
+  document.getElementById('link-actions-menu').style.display = 'none';
+  const record = adminRecords.find(r => r.row === activeLinkRow);
+  if (!record) return;
+  document.getElementById('sms-modal-recipient').textContent = record.phone || record.name || '';
+  document.getElementById('sms-modal-textarea').value = getActiveSmsMessage();
+  document.getElementById('sms-modal-overlay').classList.add('open');
+}
+
+function closeSmsModal() { document.getElementById('sms-modal-overlay').classList.remove('open'); }
+function closeSmsModalOnOverlay(e) { if (e.target === e.currentTarget) closeSmsModal(); }
+
+function copySmsModalText() {
+  const text = document.getElementById('sms-modal-textarea').value;
+  const btn = document.getElementById('sms-modal-copy-btn');
+  navigator.clipboard.writeText(text).then(() => {
+    btn.textContent = 'Copied!';
+    setTimeout(() => { btn.textContent = 'Copy'; }, 1500);
+  });
+}
+
+function isIOSDevice() {
+  return /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+}
+
+function openSmsFromModal() {
+  const record = adminRecords.find(r => r.row === activeLinkRow);
+  const phone = ((record && record.phone) || '').trim();
+  if (!phone) return;
+  const body = document.getElementById('sms-modal-textarea').value;
+  window.location.href = 'sms:' + phone + (isIOSDevice() ? '&' : '?') + 'body=' + encodeURIComponent(body);
+}
+
+function copyEmailAddress() {
+  const record = adminRecords.find(r => r.row === activeEmailRow);
+  if (!record) return;
+  navigator.clipboard.writeText(record.email).then(() => {
+    document.getElementById('email-actions-menu').style.display = 'none';
+  });
+}
+
+// ── MAIL MODAL ──
+function getStaffName() {
+  return (document.getElementById('mail-staff-name') || {}).value || localStorage.getItem('mykita_staff_name') || '';
+}
+function saveStaffName() {
+  const v = (document.getElementById('mail-staff-name') || {}).value || '';
+  localStorage.setItem('mykita_staff_name', v);
+}
+
+const MAIL_TEMPLATES = [
+  {
+    id: 'thankyou',
+    label: 'Thank You (Visit)',
+    subject: (r) => 'Thank You for Visiting/MYKITA Osaka',
+    body: (r) => {
+      const staff = getStaffName();
+      let when = 'the other day';
+      if (r.timestamp) {
+        const ts = new Date(r.timestamp);
+        const now = new Date();
+        const tsDay = new Date(ts.getFullYear(), ts.getMonth(), ts.getDate()).getTime();
+        const todayDay = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+        const diff = todayDay - tsDay;
+        if (diff === 0) when = 'today';
+        else if (diff === 86400000) when = 'yesterday';
+      }
+      return `Dear ${r.name}-san,\n\nThank you very much for visiting our store ${when}.\nIt was a pleasure to meet you.\n\nWe hope you will enjoy your new MYKITA glasses.\nShould you require any maintenance or adjustments, please feel free to visit our store at any time. We would be delighted to assist you.\n\nWe look forward to welcoming you again on your next visit to Japan.\n\n\nKind regards,\n${staff}\nMYKITA Osaka\nGoogle Map Link | https://share.google/mw7yBJWFXs3xLcj1Y\n\nGrish Corporation | 2F PARCO 1-8-3 Shinsaibashisuji Chuou-ku | Osaka | 542-0085 | JP\n+81-(0)6 6563 7747\nosaka@mykita.com | www.mykita.com`;
+    }
+  },
+];
+
+let mailTargetRecord = null;
+
+function populateMailTemplates() {
+  const sel = document.getElementById('mail-template-select');
+  if (!sel) return;
+  sel.innerHTML = MAIL_TEMPLATES.map(t => `<option value="${t.id}">${escapeHtml(t.label)}</option>`).join('');
+}
+
+function composeFromEmailActions() {
+  document.getElementById('email-actions-menu').style.display = 'none';
+  const record = adminRecords.find(r => r.row === activeEmailRow);
+  if (!record) return;
+  mailTargetRecord = record;
+  document.getElementById('mail-recipient').textContent = record.email;
+  const staffInput = document.getElementById('mail-staff-name');
+  if (staffInput && !staffInput.value) staffInput.value = localStorage.getItem('mykita_staff_name') || '';
+  applyMailTemplate();
+  document.getElementById('mail-modal-overlay').classList.add('open');
+}
+
+function applyMailTemplate() {
+  if (!mailTargetRecord) return;
+  const sel = document.getElementById('mail-template-select');
+  const tmpl = MAIL_TEMPLATES.find(t => t.id === sel.value);
+  if (!tmpl) return;
+  document.getElementById('mail-subject').value = tmpl.subject(mailTargetRecord);
+  document.getElementById('mail-textarea').value = tmpl.body(mailTargetRecord);
+}
+
+function closeMailModal() { document.getElementById('mail-modal-overlay').classList.remove('open'); }
+function closeMailModalOnOverlay(e) { if (e.target === e.currentTarget) closeMailModal(); }
+
+function copyMailText() {
+  const subject = document.getElementById('mail-subject').value;
+  const body = document.getElementById('mail-textarea').value;
+  const text = subject ? `Subject: ${subject}\n\n${body}` : body;
+  const btn = document.getElementById('mail-copy-btn');
+  navigator.clipboard.writeText(text).then(() => {
+    btn.textContent = 'Copied!';
+    setTimeout(() => { btn.textContent = 'Copy'; }, 1500);
+  });
+}
+
+async function copyMailImage() {
+  const btn = document.getElementById('mail-image-copy-btn');
+  const originalLabel = btn.textContent;
+  try {
+    const img = document.getElementById('mail-banner-img');
+    const resp = await fetch(img.src);
+    const blob = await resp.blob();
+    // Draw to canvas and export as PNG — the clipboard image type most mail
+    // clients (and Safari) reliably accept; also flattens an animated GIF to
+    // its first frame, which is what pasting into an email needs anyway.
+    const bitmap = await createImageBitmap(blob);
+    const canvas = document.createElement('canvas');
+    canvas.width = bitmap.width;
+    canvas.height = bitmap.height;
+    canvas.getContext('2d').drawImage(bitmap, 0, 0);
+    const pngBlob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
+    await navigator.clipboard.write([new ClipboardItem({ 'image/png': pngBlob })]);
+    btn.textContent = 'Copied!';
+  } catch (e) {
+    btn.textContent = 'Copy failed';
+  } finally {
+    setTimeout(() => { btn.textContent = originalLabel; }, 1500);
+  }
+}
+
+function openInMailClient() {
+  if (!mailTargetRecord) return;
+  const to = mailTargetRecord.email;
+  const subject = document.getElementById('mail-subject').value;
+  const body = document.getElementById('mail-textarea').value;
+  const mailto = `mailto:${encodeURIComponent(to)}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+  window.location.href = mailto;
+}
+
+// ── UTILS ──
+function escapeHtml(str) {
+  return String(str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+
+// ── INIT ──
+setLang('en');
+renderFrameRowList();
+initAutocomplete();
+initAddressPrefAutocomplete();
+initEmailAutocomplete();
+renderProspectFrameRowList();
+initPhoneCodeSelect();
+checkAdminMode();
+updateSubmitState();
+initTextScale();
+loadLensSectionSetting();
+</script>
+</body>
+</html>
