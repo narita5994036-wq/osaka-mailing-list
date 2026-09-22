@@ -36,10 +36,11 @@ sim: generate
 	xcrun simctl boot "$(SIM_NAME)" 2>/dev/null || true
 	# "open -a Simulator" relies on Launch Services having indexed the app
 	# by name, which a manually-installed (non-App-Store) Xcode that's
-	# never been opened via Finder/GUI may not have done yet — open the
-	# actual bundle path instead, resolved from whichever Xcode is
-	# currently selected so this isn't hardcoded to /Applications.
-	open "$$(xcode-select -p)/Applications/Simulator.app"
+	# never been opened via Finder/GUI may not have done yet. The bundle's
+	# exact path under Xcode.app has also moved between Xcode versions, so
+	# search for it under the currently-selected Xcode rather than
+	# hardcoding a path that may not match this version's layout.
+	open "$$(find "$$(xcode-select -p)/.." -maxdepth 4 -iname 'Simulator.app' -print -quit)"
 	xcrun simctl install booted "$(SIM_APP_PATH)"
 	xcrun simctl launch booted $(SIM_BUNDLE_ID)
 
