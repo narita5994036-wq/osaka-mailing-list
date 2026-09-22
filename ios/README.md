@@ -85,16 +85,18 @@ these in one at a time without breaking the others.
 
 ## 3. App icon
 
-`MykitaWarranty/AppIcon-source-512.png` and the copy already wired into
-`Assets.xcassets/AppIcon.appiconset/icon-1024.png` are both the existing
-512×512 PWA icon — a placeholder so the project isn't empty. It's too
-small and (likely) has transparency, which Apple's App Icon slot doesn't
-allow. Before you distribute a build, replace
-`Assets.xcassets/AppIcon.appiconset/icon-1024.png` with a proper
-**1024×1024, no alpha channel** icon (export one from the original artwork
-if you have it at higher res; I couldn't resize it myself in this
-environment — no image tools available here), keeping the same filename
-(or update the name in that folder's `Contents.json` to match).
+`Assets.xcassets/AppIcon.appiconset/icon-1024.png` is the existing PWA icon
+(`MykitaWarranty/AppIcon-source-512.png`, originally 512×512 with no alpha
+channel — good, since Apple's App Icon slot doesn't allow transparency),
+nearest-neighbor upscaled to a real 1024×1024 file so the asset catalog
+compiles (Xcode's `actool` hard-errors — not just warns — on a size
+mismatch here; I wrote a small pure-Python PNG scaler for this since no
+image tools were available in the environment I built this in). It's
+functional but blurry up close, being a 2× pixel-doubled scale-up rather
+than real high-resolution artwork. Before you actually distribute a build,
+replace it with a proper 1024×1024 export from the original artwork if you
+have it at higher res, keeping the same filename (or update the name in
+that folder's `Contents.json` to match).
 
 ## 4. Build and run in the Simulator (no device/signing needed yet)
 
