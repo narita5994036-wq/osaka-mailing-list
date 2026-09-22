@@ -34,7 +34,12 @@ sim: generate
 		CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO \
 		build
 	xcrun simctl boot "$(SIM_NAME)" 2>/dev/null || true
-	open -a Simulator
+	# "open -a Simulator" relies on Launch Services having indexed the app
+	# by name, which a manually-installed (non-App-Store) Xcode that's
+	# never been opened via Finder/GUI may not have done yet — open the
+	# actual bundle path instead, resolved from whichever Xcode is
+	# currently selected so this isn't hardcoded to /Applications.
+	open "$$(xcode-select -p)/Applications/Simulator.app"
 	xcrun simctl install booted "$(SIM_APP_PATH)"
 	xcrun simctl launch booted $(SIM_BUNDLE_ID)
 
