@@ -23,10 +23,16 @@ SIM_BUNDLE_ID := com.mykita.warranty
 generate:
 	xcodegen generate
 
+# Simulator apps don't run on a real device, so they don't need real code
+# signing at all — CODE_SIGN_STYLE: Automatic (project.yml) otherwise tries
+# to resolve a signing identity/team and fails the build when none is
+# configured yet. archive/ipa below are unaffected and still sign for real.
 sim: generate
 	xcodebuild -project $(PROJECT) -scheme $(SCHEME) \
 		-destination 'platform=iOS Simulator,name=$(SIM_NAME)' \
-		-derivedDataPath $(BUILD_DIR) build
+		-derivedDataPath $(BUILD_DIR) \
+		CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO \
+		build
 	xcrun simctl boot "$(SIM_NAME)" 2>/dev/null || true
 	open -a Simulator
 	xcrun simctl install booted "$(SIM_APP_PATH)"
