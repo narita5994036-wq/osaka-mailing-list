@@ -1,0 +1,42 @@
+name: MykitaWarranty
+options:
+  bundleIdPrefix: com.mykita
+  deploymentTarget:
+    iOS: "15.0"
+  createIntermediateGroups: true
+targets:
+  MykitaWarranty:
+    type: application
+    platform: iOS
+    sources:
+      - path: MykitaWarranty
+        excludes:
+          - "AppIcon-source-512.png"
+      - path: MykitaWarranty/Resources
+        type: folder
+        buildPhase: resources
+    info:
+      path: Generated/Info.plist
+      properties:
+        CFBundleDisplayName: MYKITA JAPAN
+        UILaunchScreen: {}
+        UISupportedInterfaceOrientations:
+          - UIInterfaceOrientationPortrait
+        UISupportedInterfaceOrientations~ipad:
+          - UIInterfaceOrientationPortrait
+          - UIInterfaceOrientationPortraitUpsideDown
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.mykita.warranty
+        # Left as the target name (no spaces) on purpose — this becomes the
+        # .app bundle's filename, which build scripts below reference by
+        # path. CFBundleDisplayName above ("MYKITA JAPAN") is what actually
+        # shows under the icon on the Home Screen; they're independent.
+        # Fill in your Apple Developer Program Team ID (Xcode > Settings >
+        # Accounts, or developer.apple.com > Membership), or leave blank and
+        # pass DEVELOPMENT_TEAM=XXXXXXXXXX on the xcodebuild command line
+        # instead — see ios/README.md.
+        DEVELOPMENT_TEAM: ""
+        CODE_SIGN_STYLE: Automatic
+        TARGETED_DEVICE_FAMILY: "1" # iPhone only
+        SWIFT_VERSION: "5.0"

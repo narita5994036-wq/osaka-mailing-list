@@ -8,36 +8,45 @@ instantly and works even with a flaky connection; only the actual
 submit/admin network calls need connectivity, exactly as they do on the web
 today.
 
-This folder has the Swift source and the resources to bundle — not a
-`.xcodeproj`. Hand-writing Xcode's project file reliably without being able
-to open it in Xcode myself isn't safe (a bad `.pbxproj` shows up as "cannot
-open a project with a missing or damaged file", and I can't verify it), so
-the steps below have you create the project shell in Xcode (a few clicks)
-and then drop these files in.
+This folder has the Swift source, the resources to bundle, and everything
+needed to build entirely from **Terminal — no Xcode GUI required at any
+step**. You still need Xcode.app installed (its SDKs and code-signing
+tools are the only source of those on macOS — nothing else, including
+Homebrew, can substitute), but you never have to open it. Edit the Swift
+files in whatever editor you like (VS Code, etc.); `project.yml` +
+[XcodeGen](https://github.com/yonaskolb/XcodeGen) generates the
+`.xcodeproj` on demand, and the `Makefile` wraps the `xcodebuild` commands
+for building, archiving, and exporting a signed `.ipa`.
 
-## 1. Create the project
+(If you ever do want to open this in Xcode's GUI instead — e.g. to use the
+debugger or Interface Builder-style previews — `make generate` still
+produces a completely normal `MykitaWarranty.xcodeproj` you can just
+double-click open. The two approaches aren't exclusive.)
 
-1. Xcode → File → New → Project → **iOS → App**.
-2. Product Name: `MykitaWarranty`. Interface: **SwiftUI**. Language: **Swift**.
-3. Uncheck "Include Tests" (not needed for this).
-4. Save it at `ios/` inside this repo — i.e. so the result is
-   `ios/MykitaWarranty/MykitaWarranty.xcodeproj`. Xcode will create a
-   `MykitaWarranty/MykitaWarranty/` source folder next to it, matching the
-   layout already in this repo.
+## 1. One-time setup
 
-## 2. Replace/add the source files
+```bash
+xcode-select -p                        # confirm Xcode.app itself (not just
+                                        # Command Line Tools) is selected —
+                                        # should print .../Xcode.app/...
+sudo xcodebuild -license accept        # if you haven't accepted it yet
+brew install xcodegen
+```
 
-Xcode's template already created `MykitaWarrantyApp.swift` and
-`ContentView.swift` — delete those two (Move to Trash) and drag in these
-five files from this repo instead (check "Copy items if needed" is **off**
-if you want them to stay tracked at their current path, or **on** if you'd
-rather Xcode own a copy — either works, just be consistent with git):
+## 2. Generate the Xcode project
 
-- `MykitaWarranty/MykitaWarrantyApp.swift`
-- `MykitaWarranty/ContentView.swift`
-- `MykitaWarranty/WebView.swift`
-- `MykitaWarranty/Store.swift`
-- `MykitaWarranty/StorePickerView.swift`
+```bash
+cd ios/MykitaWarranty
+make generate
+```
+
+This reads `project.yml` and produces `MykitaWarranty.xcodeproj` (not
+committed to git — regenerate it any time with this command; see
+`.gitignore`). It already wires up all five Swift files, the bundled
+`Resources/` folder (as a proper folder reference, so `index.html`'s
+relative paths to `assets/` and `icons/` resolve — this replaces the
+"drag in and choose Create folder references" step a GUI setup would
+need), and `Assets.xcassets/AppIcon.appiconset`.
 
 ### Multi-store setup (Tokyo / Osaka / Fukuoka)
 
@@ -74,51 +83,58 @@ URL regardless of this app's per-store config. A store left as `nil` in
 `Store.swift` just falls back to that same default too, so you can fill
 these in one at a time without breaking the others.
 
-## 3. Add the bundled web content
+## 3. App icon
 
-Drag the `MykitaWarranty/Resources/` folder (from this repo, the one
-containing `index.html`, `assets/`, `icons/`) into the Xcode project
-navigator, next to the Swift files.
-
-**Important:** when Xcode asks, choose **"Create folder references"**, not
-"Create groups". A folder reference (shown in blue in Xcode) preserves the
-`Resources/assets/...` and `Resources/icons/...` subfolder structure at
-runtime, which `WebView.swift` and `index.html`'s relative paths both
-depend on — a plain group would flatten everything into the bundle root and
-break the image references.
-
-## 4. App icon
-
-`MykitaWarranty/AppIcon-source-512.png` is the existing 512×512 PWA icon —
-not a ready-made asset catalog entry, just a source image to drag into
-Xcode's own auto-generated `Assets.xcassets → AppIcon` slot (Xcode 14+
-projects use a single 1024×1024 slot; it'll scale down for you). It's too
+`MykitaWarranty/AppIcon-source-512.png` and the copy already wired into
+`Assets.xcassets/AppIcon.appiconset/icon-1024.png` are both the existing
+512×512 PWA icon — a placeholder so the project isn't empty. It's too
 small and (likely) has transparency, which Apple's App Icon slot doesn't
-allow — before you distribute a build, replace it with a proper
+allow. Before you distribute a build, replace
+`Assets.xcassets/AppIcon.appiconset/icon-1024.png` with a proper
 **1024×1024, no alpha channel** icon (export one from the original artwork
 if you have it at higher res; I couldn't resize it myself in this
-environment — no image tools available here).
+environment — no image tools available here), keeping the same filename
+(or update the name in that folder's `Contents.json` to match).
 
-## 5. A few target settings worth setting explicitly
+## 4. Build and run in the Simulator (no device/signing needed yet)
 
-In the target's **Info** tab (or General → Deployment Info):
-- **Display Name**: `MYKITA JAPAN` (matches `manifest.json`'s `short_name`)
-- **Supported interface orientations**: Portrait only (the web layout is a
-  fixed-width mobile form; landscape isn't designed for)
-- **iOS Deployment Target**: 15.0 or later (needed for `WKDownloadDelegate`,
-  used for the admin panel's CSV export — see `WebView.swift`)
+```bash
+make sim
+```
 
-## 6. Signing, for internal-only distribution
+Builds, installs, and launches the app in the iOS Simulator — good for
+checking the multi-store picker, layout, etc. before dealing with a real
+device or code signing at all. `SIM_NAME` defaults to "iPhone 16"; override
+with e.g. `make sim SIM_NAME="iPhone 15"` to match a Simulator you actually
+have installed (Xcode → Settings → Platforms, or `xcrun simctl list
+devices` to see what's available).
 
-Since this is staff-only (not the App Store):
-- **Xcode → Signing & Capabilities**: sign with your Apple Developer Program
-  team, automatic signing is fine.
-- Distribute via **Ad Hoc** (register store devices' UDIDs, export an .ipa,
-  install via Apple Configurator or a service like TestFlight/Diawi) or
-  **TestFlight internal testing** (up to 100 people on your team, no App
-  Review needed for internal testers) — TestFlight internal is usually the
-  easier ongoing workflow if staff already have Apple IDs added to your
-  Developer team.
+## 5. Build for a real device / distribute, for internal-only use
+
+Since this is staff-only (not the App Store), sign with your Apple
+Developer Program team:
+
+```bash
+make archive TEAM_ID=YOUR_TEAM_ID     # signed .xcarchive, device build
+make ipa TEAM_ID=YOUR_TEAM_ID          # → build/ipa/MykitaWarranty.ipa
+```
+
+(Find your Team ID at developer.apple.com → Membership, or omit `TEAM_ID`
+and instead fill in `DEVELOPMENT_TEAM` directly in `project.yml` once so
+you don't have to pass it every time.)
+
+`ExportOptions.plist`'s `method` defaults to `development` (installs on
+devices registered to your team — simplest for a handful of store
+devices; register each device's UDID at developer.apple.com first). For
+wider internal distribution without physically cabling every device,
+change `method` to `ad-hoc` in `ExportOptions.plist` and distribute the
+resulting `.ipa` via a service like Diawi, or set up **TestFlight internal
+testing** instead (up to 100 people on your team, no App Review for
+internal testers) — TestFlight is usually the easier ongoing workflow if
+staff already have Apple IDs added to your Developer team; uploading to it
+still goes through `xcodebuild -exportArchive` with `method: app-store`
+plus `xcrun altool` (or `xcrun notarytool`/Transporter) to actually upload,
+which I can help script once you're at that stage.
 
 ## What I could not verify (please test on-device and report back)
 
@@ -126,6 +142,13 @@ I wrote and reasoned through this carefully, but I'm working in a Linux
 environment with no Xcode/Simulator/device access, so none of this has
 actually been built or run. Please build it on your Mac and check:
 
+0. **`make generate` / `make sim` themselves** — I validated `project.yml`
+   as well-formed YAML and dry-ran the `Makefile`'s recipes (`make -n`) to
+   confirm the commands they'd run are what I intended, but I have neither
+   `xcodegen` nor `xcodebuild` available here, so I couldn't actually
+   generate the `.xcodeproj` or build it. If `xcodegen generate` errors,
+   paste me the message — XcodeGen's errors are usually specific enough
+   (a bad path, an unrecognized key) that I can fix `project.yml` directly.
 1. **SMS compose** (prospect registration's "Send SMS" button, and the
    admin panel's SMS Message modal → Open SMS) — should hand off to the
    Messages app pre-filled. This is the most standard case and most likely
