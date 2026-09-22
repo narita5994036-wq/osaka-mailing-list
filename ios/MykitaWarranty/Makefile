@@ -14,7 +14,7 @@ PROJECT := MykitaWarranty.xcodeproj
 BUILD_DIR := build
 ARCHIVE_PATH := $(BUILD_DIR)/MykitaWarranty.xcarchive
 IPA_DIR := $(BUILD_DIR)/ipa
-SIM_NAME ?= iPhone 16
+SIM_NAME ?= iPhone 17
 SIM_APP_PATH := $(BUILD_DIR)/Build/Products/Debug-iphonesimulator/MykitaWarranty.app
 SIM_BUNDLE_ID := com.mykita.warranty
 
