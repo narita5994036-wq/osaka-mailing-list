@@ -12,19 +12,17 @@ targets:
       - path: MykitaWarranty
         excludes:
           - "AppIcon-source-512.png"
-          # Resources/ is added explicitly below as a single folder
+          # WebAssets/ is added explicitly below as a single folder
           # reference (so index.html's relative asset paths resolve).
           # Without this exclude, XcodeGen's recursive scan of this
           # top-level `MykitaWarranty` path ALSO picks up every file
-          # under Resources/ individually, copying each one twice into
+          # under WebAssets/ individually, copying each one twice into
           # the bundle (once flattened to the bundle root as its own
-          # Copy Bundle Resources entry, once nested under Resources/ via
-          # the folder reference) — a duplication that was intermittently
-          # tripping up `codesign` on a physical-device build with
-          # "code object is not signed at all" against a different
-          # resource file each run.
-          - "Resources/**"
-      - path: MykitaWarranty/Resources
+          # Copy Bundle Resources entry, once nested under WebAssets/ via
+          # the folder reference below) — harmless on its own, but worth
+          # avoiding.
+          - "WebAssets/**"
+      - path: MykitaWarranty/WebAssets
         type: folder
         buildPhase: resources
     info:
