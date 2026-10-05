@@ -5,6 +5,7 @@
 # Usage:
 #   make generate          Regenerate MykitaWarranty.xcodeproj from project.yml
 #   make sim                Build + install + launch in the iOS Simulator
+#   make device [TEAM_ID=XXXX] Build + install + launch on a connected iPhone
 #   make archive             Build a signed .xcarchive (device build)
 #   make ipa TEAM_ID=XXXX     Export a distributable .ipa from that archive
 #   make clean                Remove all generated/build output
@@ -16,9 +17,13 @@ ARCHIVE_PATH := $(BUILD_DIR)/MykitaWarranty.xcarchive
 IPA_DIR := $(BUILD_DIR)/ipa
 SIM_NAME ?= iPhone 17
 SIM_APP_PATH := $(BUILD_DIR)/Build/Products/Debug-iphonesimulator/MykitaWarranty.app
-SIM_BUNDLE_ID := com.mykita.warranty
+BUNDLE_ID := com.mykita.warranty
+# From `xcrun devicectl list devices` — override with e.g.
+# `make device DEVICE_ID=...` if you connect a different iPhone.
+DEVICE_ID ?= 00008110-0009054A1E47801E
+DEVICE_APP_PATH := $(BUILD_DIR)/Build/Products/Debug-iphoneos/MykitaWarranty.app
 
-.PHONY: generate sim archive ipa clean
+.PHONY: generate sim device archive ipa clean
 
 generate:
 	xcodegen generate
@@ -42,7 +47,27 @@ sim: generate
 	# hardcoding a path that may not match this version's layout.
 	open "$$(find "$$(xcode-select -p)/.." -maxdepth 4 -iname 'Simulator.app' -print -quit)"
 	xcrun simctl install booted "$(SIM_APP_PATH)"
-	xcrun simctl launch booted $(SIM_BUNDLE_ID)
+	xcrun simctl launch booted $(BUNDLE_ID)
+
+# Builds, installs, and launches on a connected, trusted, Developer-Mode-
+# enabled iPhone — unlike sim, this needs real signing. TEAM_ID is optional:
+# -allowProvisioningUpdates lets xcodebuild ask your signed-in Apple ID
+# (Xcode > Settings > Accounts) to register the device and create a
+# certificate/profile itself, which works fine with just one team signed in
+# (e.g. a free Apple ID's "Personal Team") without knowing its Team ID at
+# all. Pass TEAM_ID explicitly only if you have more than one team and need
+# to disambiguate. Run `xcrun devicectl list devices` to confirm DEVICE_ID
+# matches your connected iPhone (State should be "available" or
+# "connected", Reality blank — not "simulated").
+device: generate
+	xcodebuild -project $(PROJECT) -scheme $(SCHEME) \
+		-destination 'platform=iOS,id=$(DEVICE_ID)' \
+		-derivedDataPath $(BUILD_DIR) \
+		-allowProvisioningUpdates \
+		$(if $(TEAM_ID),DEVELOPMENT_TEAM=$(TEAM_ID),) \
+		build
+	xcrun devicectl device install app --device $(DEVICE_ID) "$(DEVICE_APP_PATH)"
+	xcrun devicectl device process launch --device $(DEVICE_ID) $(BUNDLE_ID)
 
 # Device build, signed — requires a real Apple Developer Program team and
 # (for automatic signing) that team logged into Xcode's account settings at

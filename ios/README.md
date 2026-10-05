@@ -106,12 +106,51 @@ make sim
 
 Builds, installs, and launches the app in the iOS Simulator — good for
 checking the multi-store picker, layout, etc. before dealing with a real
-device or code signing at all. `SIM_NAME` defaults to "iPhone 16"; override
+device or code signing at all. `SIM_NAME` defaults to "iPhone 17"; override
 with e.g. `make sim SIM_NAME="iPhone 15"` to match a Simulator you actually
 have installed (Xcode → Settings → Platforms, or `xcrun simctl list
 devices` to see what's available).
 
-## 5. Build for a real device / distribute, for internal-only use
+## 5. Build and run on a connected iPhone
+
+Unlike the Simulator, a real device needs real code signing, which needs
+an Apple ID added to Xcode once (Xcode → Settings → Accounts — this is one
+of the few steps that still needs Xcode's GUI; `open /Applications/Xcode.app`
+if `open -a Xcode` can't find it by name). A free Apple ID works fine for
+testing on your own device — Xcode creates a "Personal Team" for it
+automatically, no paid Developer Program enrollment needed yet.
+
+You do **not** need to look up a Team ID: `make device` passes
+`-allowProvisioningUpdates`, which lets `xcodebuild` ask your signed-in
+Apple ID to register the device and create a signing certificate/profile
+itself. That's unambiguous with just one team signed in. (If you ever sign
+in with more than one team, pass `TEAM_ID=...` to disambiguate — found in
+Xcode → Settings → Accounts by selecting the team.)
+
+The iPhone itself needs, once:
+- Connected via a cable that actually carries data, not just power (some
+  cables, including some that look identical to a sync-capable one, only
+  carry charging current — `system_profiler SPUSBDataType` should list the
+  iPhone if the cable's good)
+- Trusted ("Trust This Computer" on the iPhone, unlocked, when prompted)
+- Paired with Xcode once — Window → Devices and Simulators (`⌘⇧2`) in
+  Xcode, click the device in the sidebar. **This is also what makes
+  Settings → Privacy & Security → Developer Mode appear on the iPhone at
+  all** — it isn't there until a Mac has attempted this pairing at least
+  once. Turn Developer Mode on and let the iPhone restart.
+
+Then, with the iPhone connected:
+
+```bash
+xcrun devicectl list devices   # confirm DEVICE_ID / that it shows up
+make device
+```
+
+`DEVICE_ID` defaults to the iPhone SE this was set up against; pass
+`DEVICE_ID=...` (from the `devicectl` listing) if you're using a different
+iPhone.
+
+## 6. Build for distribution to other staff (not just your own device)
 
 Since this is staff-only (not the App Store), sign with your Apple
 Developer Program team:
