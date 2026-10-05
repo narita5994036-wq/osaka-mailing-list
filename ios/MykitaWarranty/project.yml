@@ -32,11 +32,13 @@ targets:
         # .app bundle's filename, which build scripts below reference by
         # path. CFBundleDisplayName above ("MYKITA JAPAN") is what actually
         # shows under the icon on the Home Screen; they're independent.
-        # Fill in your Apple Developer Program Team ID (Xcode > Settings >
-        # Accounts, or developer.apple.com > Membership), or leave blank and
-        # pass DEVELOPMENT_TEAM=XXXXXXXXXX on the xcodebuild command line
-        # instead — see ios/README.md.
-        DEVELOPMENT_TEAM: ""
+        # Osaka MYKITA's Personal Team (found via Xcode > Signing &
+        # Capabilities, or `security find-certificate -a -c "Apple
+        # Development" -p ~/Library/Keychains/login.keychain-db | openssl
+        # x509 -noout -subject` once a dev certificate exists — see the OU=
+        # field). Override on the command line with DEVELOPMENT_TEAM=... or
+        # `make device TEAM_ID=...` for a different team.
+        DEVELOPMENT_TEAM: "9FYL3F3ZD8"
         CODE_SIGN_STYLE: Automatic
         TARGETED_DEVICE_FAMILY: "1" # iPhone only
         SWIFT_VERSION: "5.0"

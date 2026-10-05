@@ -50,15 +50,15 @@ sim: generate
 	xcrun simctl launch booted $(BUNDLE_ID)
 
 # Builds, installs, and launches on a connected, trusted, Developer-Mode-
-# enabled iPhone — unlike sim, this needs real signing. TEAM_ID is optional:
-# -allowProvisioningUpdates lets xcodebuild ask your signed-in Apple ID
-# (Xcode > Settings > Accounts) to register the device and create a
-# certificate/profile itself, which works fine with just one team signed in
-# (e.g. a free Apple ID's "Personal Team") without knowing its Team ID at
-# all. Pass TEAM_ID explicitly only if you have more than one team and need
-# to disambiguate. Run `xcrun devicectl list devices` to confirm DEVICE_ID
-# matches your connected iPhone (State should be "available" or
-# "connected", Reality blank — not "simulated").
+# enabled iPhone — unlike sim, this needs real signing. DEVELOPMENT_TEAM is
+# already set in project.yml (Osaka MYKITA's Personal Team), so no TEAM_ID
+# is needed normally; -allowProvisioningUpdates lets xcodebuild create the
+# actual signing certificate/profile for that team the first time. Pass
+# TEAM_ID to use a different team for one build (see ../README.md for how
+# to find a team's ID from Terminal once it has a dev certificate). Run
+# `xcrun devicectl list devices` to confirm DEVICE_ID matches your
+# connected iPhone (State should be "available" or "connected", Reality
+# blank — not "simulated").
 device: generate
 	xcodebuild -project $(PROJECT) -scheme $(SCHEME) \
 		-destination 'platform=iOS,id=$(DEVICE_ID)' \
