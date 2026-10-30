@@ -66,12 +66,15 @@ struct WebView: UIViewRepresentable {
                 controller.addUserScript(WKUserScript(source: source, injectionTime: .atDocumentStart, forMainFrameOnly: true))
             }
 
-            guard let indexURL = Bundle.main.url(forResource: "index", withExtension: "html", subdirectory: "Resources") else {
+            guard let indexURL = Bundle.main.url(forResource: "index", withExtension: "html", subdirectory: "WebAssets") else {
                 return
             }
-            // Grant read access to the whole Resources folder (not just the
+            // Grant read access to the whole WebAssets folder (not just the
             // file itself) so relative references like assets/*.gif and
-            // icons/*.png resolve.
+            // icons/*.png resolve. (Named WebAssets rather than the more
+            // obvious "Resources" — a folder named exactly "Resources"
+            // nested in the bundle appeared to trip up this Xcode/codesign
+            // version's deep-signing walk: see ios/README.md.)
             webView.loadFileURL(indexURL, allowingReadAccessTo: indexURL.deletingLastPathComponent())
         }
 

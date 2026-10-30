@@ -120,12 +120,28 @@ if `open -a Xcode` can't find it by name). A free Apple ID works fine for
 testing on your own device — Xcode creates a "Personal Team" for it
 automatically, no paid Developer Program enrollment needed yet.
 
-You do **not** need to look up a Team ID: `make device` passes
-`-allowProvisioningUpdates`, which lets `xcodebuild` ask your signed-in
-Apple ID to register the device and create a signing certificate/profile
-itself. That's unambiguous with just one team signed in. (If you ever sign
-in with more than one team, pass `TEAM_ID=...` to disambiguate — found in
-Xcode → Settings → Accounts by selecting the team.)
+`project.yml` already has Osaka MYKITA's Personal Team ID
+(`9FYL3F3ZD8`) baked in as `DEVELOPMENT_TEAM`, so `make device` just
+works with no `TEAM_ID` needed. `-allowProvisioningUpdates` then lets
+`xcodebuild` create the actual signing certificate/profile for that team
+automatically the first time.
+
+If you ever need a *different* team's ID (a second Apple ID, a real
+Developer Program team later on): `xcodebuild` alone won't auto-pick one
+without it being set somewhere first, even with only one team signed in —
+open the project once in Xcode (`open MykitaWarranty.xcodeproj`) → select
+the target → **Signing & Capabilities** → check "Automatically manage
+signing" → pick the team, which creates a development certificate. Then
+read its Team ID from Terminal without needing to find it in the Xcode UI:
+
+```bash
+security find-certificate -a -c "Apple Development" -p ~/Library/Keychains/login.keychain-db \
+  | openssl x509 -noout -subject
+# subject= ... /OU=XXXXXXXXXX/...  ← this is the Team ID
+```
+
+Pass it as `make device TEAM_ID=...` for one build, or replace
+`DEVELOPMENT_TEAM` in `project.yml` to make it the default.
 
 The iPhone itself needs, once:
 - Connected via a cable that actually carries data, not just power (some
