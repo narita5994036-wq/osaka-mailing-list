@@ -132,15 +132,6 @@ body {
   color: var(--mid);
   margin-bottom: 10px;
 }
-.field-header { display: flex; justify-content: space-between; align-items: baseline; }
-.field-header label { margin-bottom: 10px; }
-.field-hide-btn {
-  background: none; border: none; padding: 0;
-  font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase;
-  color: var(--mid); cursor: pointer; text-decoration: underline;
-  font-family: var(--font);
-}
-.field-hide-btn:hover { color: var(--red); }
 .required::after { content: " *"; color: var(--red); }
 .required-before::before { content: "* "; color: var(--red); }
 .field input[type="text"],
@@ -889,22 +880,16 @@ tr:hover td { background: #f9f9f9; }
         <div class="err-msg" id="e-name">Please enter your name.</div>
       </div>
 
-      <!-- Date of Birth (purchaser only, optional; staff may hide it per customer) -->
+      <!-- Date of Birth (purchaser only, optional; admin can hide via Settings) -->
       <div class="field" id="dob-field">
-        <div class="field-header">
-          <label id="lbl-dob">Date of Birth</label>
-          <button type="button" class="field-hide-btn" id="lbl-dob-hide" onclick="hideDobField()">Hide</button>
-        </div>
+        <label id="lbl-dob">Date of Birth</label>
         <button type="button" class="dob-display placeholder" id="dob-display" onclick="openDobPicker()">Select date</button>
         <input type="hidden" id="f-dob">
       </div>
 
-      <!-- Gender (purchaser only, optional; staff may hide it per customer) -->
+      <!-- Gender (purchaser only, optional; admin can hide via Settings) -->
       <div class="field" id="gender-field">
-        <div class="field-header">
-          <label id="lbl-gender">Gender</label>
-          <button type="button" class="field-hide-btn" id="lbl-gender-hide" onclick="hideGenderField()">Hide</button>
-        </div>
+        <label id="lbl-gender">Gender</label>
         <select id="f-gender">
           <option value=""></option>
           <option value="Male" id="opt-gender-male">Male</option>
@@ -1097,6 +1082,14 @@ tr:hover td { background: #f9f9f9; }
         <input type="checkbox" id="setting-price-tax-excluded" onchange="updatePriceTaxExcludedSetting()">
         <span>Enter prospect frame prices tax-excluded (instead of tax-included)</span>
       </label>
+      <label class="admin-setting-toggle" for="setting-hide-dob">
+        <input type="checkbox" id="setting-hide-dob" onchange="updateHideDobSetting()">
+        <span>Hide "Date of Birth" field on registration form</span>
+      </label>
+      <label class="admin-setting-toggle" for="setting-hide-gender">
+        <input type="checkbox" id="setting-hide-gender" onchange="updateHideGenderSetting()">
+        <span>Hide "Gender" field on registration form</span>
+      </label>
     </div>
     <div class="admin-header-row">
       <div>
@@ -1202,6 +1195,8 @@ const SHEET_WEBHOOK_URL = window.MYKITA_STORE_WEBHOOK_URL || 'https://script.goo
 let adminPassword = '';
 let adminRecords = [];
 let hideLensSection = false;
+let hideDobSection = false;
+let hideGenderSection = false;
 let lensSettingLoaded = false;
 let priceInputTaxExcluded = false;
 const PRICE_TAX_RATE = 1.10; // 10% Japanese consumption tax
@@ -1218,8 +1213,6 @@ let activeEmailRow = null;
 let activeEmailEl = null;
 let purchasedFrames = [];
 let customerType = 'purchaser';
-let dobHiddenByStaff = false;
-let genderHiddenByStaff = false;
 
 // ── FOLLOW-UP TIMING ──
 const FOLLOWUP_WINDOW_MS = 7 * 24 * 60 * 60 * 1000;
@@ -1241,7 +1234,6 @@ const i18n = {
     personal: 'Personal Information',
     name: 'Full Name', country: 'Country / Region', email: 'Email Address', dob: 'Date of Birth',
     gender: 'Gender', genderMale: 'Male', genderFemale: 'Female', genderNA: 'Prefer not to say',
-    hideField: 'Hide',
     dobSelect: 'Select date', dobPickerTitle: 'Date of Birth', dobCancel: 'Cancel', dobDone: 'Done',
     dobYear: 'Year', dobMonth: 'Month', dobDay: 'Day',
     optinSection: 'Email Opt-in',
@@ -1296,7 +1288,6 @@ const i18n = {
     personal: 'お客様情報',
     name: 'お名前', country: '都道府県', email: 'メールアドレス', dob: '生年月日',
     gender: '性別', genderMale: '男性', genderFemale: '女性', genderNA: '回答しない',
-    hideField: '非表示',
     dobSelect: '日付を選択', dobPickerTitle: '生年月日', dobCancel: 'キャンセル', dobDone: '完了',
     dobYear: '年', dobMonth: '月', dobDay: '日',
     optinSection: 'メール配信',
@@ -1351,7 +1342,6 @@ const i18n = {
     personal: '个人信息',
     name: '姓名', country: '国家 / 地区', email: '电子邮箱', dob: '出生日期',
     gender: '性别', genderMale: '男', genderFemale: '女', genderNA: '不愿透露',
-    hideField: '隐藏',
     dobSelect: '选择日期', dobPickerTitle: '出生日期', dobCancel: '取消', dobDone: '完成',
     dobYear: '年', dobMonth: '月', dobDay: '日',
     optinSection: '邮件订阅',
@@ -1406,7 +1396,6 @@ const i18n = {
     personal: '개인 정보',
     name: '성명', country: '국가 / 지역', email: '이메일 주소', dob: '생년월일',
     gender: '성별', genderMale: '남성', genderFemale: '여성', genderNA: '응답하지 않음',
-    hideField: '숨기기',
     dobSelect: '날짜 선택', dobPickerTitle: '생년월일', dobCancel: '취소', dobDone: '완료',
     dobYear: '년', dobMonth: '월', dobDay: '일',
     optinSection: '이메일 수신 동의',
@@ -1469,9 +1458,7 @@ function setLang(lang) {
   document.getElementById('lbl-name').textContent = t.name;
   document.getElementById('lbl-country').textContent = t.country;
   document.getElementById('lbl-dob').textContent = t.dob;
-  document.getElementById('lbl-dob-hide').textContent = t.hideField;
   document.getElementById('lbl-gender').textContent = t.gender;
-  document.getElementById('lbl-gender-hide').textContent = t.hideField;
   document.getElementById('opt-gender-male').textContent = t.genderMale;
   document.getElementById('opt-gender-female').textContent = t.genderFemale;
   document.getElementById('opt-gender-na').textContent = t.genderNA;
@@ -1709,8 +1696,6 @@ function resetFrameEntry() {
   document.getElementById('f-dob').value = '';
   resetDobDisplay();
   document.getElementById('f-gender').value = '';
-  dobHiddenByStaff = false;
-  genderHiddenByStaff = false;
   document.getElementById('f-customer-type-purchaser').checked = false;
   document.getElementById('f-customer-type-prospect').checked = false;
   document.getElementById('customer-type-continue-btn').disabled = true;
@@ -1921,10 +1906,13 @@ function continueCustomerType() {
 
 function applyCustomerTypeToForm() {
   const isProspect = customerType === 'prospect';
-  // Until the admin's hideLensSection setting has actually loaded, keep the
-  // section hidden rather than briefly showing it and then hiding it (or
-  // vice versa) once the fetch resolves.
+  // Until the admin's hideLensSection/hideDobSection/hideGenderSection
+  // settings have actually loaded, keep those sections hidden rather than
+  // briefly showing them and then hiding them (or vice versa) once the
+  // fetch resolves.
   const hideLens = isProspect || !lensSettingLoaded || hideLensSection;
+  const hideDob = isProspect || !lensSettingLoaded || hideDobSection;
+  const hideGender = isProspect || !lensSettingLoaded || hideGenderSection;
 
   document.getElementById('lbl-subtitle').style.display = isProspect ? 'none' : '';
   document.getElementById('warranty-block').style.display = isProspect ? 'none' : '';
@@ -1932,8 +1920,8 @@ function applyCustomerTypeToForm() {
   document.getElementById('optin-block').style.display = isProspect ? 'none' : '';
   document.getElementById('prospect-frame-block').style.display = isProspect ? 'block' : 'none';
   document.getElementById('prospect-contact-block').style.display = isProspect ? 'block' : 'none';
-  document.getElementById('dob-field').style.display = (isProspect || dobHiddenByStaff) ? 'none' : '';
-  document.getElementById('gender-field').style.display = (isProspect || genderHiddenByStaff) ? 'none' : '';
+  document.getElementById('dob-field').style.display = hideDob ? 'none' : '';
+  document.getElementById('gender-field').style.display = hideGender ? 'none' : '';
   document.getElementById('lbl-email-or-phone-note').style.display = isProspect ? 'block' : 'none';
   updateProspectSmsAvailability();
 
@@ -1955,18 +1943,6 @@ function applyCustomerTypeToForm() {
     updateCountryFieldVisibility();
   }
   updateSubmitState();
-}
-
-// Staff-only: lets staff hide the Date of Birth / Gender fields for a
-// customer who doesn't want to share them, before handing the device over.
-// Resets automatically on the next registration (resetFrameEntry()).
-function hideDobField() {
-  dobHiddenByStaff = true;
-  document.getElementById('dob-field').style.display = 'none';
-}
-function hideGenderField() {
-  genderHiddenByStaff = true;
-  document.getElementById('gender-field').style.display = 'none';
 }
 
 // ── DOB WHEEL PICKER ──
@@ -2782,16 +2758,24 @@ async function loadLensSectionSetting() {
     const json = await res.json();
     if (json.ok) {
       hideLensSection = !!json.hideLensSection;
+      hideDobSection = !!json.hideDobSection;
+      hideGenderSection = !!json.hideGenderSection;
       priceInputTaxExcluded = !!json.priceInputTaxExcluded;
     }
   } catch (err) {
     hideLensSection = false; // can't confirm the setting — fail open (visible)
+    hideDobSection = false;
+    hideGenderSection = false;
     priceInputTaxExcluded = false; // fail open (default tax-included entry)
   } finally {
     lensSettingLoaded = true;
     applyCustomerTypeToForm();
     const cb = document.getElementById('setting-hide-lens');
     if (cb) cb.checked = hideLensSection;
+    const dobCb = document.getElementById('setting-hide-dob');
+    if (dobCb) dobCb.checked = hideDobSection;
+    const genderCb = document.getElementById('setting-hide-gender');
+    if (genderCb) genderCb.checked = hideGenderSection;
     const priceCb = document.getElementById('setting-price-tax-excluded');
     if (priceCb) priceCb.checked = priceInputTaxExcluded;
     document.getElementById('lbl-prospect-frame-price-mode').textContent =
@@ -2807,6 +2791,48 @@ async function updateHideLensSetting() {
     const json = await adminRequest({ op: 'setting', key: 'hideLensSection', value: String(value) });
     if (json.ok) {
       hideLensSection = value;
+      applyCustomerTypeToForm();
+    } else {
+      cb.checked = !value;
+      alert('Failed to update setting: ' + (json.error || 'unknown error'));
+    }
+  } catch (err) {
+    cb.checked = !value;
+    alert('Connection error.');
+  } finally {
+    cb.disabled = false;
+  }
+}
+
+async function updateHideDobSetting() {
+  const cb = document.getElementById('setting-hide-dob');
+  const value = cb.checked;
+  cb.disabled = true;
+  try {
+    const json = await adminRequest({ op: 'setting', key: 'hideDobSection', value: String(value) });
+    if (json.ok) {
+      hideDobSection = value;
+      applyCustomerTypeToForm();
+    } else {
+      cb.checked = !value;
+      alert('Failed to update setting: ' + (json.error || 'unknown error'));
+    }
+  } catch (err) {
+    cb.checked = !value;
+    alert('Connection error.');
+  } finally {
+    cb.disabled = false;
+  }
+}
+
+async function updateHideGenderSetting() {
+  const cb = document.getElementById('setting-hide-gender');
+  const value = cb.checked;
+  cb.disabled = true;
+  try {
+    const json = await adminRequest({ op: 'setting', key: 'hideGenderSection', value: String(value) });
+    if (json.ok) {
+      hideGenderSection = value;
       applyCustomerTypeToForm();
     } else {
       cb.checked = !value;
