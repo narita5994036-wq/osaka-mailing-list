@@ -132,6 +132,15 @@ body {
   color: var(--mid);
   margin-bottom: 10px;
 }
+.field-header { display: flex; justify-content: space-between; align-items: baseline; }
+.field-header label { margin-bottom: 10px; }
+.field-hide-btn {
+  background: none; border: none; padding: 0;
+  font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--mid); cursor: pointer; text-decoration: underline;
+  font-family: var(--font);
+}
+.field-hide-btn:hover { color: var(--red); }
 .required::after { content: " *"; color: var(--red); }
 .required-before::before { content: "* "; color: var(--red); }
 .field input[type="text"],
@@ -811,6 +820,17 @@ tr:hover td { background: #f9f9f9; }
         </label>
       </div>
 
+      <!-- Country (staff enters this, before handing the device to the customer) -->
+      <div class="field" id="country-field">
+        <label id="lbl-country">Country / Region</label>
+        <div class="ac-wrap" id="country-ac-wrap">
+          <input type="text" class="ac-input" id="f-country-input" autocomplete="off" oninput="updateSubmitState()">
+          <input type="hidden" id="f-country">
+          <div class="ac-dropdown" id="country-dropdown"></div>
+        </div>
+        <div class="err-msg" id="e-country">Please select your country.</div>
+      </div>
+
       <div style="display:flex; gap:10px;">
         <button class="refresh-btn" style="flex:1; height:48px;" onclick="skipFrameEntry()" id="lbl-frame-skip">Skip</button>
         <button class="submit-btn" style="flex:1; margin-top:0; height:48px; padding:13px 20px;" onclick="continueFrameEntry()" id="lbl-frame-continue">Continue</button>
@@ -869,27 +889,22 @@ tr:hover td { background: #f9f9f9; }
         <div class="err-msg" id="e-name">Please enter your name.</div>
       </div>
 
-      <!-- Country -->
-      <div class="field" id="country-field">
-        <label id="lbl-country">Country / Region</label>
-        <div class="ac-wrap" id="country-ac-wrap">
-          <input type="text" class="ac-input" id="f-country-input" autocomplete="off" oninput="updateSubmitState()">
-          <input type="hidden" id="f-country">
-          <div class="ac-dropdown" id="country-dropdown"></div>
-        </div>
-        <div class="err-msg" id="e-country">Please select your country.</div>
-      </div>
-
-      <!-- Date of Birth (purchaser only, optional) -->
+      <!-- Date of Birth (purchaser only, optional; staff may hide it per customer) -->
       <div class="field" id="dob-field">
-        <label id="lbl-dob">Date of Birth</label>
+        <div class="field-header">
+          <label id="lbl-dob">Date of Birth</label>
+          <button type="button" class="field-hide-btn" id="lbl-dob-hide" onclick="hideDobField()">Hide</button>
+        </div>
         <button type="button" class="dob-display placeholder" id="dob-display" onclick="openDobPicker()">Select date</button>
         <input type="hidden" id="f-dob">
       </div>
 
-      <!-- Gender (purchaser only, optional) -->
+      <!-- Gender (purchaser only, optional; staff may hide it per customer) -->
       <div class="field" id="gender-field">
-        <label id="lbl-gender">Gender</label>
+        <div class="field-header">
+          <label id="lbl-gender">Gender</label>
+          <button type="button" class="field-hide-btn" id="lbl-gender-hide" onclick="hideGenderField()">Hide</button>
+        </div>
         <select id="f-gender">
           <option value=""></option>
           <option value="Male" id="opt-gender-male">Male</option>
@@ -1203,6 +1218,8 @@ let activeEmailRow = null;
 let activeEmailEl = null;
 let purchasedFrames = [];
 let customerType = 'purchaser';
+let dobHiddenByStaff = false;
+let genderHiddenByStaff = false;
 
 // ── FOLLOW-UP TIMING ──
 const FOLLOWUP_WINDOW_MS = 7 * 24 * 60 * 60 * 1000;
@@ -1224,6 +1241,7 @@ const i18n = {
     personal: 'Personal Information',
     name: 'Full Name', country: 'Country / Region', email: 'Email Address', dob: 'Date of Birth',
     gender: 'Gender', genderMale: 'Male', genderFemale: 'Female', genderNA: 'Prefer not to say',
+    hideField: 'Hide',
     dobSelect: 'Select date', dobPickerTitle: 'Date of Birth', dobCancel: 'Cancel', dobDone: 'Done',
     dobYear: 'Year', dobMonth: 'Month', dobDay: 'Day',
     optinSection: 'Email Opt-in',
@@ -1278,6 +1296,7 @@ const i18n = {
     personal: 'お客様情報',
     name: 'お名前', country: '都道府県', email: 'メールアドレス', dob: '生年月日',
     gender: '性別', genderMale: '男性', genderFemale: '女性', genderNA: '回答しない',
+    hideField: '非表示',
     dobSelect: '日付を選択', dobPickerTitle: '生年月日', dobCancel: 'キャンセル', dobDone: '完了',
     dobYear: '年', dobMonth: '月', dobDay: '日',
     optinSection: 'メール配信',
@@ -1332,6 +1351,7 @@ const i18n = {
     personal: '个人信息',
     name: '姓名', country: '国家 / 地区', email: '电子邮箱', dob: '出生日期',
     gender: '性别', genderMale: '男', genderFemale: '女', genderNA: '不愿透露',
+    hideField: '隐藏',
     dobSelect: '选择日期', dobPickerTitle: '出生日期', dobCancel: '取消', dobDone: '完成',
     dobYear: '年', dobMonth: '月', dobDay: '日',
     optinSection: '邮件订阅',
@@ -1386,6 +1406,7 @@ const i18n = {
     personal: '개인 정보',
     name: '성명', country: '국가 / 지역', email: '이메일 주소', dob: '생년월일',
     gender: '성별', genderMale: '남성', genderFemale: '여성', genderNA: '응답하지 않음',
+    hideField: '숨기기',
     dobSelect: '날짜 선택', dobPickerTitle: '생년월일', dobCancel: '취소', dobDone: '완료',
     dobYear: '년', dobMonth: '월', dobDay: '일',
     optinSection: '이메일 수신 동의',
@@ -1448,7 +1469,9 @@ function setLang(lang) {
   document.getElementById('lbl-name').textContent = t.name;
   document.getElementById('lbl-country').textContent = t.country;
   document.getElementById('lbl-dob').textContent = t.dob;
+  document.getElementById('lbl-dob-hide').textContent = t.hideField;
   document.getElementById('lbl-gender').textContent = t.gender;
+  document.getElementById('lbl-gender-hide').textContent = t.hideField;
   document.getElementById('opt-gender-male').textContent = t.genderMale;
   document.getElementById('opt-gender-female').textContent = t.genderFemale;
   document.getElementById('opt-gender-na').textContent = t.genderNA;
@@ -1686,6 +1709,8 @@ function resetFrameEntry() {
   document.getElementById('f-dob').value = '';
   resetDobDisplay();
   document.getElementById('f-gender').value = '';
+  dobHiddenByStaff = false;
+  genderHiddenByStaff = false;
   document.getElementById('f-customer-type-purchaser').checked = false;
   document.getElementById('f-customer-type-prospect').checked = false;
   document.getElementById('customer-type-continue-btn').disabled = true;
@@ -1907,8 +1932,8 @@ function applyCustomerTypeToForm() {
   document.getElementById('optin-block').style.display = isProspect ? 'none' : '';
   document.getElementById('prospect-frame-block').style.display = isProspect ? 'block' : 'none';
   document.getElementById('prospect-contact-block').style.display = isProspect ? 'block' : 'none';
-  document.getElementById('dob-field').style.display = isProspect ? 'none' : '';
-  document.getElementById('gender-field').style.display = isProspect ? 'none' : '';
+  document.getElementById('dob-field').style.display = (isProspect || dobHiddenByStaff) ? 'none' : '';
+  document.getElementById('gender-field').style.display = (isProspect || genderHiddenByStaff) ? 'none' : '';
   document.getElementById('lbl-email-or-phone-note').style.display = isProspect ? 'block' : 'none';
   updateProspectSmsAvailability();
 
@@ -1930,6 +1955,18 @@ function applyCustomerTypeToForm() {
     updateCountryFieldVisibility();
   }
   updateSubmitState();
+}
+
+// Staff-only: lets staff hide the Date of Birth / Gender fields for a
+// customer who doesn't want to share them, before handing the device over.
+// Resets automatically on the next registration (resetFrameEntry()).
+function hideDobField() {
+  dobHiddenByStaff = true;
+  document.getElementById('dob-field').style.display = 'none';
+}
+function hideGenderField() {
+  genderHiddenByStaff = true;
+  document.getElementById('gender-field').style.display = 'none';
 }
 
 // ── DOB WHEEL PICKER ──
