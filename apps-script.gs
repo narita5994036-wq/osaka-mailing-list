@@ -443,7 +443,12 @@ function handleAdminRequest(params) {
   }
 
   if (op === 'setting') {
-    var settingKeys = { hideLensSection: 'HIDE_LENS_SECTION', priceInputTaxExcluded: 'PRICE_INPUT_TAX_EXCLUDED' };
+    var settingKeys = {
+      hideLensSection: 'HIDE_LENS_SECTION',
+      priceInputTaxExcluded: 'PRICE_INPUT_TAX_EXCLUDED',
+      hideDobSection: 'HIDE_DOB_SECTION',
+      hideGenderSection: 'HIDE_GENDER_SECTION'
+    };
     var propKey = settingKeys[params.key];
     if (!propKey) {
       return { ok: false, error: 'unknown setting key' };
@@ -464,7 +469,9 @@ function handleGetSettings() {
   return {
     ok: true,
     hideLensSection: props.getProperty('HIDE_LENS_SECTION') === 'true',
-    priceInputTaxExcluded: props.getProperty('PRICE_INPUT_TAX_EXCLUDED') === 'true'
+    priceInputTaxExcluded: props.getProperty('PRICE_INPUT_TAX_EXCLUDED') === 'true',
+    hideDobSection: props.getProperty('HIDE_DOB_SECTION') === 'true',
+    hideGenderSection: props.getProperty('HIDE_GENDER_SECTION') === 'true'
   };
 }
 
