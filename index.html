@@ -811,15 +811,12 @@ tr:hover td { background: #f9f9f9; }
         </label>
       </div>
 
-      <!-- Country (staff enters this, before handing the device to the customer) -->
-      <div class="field" id="country-field">
-        <label id="lbl-country">Country / Region</label>
-        <div class="ac-wrap" id="country-ac-wrap">
-          <input type="text" class="ac-input" id="f-country-input" autocomplete="off" oninput="updateSubmitState()">
-          <input type="hidden" id="f-country">
-          <div class="ac-dropdown" id="country-dropdown"></div>
-        </div>
-        <div class="err-msg" id="e-country">Please select your country.</div>
+      <!-- Transaction ID (purchaser only, optional; staff enters this, writes
+           column B prefixed with "#". May also be added later from the
+           thank-you screen — see thanks-add-transaction-id-wrap.) -->
+      <div class="field" id="transaction-id-field">
+        <label id="lbl-transaction-id">Transaction ID</label>
+        <input type="text" inputmode="numeric" pattern="[0-9]*" id="f-transaction-id" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
       </div>
 
       <div style="display:flex; gap:10px;">
@@ -878,6 +875,17 @@ tr:hover td { background: #f9f9f9; }
         <label id="lbl-name" class="required">Full Name</label>
         <input type="text" id="f-name" autocomplete="name" oninput="updateSubmitState()">
         <div class="err-msg" id="e-name">Please enter your name.</div>
+      </div>
+
+      <!-- Country (admin can hide via Settings) -->
+      <div class="field" id="country-field">
+        <label id="lbl-country">Country / Region</label>
+        <div class="ac-wrap" id="country-ac-wrap">
+          <input type="text" class="ac-input" id="f-country-input" autocomplete="off" oninput="updateSubmitState()">
+          <input type="hidden" id="f-country">
+          <div class="ac-dropdown" id="country-dropdown"></div>
+        </div>
+        <div class="err-msg" id="e-country">Please select your country.</div>
       </div>
 
       <!-- Date of Birth (purchaser only, optional; admin can hide via Settings) -->
@@ -1014,6 +1022,20 @@ tr:hover td { background: #f9f9f9; }
         </div>
         <div id="thanks-frame-status" style="font-size:12px; color:var(--mid); margin-top:10px; text-align:center;"></div>
       </div>
+      <div id="thanks-add-transaction-id-wrap" style="display:none; margin-bottom:20px;">
+        <button class="refresh-btn" style="width:100%; margin-bottom:0;" onclick="showThanksTransactionIdEntry()" id="lbl-add-transaction-id-btn">+ Add Transaction ID</button>
+      </div>
+      <div id="thanks-transaction-id-entry" style="display:none; margin-bottom:24px; text-align:left;">
+        <div class="field" style="margin-bottom:16px;">
+          <label id="lbl-thanks-transaction-id-info">Transaction ID</label>
+          <input type="text" inputmode="numeric" pattern="[0-9]*" id="f-thanks-transaction-id" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+        </div>
+        <div style="display:flex; gap:10px;">
+          <button class="refresh-btn" style="flex:1; height:44px;" onclick="cancelThanksTransactionIdEntry()" id="lbl-thanks-transaction-id-cancel">Cancel</button>
+          <button class="submit-btn" style="flex:1; margin-top:0;" onclick="submitThanksTransactionId()" id="lbl-thanks-transaction-id-submit">Save</button>
+        </div>
+        <div id="thanks-transaction-id-status" style="font-size:12px; color:var(--mid); margin-top:10px; text-align:center;"></div>
+      </div>
       <div id="thanks-sms-wrap" style="display:none; margin-bottom:20px;">
         <button class="submit-btn" style="width:100%; margin-top:0;" onclick="openProspectSms()" id="lbl-thanks-sms">Send SMS</button>
       </div>
@@ -1089,6 +1111,10 @@ tr:hover td { background: #f9f9f9; }
       <label class="admin-setting-toggle" for="setting-hide-gender">
         <input type="checkbox" id="setting-hide-gender" onchange="updateHideGenderSetting()">
         <span>Hide "Gender" field on registration form</span>
+      </label>
+      <label class="admin-setting-toggle" for="setting-hide-country">
+        <input type="checkbox" id="setting-hide-country" onchange="updateHideCountrySetting()">
+        <span>Hide "Country / Region" field on registration form</span>
       </label>
     </div>
     <div class="admin-header-row">
@@ -1197,6 +1223,7 @@ let adminRecords = [];
 let hideLensSection = false;
 let hideDobSection = false;
 let hideGenderSection = false;
+let hideCountrySection = false;
 let lensSettingLoaded = false;
 let priceInputTaxExcluded = false;
 const PRICE_TAX_RATE = 1.10; // 10% Japanese consumption tax
@@ -1232,7 +1259,7 @@ const i18n = {
     warrantyBody: '・This warranty is valid only at MYKITA JAPAN stores.<br>・MYKITA frames are covered by a 2-year product warranty from the date of purchase.<br>・The warranty covers product defects under normal use, excluding initial defects. (Damage from dropping or crushing, and lens damage, are not covered.)',
     warrantyFooter: 'Please complete this registration to activate your warranty.',
     personal: 'Personal Information',
-    name: 'Full Name', country: 'Customer Country / Region', email: 'Email Address', dob: 'Date of Birth',
+    name: 'Full Name', country: 'Country / Region', transactionId: 'Transaction ID', email: 'Email Address', dob: 'Date of Birth',
     gender: 'Gender', genderMale: 'Male', genderFemale: 'Female', genderNA: 'Prefer not to say',
     dobSelect: 'Select date', dobPickerTitle: 'Date of Birth', dobCancel: 'Cancel', dobDone: 'Done',
     dobYear: 'Year', dobMonth: 'Month', dobDay: 'Day',
@@ -1257,6 +1284,10 @@ const i18n = {
     thanksFrameAdd: '+ Add Frame',
     thanksFrameCancel: 'Cancel',
     thanksFrameSubmit: 'Save',
+    addTransactionIdBtn: '+ Add Transaction ID',
+    thanksTransactionIdInfo: 'Transaction ID',
+    thanksTransactionIdCancel: 'Cancel',
+    thanksTransactionIdSubmit: 'Save',
     errName: 'Please enter your name.',
     errCountry: 'Please select your country.',
     errEmail: 'Please enter a valid email address.',
@@ -1286,7 +1317,7 @@ const i18n = {
     warrantyBody: '・本保証はMYKITA JAPAN店舗でのみ有効です。<br>・MYKITAフレームには、ご購入日より2年間の製品保証が適用されます。<br>・保証範囲は、初期不良を除く通常使用下での製品トラブルに限ります。（落下や踏みつけによる損傷・破損、また、レンズ破損は対象外）',
     warrantyFooter: '保証を有効にするために、以下の登録を完了してください。',
     personal: 'お客様情報',
-    name: 'お名前', country: 'お客様の都道府県', email: 'メールアドレス', dob: '生年月日',
+    name: 'お名前', country: '都道府県', transactionId: '取引ID', email: 'メールアドレス', dob: '生年月日',
     gender: '性別', genderMale: '男性', genderFemale: '女性', genderNA: '回答しない',
     dobSelect: '日付を選択', dobPickerTitle: '生年月日', dobCancel: 'キャンセル', dobDone: '完了',
     dobYear: '年', dobMonth: '月', dobDay: '日',
@@ -1311,6 +1342,10 @@ const i18n = {
     thanksFrameAdd: '+ フレームを追加',
     thanksFrameCancel: 'キャンセル',
     thanksFrameSubmit: '保存',
+    addTransactionIdBtn: '+ 取引IDを追加する',
+    thanksTransactionIdInfo: '取引ID',
+    thanksTransactionIdCancel: 'キャンセル',
+    thanksTransactionIdSubmit: '保存',
     errName: 'お名前を入力してください。',
     errCountry: '都道府県を選択してください。',
     errEmail: '有効なメールアドレスを入力してください。',
@@ -1340,7 +1375,7 @@ const i18n = {
     warrantyBody: '・本保修仅在MYKITA JAPAN门店有效。<br>・MYKITA镜架自购买之日起享有2年产品保修。<br>・保修范围仅限正常使用下的产品故障（初期不良除外）。（因跌落或踩踏造成的损伤、破损及镜片破损不在保修范围内。）',
     warrantyFooter: '请完成以下登记以激活您的保修。',
     personal: '个人信息',
-    name: '姓名', country: '顾客国家 / 地区', email: '电子邮箱', dob: '出生日期',
+    name: '姓名', country: '国家 / 地区', transactionId: '交易编号', email: '电子邮箱', dob: '出生日期',
     gender: '性别', genderMale: '男', genderFemale: '女', genderNA: '不愿透露',
     dobSelect: '选择日期', dobPickerTitle: '出生日期', dobCancel: '取消', dobDone: '完成',
     dobYear: '年', dobMonth: '月', dobDay: '日',
@@ -1365,6 +1400,10 @@ const i18n = {
     thanksFrameAdd: '+ 添加镜架',
     thanksFrameCancel: '取消',
     thanksFrameSubmit: '保存',
+    addTransactionIdBtn: '+ 添加交易编号',
+    thanksTransactionIdInfo: '交易编号',
+    thanksTransactionIdCancel: '取消',
+    thanksTransactionIdSubmit: '保存',
     errName: '请输入您的姓名。',
     errCountry: '请选择您的国家。',
     errEmail: '请输入有效的电子邮箱地址。',
@@ -1394,7 +1433,7 @@ const i18n = {
     warrantyBody: '・본 보증은 MYKITA JAPAN 매장에서만 유효합니다.<br>・MYKITA 프레임은 구매일로부터 2년간 제품 보증이 적용됩니다.<br>・보증 범위는 초기 불량을 제외한 정상 사용 중 발생한 제품 문제에 한합니다. （낙하 또는 밟힘으로 인한 손상·파손, 렌즈 파손은 대상 외）',
     warrantyFooter: '보증을 활성화하려면 아래 등록을 완료해 주세요.',
     personal: '개인 정보',
-    name: '성명', country: '고객 국가 / 지역', email: '이메일 주소', dob: '생년월일',
+    name: '성명', country: '국가 / 지역', transactionId: '거래 ID', email: '이메일 주소', dob: '생년월일',
     gender: '성별', genderMale: '남성', genderFemale: '여성', genderNA: '응답하지 않음',
     dobSelect: '날짜 선택', dobPickerTitle: '생년월일', dobCancel: '취소', dobDone: '완료',
     dobYear: '년', dobMonth: '월', dobDay: '일',
@@ -1419,6 +1458,10 @@ const i18n = {
     thanksFrameAdd: '+ 프레임 추가',
     thanksFrameCancel: '취소',
     thanksFrameSubmit: '저장',
+    addTransactionIdBtn: '+ 거래 ID 추가',
+    thanksTransactionIdInfo: '거래 ID',
+    thanksTransactionIdCancel: '취소',
+    thanksTransactionIdSubmit: '저장',
     errName: '이름을 입력해 주세요.',
     errCountry: '국가를 선택해 주세요.',
     errEmail: '유효한 이메일 주소를 입력해 주세요.',
@@ -1457,6 +1500,7 @@ function setLang(lang) {
   document.getElementById('lbl-personal').textContent = t.personal;
   document.getElementById('lbl-name').textContent = t.name;
   document.getElementById('lbl-country').textContent = t.country;
+  document.getElementById('lbl-transaction-id').textContent = t.transactionId;
   document.getElementById('lbl-dob').textContent = t.dob;
   document.getElementById('lbl-gender').textContent = t.gender;
   document.getElementById('opt-gender-male').textContent = t.genderMale;
@@ -1483,6 +1527,10 @@ function setLang(lang) {
   document.getElementById('lbl-thanks-frame-add').textContent = t.thanksFrameAdd;
   document.getElementById('lbl-thanks-frame-cancel').textContent = t.thanksFrameCancel;
   document.getElementById('lbl-thanks-frame-submit').textContent = t.thanksFrameSubmit;
+  document.getElementById('lbl-add-transaction-id-btn').textContent = t.addTransactionIdBtn;
+  document.getElementById('lbl-thanks-transaction-id-info').textContent = t.thanksTransactionIdInfo;
+  document.getElementById('lbl-thanks-transaction-id-cancel').textContent = t.thanksTransactionIdCancel;
+  document.getElementById('lbl-thanks-transaction-id-submit').textContent = t.thanksTransactionIdSubmit;
   document.getElementById('e-name').textContent = t.errName;
   document.getElementById('e-country').textContent = t.errCountry;
   document.getElementById('e-email').textContent = t.errEmail;
@@ -1594,7 +1642,11 @@ function triggerLogoShine() {
 function updateCountryFieldVisibility() {
   const lensChecked = document.getElementById('f-lens').checked;
   // JA address fields already collect the prefecture, so skip asking twice.
-  document.getElementById('country-field').style.display = (currentLang === 'ja' && lensChecked) ? 'none' : '';
+  // Until the admin's hideCountrySection setting has actually loaded, keep
+  // the field hidden rather than briefly showing it and then hiding it (or
+  // vice versa) once the fetch resolves — same reasoning as hideLensSection.
+  const hide = !lensSettingLoaded || hideCountrySection || (currentLang === 'ja' && lensChecked);
+  document.getElementById('country-field').style.display = hide ? 'none' : '';
 }
 
 function lensFieldsValid() {
@@ -1681,6 +1733,8 @@ function removeFrameRow(id) {
 function resetFrameEntry() {
   frameRows = [{ id: 0 }]; frameRowSeq = 1; purchasedFrames = [];
   renderFrameRowList();
+  document.getElementById('f-transaction-id').value = '';
+  lastSubmittedMemberNoEmpty = false;
   document.getElementById('f-lens').checked = false;
   document.getElementById('f-phone-intl').value = '';
   document.getElementById('f-phone-ja').value = '';
@@ -2388,6 +2442,8 @@ async function handleSubmit() {
 
   const isProspect = customerType === 'prospect';
   const confirmToken = isProspect ? generateConfirmToken() : '';
+  const transactionIdRaw = document.getElementById('f-transaction-id').value.trim();
+  const memberNo = (!isProspect && transactionIdRaw) ? ('#' + transactionIdRaw) : '';
   const record = {
     timestamp: ts,
     name: name.value.trim(),
@@ -2396,7 +2452,7 @@ async function handleSubmit() {
     country: country.value,
     countryCode: countryCode,
     lang: currentLang,
-    memberNo: '',
+    memberNo: memberNo,
     frameNames: purchasedFrames.join(', '),
     phone: phone,
     postcode: postcode,
@@ -2427,6 +2483,7 @@ async function handleSubmit() {
     lastSubmittedEmail = record.email;
     lastSubmittedTimestamp = record.timestamp;
     lastProspectConfirmToken = confirmToken;
+    lastSubmittedMemberNoEmpty = !isProspect && !memberNo;
     btn.textContent = i18n[currentLang].submit;
     showThanks();
   } catch (err) {
@@ -2463,6 +2520,10 @@ function showThanks() {
     (!isProspect && purchasedFrames.length === 0) ? 'block' : 'none';
   document.getElementById('thanks-frame-entry').style.display = 'none';
   document.getElementById('thanks-frame-status').textContent = '';
+  document.getElementById('thanks-add-transaction-id-wrap').style.display =
+    lastSubmittedMemberNoEmpty ? 'block' : 'none';
+  document.getElementById('thanks-transaction-id-entry').style.display = 'none';
+  document.getElementById('thanks-transaction-id-status').textContent = '';
   const smsPhone = isProspect ? document.getElementById('f-prospect-phone').value.trim() : '';
   const smsWanted = isProspect && document.getElementById('f-prospect-sms').checked;
   document.getElementById('thanks-sms-wrap').style.display = (smsWanted && smsPhone) ? 'block' : 'none';
@@ -2517,6 +2578,7 @@ let thanksFrameRows = [{ id: 0 }];
 let thanksFrameSeq = 1;
 let lastSubmittedEmail = '';
 let lastSubmittedTimestamp = '';
+let lastSubmittedMemberNoEmpty = false;
 let lastProspectConfirmToken = '';
 
 function showThanksFrameEntry() {
@@ -2604,6 +2666,51 @@ async function submitThanksFrames() {
     if (json.ok) {
       purchasedFrames = names;
       document.getElementById('thanks-frame-entry').style.display = 'none';
+      status.textContent = '';
+    } else {
+      status.textContent = 'Could not save. Please try again.';
+    }
+  } catch (err) {
+    status.textContent = 'Connection error. Please try again.';
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+// ── THANKS-SCREEN TRANSACTION ID ENTRY ──
+function showThanksTransactionIdEntry() {
+  document.getElementById('thanks-add-transaction-id-wrap').style.display = 'none';
+  document.getElementById('f-thanks-transaction-id').value = '';
+  document.getElementById('thanks-transaction-id-entry').style.display = 'block';
+}
+
+function cancelThanksTransactionIdEntry() {
+  document.getElementById('thanks-transaction-id-entry').style.display = 'none';
+  document.getElementById('thanks-add-transaction-id-wrap').style.display = 'block';
+}
+
+async function submitThanksTransactionId() {
+  const raw = document.getElementById('f-thanks-transaction-id').value.trim();
+  if (!raw) return;
+
+  const btn = document.getElementById('lbl-thanks-transaction-id-submit');
+  const status = document.getElementById('thanks-transaction-id-status');
+  btn.disabled = true;
+  status.textContent = '…';
+
+  const qs = new URLSearchParams({
+    action: 'addmemberno',
+    email: lastSubmittedEmail,
+    timestamp: lastSubmittedTimestamp,
+    memberNo: '#' + raw
+  });
+
+  try {
+    const res = await fetch(SHEET_WEBHOOK_URL + '?' + qs.toString());
+    const json = await res.json();
+    if (json.ok) {
+      lastSubmittedMemberNoEmpty = false;
+      document.getElementById('thanks-transaction-id-entry').style.display = 'none';
       status.textContent = '';
     } else {
       status.textContent = 'Could not save. Please try again.';
@@ -2760,12 +2867,14 @@ async function loadLensSectionSetting() {
       hideLensSection = !!json.hideLensSection;
       hideDobSection = !!json.hideDobSection;
       hideGenderSection = !!json.hideGenderSection;
+      hideCountrySection = !!json.hideCountrySection;
       priceInputTaxExcluded = !!json.priceInputTaxExcluded;
     }
   } catch (err) {
     hideLensSection = false; // can't confirm the setting — fail open (visible)
     hideDobSection = false;
     hideGenderSection = false;
+    hideCountrySection = false;
     priceInputTaxExcluded = false; // fail open (default tax-included entry)
   } finally {
     lensSettingLoaded = true;
@@ -2776,6 +2885,8 @@ async function loadLensSectionSetting() {
     if (dobCb) dobCb.checked = hideDobSection;
     const genderCb = document.getElementById('setting-hide-gender');
     if (genderCb) genderCb.checked = hideGenderSection;
+    const countryCb = document.getElementById('setting-hide-country');
+    if (countryCb) countryCb.checked = hideCountrySection;
     const priceCb = document.getElementById('setting-price-tax-excluded');
     if (priceCb) priceCb.checked = priceInputTaxExcluded;
     document.getElementById('lbl-prospect-frame-price-mode').textContent =
@@ -2833,6 +2944,27 @@ async function updateHideGenderSetting() {
     const json = await adminRequest({ op: 'setting', key: 'hideGenderSection', value: String(value) });
     if (json.ok) {
       hideGenderSection = value;
+      applyCustomerTypeToForm();
+    } else {
+      cb.checked = !value;
+      alert('Failed to update setting: ' + (json.error || 'unknown error'));
+    }
+  } catch (err) {
+    cb.checked = !value;
+    alert('Connection error.');
+  } finally {
+    cb.disabled = false;
+  }
+}
+
+async function updateHideCountrySetting() {
+  const cb = document.getElementById('setting-hide-country');
+  const value = cb.checked;
+  cb.disabled = true;
+  try {
+    const json = await adminRequest({ op: 'setting', key: 'hideCountrySection', value: String(value) });
+    if (json.ok) {
+      hideCountrySection = value;
       applyCustomerTypeToForm();
     } else {
       cb.checked = !value;
