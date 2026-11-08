@@ -9,8 +9,14 @@
  * L Phone Number | M Postcode | N Address(Street) | O Address(Building) |
  * P City/Town | Q State/Province | R considerFrame/Color | S SMS Opt-in |
  * T Customer Type | U considerFrameURL
- * (B is filled in manually in the sheet for a purchaser, or auto-filled
- * with the Confirm Token for a prospect — see below. J (Staff Notes) is
+ * (B holds a purchaser's Transaction ID — entered on the TOP screen's
+ * numeric-only field as digits, prefixed client-side with "#" (e.g.
+ * "#1234") before being sent as data.memberNo — or, if left blank there, it
+ * reappears as a "+ Add Transaction ID" prompt on the thank-you screen
+ * (same pattern as "+ Add Frame Name(s)"; see handleAddMemberNo() below,
+ * which finds the row the same way handleAddFrames() does). A prospect's
+ * row reuses column B instead for its auto-generated Confirm Token — see
+ * below. J (Staff Notes) is
  * auto-filled with the purchaser's optional Gender when given, otherwise
  * left blank for staff to use as an actual note. K (Purchased (Lenses),
  * no longer tracked — the header label is stale) is auto-filled with the
@@ -43,11 +49,11 @@
  * time as yyyy/mm/dd hh:mm:ss; run fixExistingTimestamps() once to apply
  * the same formatting to rows submitted before this was added.
  *
- * Confirm Token: column B (ID) is only used for purchasers, filled
- * in manually by staff, so a prospect's row reuses that same column to
- * store its random confirm token (generated client-side) instead of
- * adding a new column. It lets a prospect's SMS link that one
- * registration's name and considered frames, without a password.
+ * Confirm Token: column B (ID) holds a purchaser's Transaction ID (see
+ * above), so a prospect's row reuses that same column to store its random
+ * confirm token (generated client-side) instead of adding a new column. It
+ * lets a prospect's SMS link show that one registration's name and
+ * considered frames, without a password.
  *
  * That link (built by index.html as SHEET_WEBHOOK_URL + "?page=confirm
  * &id=...") is rendered by renderConfirmPage() below as a full HTML page
@@ -366,6 +372,8 @@ function doGet(e) {
     out = handleAdminRequest(params);
   } else if (params.action === 'addframes') {
     out = handleAddFrames(params);
+  } else if (params.action === 'addmemberno') {
+    out = handleAddMemberNo(params);
   } else if (params.action === 'settings') {
     out = handleGetSettings();
   } else if (params.action === 'confirm') {
@@ -398,6 +406,36 @@ function handleAddFrames(params) {
     var rowEmail = String(values[i][3] || '').trim().toLowerCase();
     if (rowEmail === targetEmail && rowTs.slice(0, 19) === targetTs) {
       sheet.getRange(i + 2, 9).setValue(frameNames); // col I = Purchased
+      return { ok: true };
+    }
+  }
+  return { ok: false, error: 'not found' };
+}
+
+// Lets a purchaser's Transaction ID (column B) be filled in later from the
+// thank-you screen when it was left blank on the TOP screen at submission
+// time — same find-the-row-by-email+timestamp approach as handleAddFrames()
+// above. memberNo already carries its "#" prefix (added client-side).
+function handleAddMemberNo(params) {
+  var targetEmail = (params.email || '').trim().toLowerCase();
+  var targetTs    = (params.timestamp || '').slice(0, 19); // compare up to seconds
+  var memberNo    = params.memberNo || '';
+
+  if (!targetEmail || !targetTs || !memberNo) {
+    return { ok: false, error: 'missing params' };
+  }
+
+  var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+  var lastRow = sheet.getLastRow();
+  if (lastRow < 2) { return { ok: false, error: 'not found' }; }
+
+  // Read cols A (Timestamp) and D (Email)
+  var values = sheet.getRange(2, 1, lastRow - 1, 4).getValues();
+  for (var i = values.length - 1; i >= 0; i--) { // search newest first
+    var rowTs    = values[i][0] instanceof Date ? values[i][0].toISOString() : String(values[i][0] || '');
+    var rowEmail = String(values[i][3] || '').trim().toLowerCase();
+    if (rowEmail === targetEmail && rowTs.slice(0, 19) === targetTs) {
+      sheet.getRange(i + 2, 2).setValue(memberNo); // col B = ID
       return { ok: true };
     }
   }
@@ -447,7 +485,8 @@ function handleAdminRequest(params) {
       hideLensSection: 'HIDE_LENS_SECTION',
       priceInputTaxExcluded: 'PRICE_INPUT_TAX_EXCLUDED',
       hideDobSection: 'HIDE_DOB_SECTION',
-      hideGenderSection: 'HIDE_GENDER_SECTION'
+      hideGenderSection: 'HIDE_GENDER_SECTION',
+      hideCountrySection: 'HIDE_COUNTRY_SECTION'
     };
     var propKey = settingKeys[params.key];
     if (!propKey) {
@@ -471,7 +510,8 @@ function handleGetSettings() {
     hideLensSection: props.getProperty('HIDE_LENS_SECTION') === 'true',
     priceInputTaxExcluded: props.getProperty('PRICE_INPUT_TAX_EXCLUDED') === 'true',
     hideDobSection: props.getProperty('HIDE_DOB_SECTION') === 'true',
-    hideGenderSection: props.getProperty('HIDE_GENDER_SECTION') === 'true'
+    hideGenderSection: props.getProperty('HIDE_GENDER_SECTION') === 'true',
+    hideCountrySection: props.getProperty('HIDE_COUNTRY_SECTION') === 'true'
   };
 }
 
